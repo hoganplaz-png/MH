@@ -192,7 +192,18 @@
     window.print();
   };
   IB.download = function (filename, content, mime = "text/html") {
-    if (IB.hosted) return IB.toast("Downloads aren't available in this preview. Run the full site to download files.");
+    if (IB.hosted) {
+      // Hosted on claude.ai: files are offered through the page's "save files" ability.
+      const dl = window.claude && window.claude.use ? window.claude.use("downloads") : Promise.resolve(null);
+      dl.then((d) => {
+        if (!d) return IB.toast("Downloads aren't available in this view.");
+        return d.save({ filename, data: content }).then(
+          () => IB.toast("Saved " + filename),
+          (e) => { if (e && e.code !== "declined") IB.toast(e.code === "rate_limited" ? "A save is already open - finish that one first." : "Couldn't save the file here."); }
+        );
+      });
+      return;
+    }
     const blob = new Blob([content], { type: mime + ";charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -350,37 +361,163 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
   };
 
   // ---------- AI client ----------
+  // ---------- AI client ----------
+  // Two back ends with one interface:
+  //  - hosted on claude.ai: the page's built-in "ask Claude" ability (runs on the viewer's Claude account);
+  //  - self-hosted: server.js (/api/*) with an Anthropic API key.
+  const SUBJECT_NAMES = { econ: "IB Economics SL", chem: "IB Chemistry SL", geo: "IB Geography SL", math: "IB Mathematics: Analysis and Approaches SL" };
+  const TUTOR_RULES = `You are an experienced IB Diploma teacher and examiner tutoring a student in IB Economics SL, Chemistry SL, Geography SL and Mathematics: Analysis & Approaches SL.
+- Guide rather than hand over answers: when asked for help with a problem, give the next hint or ask what they have tried, unless they explicitly ask for the full worked solution.
+- Use IB command terms precisely and say what each demands in marks.
+- Use correct IB terminology, units, significant figures and notation. Economics: say which diagram to draw and how to label it. Geography: push for named, located case studies with data. Chemistry: units, state symbols, s.f. Maths: show working and note Paper 1 (no calculator) vs Paper 2.
+- Write maths with LaTeX between \\( and \\) inline and $$ $$ for display. Never use single $ delimiters.
+- Keep answers focused: short paragraphs and bullet points. End with a quick check-for-understanding question when it helps.
+- If unsure about IB rules or assessment changes, say so and suggest checking the current subject guide.`;
+  const MARK_RULES = `You are a senior IB examiner. Mark the student's answer strictly against the IB-style markscheme provided.
+- Award marks only for creditworthy points present in the answer. Accept equivalent wording (OWTTE). Do not reward vague or incorrect statements.
+- Extended responses: apply the level descriptors in the markscheme holistically and choose the best-fit level and mark.
+- Calculations: apply method (M) and accuracy (A) marks and follow-through (FT) as IB would.
+- Feedback is for a 16-18 year old: specific, encouraging and actionable; quote or paraphrase their words.`;
+  const plain = (s) => String(s || "").replace(/<br\s*\/?>/g, "\n").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&#39;/g, "'").replace(/&quot;/g, '"');
+  const SAMPLE_MSG = {
+    not_granted: "AI was not allowed for this page. You can allow it from the page's Permissions menu.",
+    sampling_disabled: "AI isn't available for this Claude account.",
+    rate_limited: "The AI is busy or you've hit your usage limit - try again in a little while.",
+    session_expired: "Please sign in to Claude again.",
+    refused: "The AI declined that request. Try rephrasing it.",
+    prompt_too_large: "That's too long for the AI - shorten your answer or question.",
+    invalid_json: "The AI's reply couldn't be read - please try again.",
+  };
+  const sampleError = (e) => {
+    const code = e && e.code;
+    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) IB.ai._health = false;
+    const err = new Error(SAMPLE_MSG[code] || "The AI had a problem - please try again.");
+    err.code = code;
+    err.partial = e && e.text;
+    return err;
+  };
+
   IB.ai = {
     _health: null,
+    _sample: null,
+    async sampler() {
+      if (this._sample !== null) return this._sample;
+      try {
+        this._sample = window.claude && window.claude.use ? (await window.claude.use("sample")) || false : false;
+      } catch (e) {
+        this._sample = false;
+      }
+      return this._sample;
+    },
     async available() {
       if (this._health === null) {
-        try {
-          const r = await fetch("/api/health", { cache: "no-store" });
-          this._health = r.ok ? (await r.json()).ai === true : false;
-        } catch (e) {
-          this._health = false;
+        if (IB.hosted) {
+          this._health = !!(await this.sampler());
+        } else {
+          try {
+            const r = await fetch("/api/health", { cache: "no-store" });
+            this._health = r.ok ? (await r.json()).ai === true : false;
+          } catch (e) {
+            this._health = false;
+          }
         }
       }
       return this._health;
     },
     async mark(q, answer) {
       const t = IB.topic(q.topic);
+      const question = plain(q.q) + (q.options ? "\nOptions: " + q.options.map(plain).join(" | ") : "");
+      if (IB.hosted) {
+        const sample = await this.sampler();
+        if (!sample) throw new Error("AI isn't available here.");
+        const prompt = `${MARK_RULES}
+
+Subject: ${SUBJECT_NAMES[q.subject] || q.subject}
+Topic: ${t ? t.title : ""}
+Maximum marks: ${q.marks}
+
+<question>
+${question}
+</question>
+
+<markscheme>
+${q.ms.map((p) => "- " + plain(p)).join("\n")}
+</markscheme>
+
+<student_answer>
+${String(answer).slice(0, 12000)}
+</student_answer>
+
+Mark the student answer out of ${q.marks}. Reply with only a JSON object of this shape:
+{"score": <integer 0-${q.marks}>, "level": "<level/band for extended responses, else empty string>", "summary": "<1-2 sentence verdict>", "awarded": ["<markscheme points earned>"], "missing": ["<points missed or wrong>"], "improvements": ["<concrete actions to gain the missing marks>"], "model_answer": "<concise full-mark model answer>"}`;
+        let r;
+        try {
+          r = await sample.json(prompt, { modelTier: "default" });
+        } catch (e) {
+          throw sampleError(e);
+        }
+        const arr = (x) => (Array.isArray(x) ? x.map((v) => IB.esc(String(v))) : []);
+        return {
+          score: Math.max(0, Math.min(q.marks, Math.round(Number(r && r.score) || 0))), max: q.marks,
+          level: String((r && r.level) || ""), summary: String((r && r.summary) || ""),
+          awarded: arr(r && r.awarded), missing: arr(r && r.missing), improvements: (r && Array.isArray(r.improvements) ? r.improvements.map(String) : []),
+          model_answer: String((r && r.model_answer) || ""),
+        };
+      }
       const r = await fetch("/api/mark", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subject: q.subject, topic: t ? t.title : "", question: q.q.replace(/<[^>]+>/g, " ") + (q.options ? "\nOptions: " + q.options.join(" | ") : ""), ms: q.ms, marks: q.marks, answer }),
+        body: JSON.stringify({ subject: q.subject, topic: t ? t.title : "", question, ms: q.ms, marks: q.marks, answer }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || "AI marking failed");
+      // AI text is shown as HTML lists, so escape it.
+      j.awarded = (j.awarded || []).map((x) => IB.esc(x));
+      j.missing = (j.missing || []).map((x) => IB.esc(x));
       return j;
     },
     async generate(opts) {
+      if (IB.hosted) {
+        const sample = await this.sampler();
+        if (!sample) throw new Error("AI isn't available here.");
+        const n = Math.max(1, Math.min(8, opts.count || 4));
+        const style = opts.style === "mcq" ? "multiple-choice (4 options)" : opts.style === "extended" ? "extended-response" : "a mix of short-answer and structured";
+        const prompt = `You are a senior IB examiner who writes original exam-style questions with accurate markschemes.
+Write ${n} ORIGINAL practice questions for ${SUBJECT_NAMES[opts.subject] || opts.subject}, topic "${opts.topic}". Style: ${style}.
+Match IB command terms, mark allocations and markscheme conventions. Do not copy real IB past-paper questions.
+Markscheme: a list of mark points (one creditworthy point per mark where possible; for extended responses give indicative content plus level descriptors).
+Write maths with \\( \\) delimiters.
+Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "short"|"extended"|"mcq", "options": ["A text","B text","C text","D text"] or [], "answer": <0-based index for mcq, else -1>, "ms": ["point 1", "point 2"]}]}`;
+        try {
+          const r = await sample.json(prompt, { modelTier: "default", cache: false });
+          return (r && Array.isArray(r.questions) ? r.questions : []).filter((x) => x && x.q).map((x) => ({
+            q: String(x.q), marks: Math.max(1, Math.min(20, parseInt(x.marks, 10) || 2)), type: ["mcq", "short", "extended"].includes(x.type) ? x.type : "short",
+            options: Array.isArray(x.options) ? x.options.map(String) : [], answer: Number.isInteger(x.answer) ? x.answer : -1, ms: Array.isArray(x.ms) ? x.ms.map(String) : [],
+          }));
+        } catch (e) {
+          throw sampleError(e);
+        }
+      }
       const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(opts) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || "Generation failed");
       return j.questions || [];
     },
     async tutor(payload, onDelta) {
+      if (IB.hosted) {
+        const sample = await this.sampler();
+        if (!sample) throw new Error("AI isn't available here.");
+        const ctx = payload.subject ? `\n\nThe student is currently studying ${SUBJECT_NAMES[payload.subject] || payload.subject}${payload.topic ? ", topic: " + payload.topic : ""}.` : "";
+        const turns = [{ role: "user", content: TUTOR_RULES + ctx }].concat(
+          (payload.messages || []).filter((m) => m.content && (m.role === "user" || m.role === "assistant")).slice(-20).map((m) => ({ role: m.role, content: String(m.content).slice(0, 12000) }))
+        );
+        try {
+          await sample(turns, { cache: false, onText: ({ delta }) => onDelta(delta) });
+        } catch (e) {
+          throw sampleError(e);
+        }
+        return;
+      }
       const r = await fetch("/api/tutor", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!r.ok || !r.body) {
         const j = await r.json().catch(() => ({}));

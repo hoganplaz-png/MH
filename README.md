@@ -29,6 +29,7 @@ Then open http://localhost:3000.
 
 - **Without an API key** everything still works. Written answers get an offline estimate: key words are matched against the markscheme, and you can then self-mark. Calculation answers are auto-marked exactly. The tutor answers from the notes.
 - **With an API key** the server calls Claude (`claude-opus-5-5` by default; override with `CLAUDE_MODEL`). It uses structured outputs for marking and question writing, and streaming for the tutor. The key stays on the server and is never sent to the browser.
+- **Hosted on claude.ai** (the shared preview link): the AI tutor, AI marking and AI question writing run through the page's built-in "ask Claude" ability, on the viewer's own Claude account (each viewer is asked to allow it once). Downloads use the page's "save files" ability.
 - The `public/` folder is a static site. It can be hosted on GitHub Pages, Netlify and similar hosts. In that case AI features fall back to offline mode unless you also deploy `server.js`.
 
 Other environment variables: `PORT` (default 3000), and `AI_ENABLED=1` if you authenticate another way (for example `ant auth login`).
