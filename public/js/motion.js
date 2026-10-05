@@ -64,6 +64,36 @@
     if (h) h.classList.toggle("scrolled", window.scrollY > 8);
   }, { passive: true });
 
+  // Reading-progress bar under the header + header shadow.
+  const bar = document.createElement("div");
+  bar.className = "read-progress";
+  bar.setAttribute("aria-hidden", "true");
+  const setBar = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${max > 200 ? Math.min(1, scrollY / max) : 0})`;
+  };
+  document.addEventListener("DOMContentLoaded", () => { document.body.appendChild(bar); setBar(); });
+  window.addEventListener("scroll", setBar, { passive: true });
+
+  // Cursor spotlight on cards, and a gentle 3D tilt on subject / feature cards.
+  if (!reduce() && matchMedia("(hover: hover)").matches) {
+    document.addEventListener("pointermove", (e) => {
+      const card = e.target.closest && e.target.closest(".card, .callout, .sec-tab, .fw-chip");
+      if (!card) return;
+      const r = card.getBoundingClientRect();
+      card.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      card.style.setProperty("--my", `${e.clientY - r.top}px`);
+      if (card.matches(".subject-card, .feature")) {
+        const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = `perspective(800px) rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg) translateY(-4px)`;
+      }
+    }, { passive: true });
+    document.addEventListener("pointerout", (e) => {
+      const card = e.target.closest && e.target.closest(".subject-card, .feature");
+      if (card && !card.contains(e.relatedTarget)) card.style.transform = "";
+    });
+  }
+
   // Floating subject symbols for hero bands.
   IB.floaters = function (host) {
     if (!host || reduce()) return;

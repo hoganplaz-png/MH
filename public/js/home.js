@@ -44,7 +44,7 @@ IB.page = function () {
     </div>
   </section>
 
-  <section class="grid grid-4" style="margin-top:40px" aria-label="Site statistics">
+  <section class="grid grid-4 stat-grid" style="margin-top:40px" aria-label="Site statistics">
     <div class="card stat-tile"><span class="stat-big" data-count="${totalT}">${totalT}</span><span class="muted">syllabus topics with notes</span></div>
     <div class="card stat-tile"><span class="stat-big" data-count="${totalQ}">${totalQ}</span><span class="muted">exam-style questions with markschemes</span></div>
     <div class="card stat-tile"><span class="stat-big">∞</span><span class="muted">fresh calculation questions</span></div>
@@ -55,25 +55,21 @@ IB.page = function () {
     <h2 style="margin:0">Your subjects</h2>
     <span class="muted small">Mastery from your last 20 attempts per topic</span>
   </div>
-  <section class="grid grid-4" id="subjects" style="margin-top:20px"></section>
+  <section class="subject-grid" id="subjects" style="margin-top:20px"></section>
 
-  <h2 style="margin-top:56px">Three ways to revise</h2>
-  <section class="grid grid-3">
-    <a class="card section-card" href="notes.html" style="color:inherit">
-      <span class="num">01 · LEARN</span><h3>Topic notes</h3>
-      <p class="muted" style="margin:0">Key concepts, definitions to learn word-for-word, exam skills and worked examples for every syllabus topic.</p>
-      <span style="font-weight:700;color:var(--primary)">Browse notes →</span>
-    </a>
-    <a class="card section-card" href="questionbank.html" style="color:inherit">
-      <span class="num">02 · PRACTISE</span><h3>Question bank</h3>
-      <p class="muted" style="margin:0">Filter by topic, paper and difficulty. Calculation topics generate new numbers every time, marked instantly. Add your own past papers too.</p>
-      <span style="font-weight:700;color:var(--primary)">Open the bank →</span>
-    </a>
-    <a class="card section-card inkcard" href="practice.html?mode=mock">
-      <span class="num eyebrow">03 · TEST YOURSELF</span><h3>Mocks + AI examiner</h3>
-      <p style="margin:0">Timed papers in the real structure, marked against the markscheme, with a grade estimate and what to fix next.</p>
-      <span style="font-weight:700">Sit a mock paper →</span>
-    </a>
+  <h2 style="margin-top:56px">Everything you need for a 7</h2>
+  <section class="features" id="features">
+    ${[
+      ["notes.html", "∑", "Learn", "Topic notes + PDFs", "Concepts, fastest methods, traps, worked examples and a four-colour highlight key - download any topic or subject as a designed PDF booklet.", "Browse notes"],
+      ["questionbank.html", "?", "Practise", `${totalQ.toLocaleString()} questions`, "A structured bank for every topic: exam-style, calculations, worked-example replays, explain-the-concept, key-term drills and spot-the-mistake.", "Open the bank"],
+      ["practice.html?mode=mock", "⏱", "Test yourself", "Quizzes & mock papers", "Timed papers in the real structure, unit quizzes and smart quizzes that target your weakest topics - marked instantly.", "Sit a mock"],
+      ["skills.html", "✎", "Exam technique", "Answer frameworks", "A framework for every question type, sentence starters, top-band checklists and the markscheme decoded band by band.", "Learn the frameworks"],
+      ["ia.html", "◎", "Coursework", "IA & EE predictor", "Score yourself on every criterion, get an AI predicted mark for your draft, and see your predicted grade and core points.", "Predict my grade"],
+      ["tutor.html", "✦", "Get unstuck", "AI tutor & marking", "An IB examiner-style tutor that gives hints, not just answers - and marks written answers against the markscheme.", "Ask the tutor"],
+    ].map(([href, icon, eyebrow, title, text, cta], i) => `<a class="card feature" href="${href}" data-reveal style="--i:${i}">
+      <span class="f-icon" aria-hidden="true">${icon}</span>
+      <span class="eyebrow">${String(i + 1).padStart(2, "0")} · ${eyebrow}</span>
+      <h3>${title}</h3><p class="muted">${text}</p><span class="f-cta">${cta} →</span></a>`).join("")}
   </section>`;
 
   const grid = IB.qs("#subjects");
@@ -83,16 +79,21 @@ IB.page = function () {
     const tried = rows.filter((m) => m !== null);
     const pct = tried.length ? Math.round(rows.reduce((n, m) => n + (m ?? 0), 0) / rows.length) : 0;
     const next = s.topics.map((t, i) => ({ t, m: rows[i] })).sort((a, b) => (a.m ?? -1) - (b.m ?? -1))[0].t;
+    const mono = { econ: "Ec", chem: "Ch", geo: "Ge", math: "Ma", bio: "Bi", engb: "En", chia: "中" }[s.id] || s.short.slice(0, 2);
+    const C = 2 * Math.PI * 26;
     grid.appendChild(
-      IB.el(`<a class="card subject-card" href="notes.html?subject=${s.id}" style="--c:${s.color}">
+      IB.el(`<a class="card subject-card" href="notes.html?subject=${s.id}" style="--c:${s.color}" data-reveal>
         <div class="stripe"></div>
         <div class="body">
-          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-            <div><h3>${s.name}</h3><div class="stats">${s.topics.length} topics · ${qs.length} questions</div></div>
-            <span class="grade" style="width:48px;height:48px;font-size:1.5rem" title="Estimated grade">${tried.length ? IB.grade(pct, s.id) : "–"}</span>
+          <div class="sc-top">
+            <span class="sc-mono">${mono}</span>
+            <span class="sc-ring" title="${tried.length ? "Estimated grade " + IB.grade(pct, s.id) : "Not started yet"}">
+              <svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="26" class="trk"/><circle cx="30" cy="30" r="26" class="val" style="stroke-dasharray:${C};--off:${C * (1 - pct / 100)}"/></svg>
+              <b>${tried.length ? IB.grade(pct, s.id) : "–"}</b>
+            </span>
           </div>
-          <div class="bar"><span style="width:${pct}%"></span></div>
-          <div style="display:flex;justify-content:space-between;gap:8px;font-size:.9rem"><span class="muted">Next: ${IB.esc(next.title)}</span><strong class="mono">${tried.length ? pct + "%" : "new"}</strong></div>
+          <div><h3>${s.name}</h3><div class="stats">${s.topics.length} topics · ${qs.length.toLocaleString()} questions</div></div>
+          <div class="sc-next"><span class="muted">Next up</span><span>${IB.esc(next.title)}</span><strong class="mono">${tried.length ? pct + "%" : "new"}</strong></div>
         </div>
       </a>`)
     );
