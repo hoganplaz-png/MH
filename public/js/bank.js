@@ -13,6 +13,7 @@ IB.page = function () {
         <label class="field">Topic<select id="fTopic"></select></label>
         <label class="field">Paper<select id="fPaper"><option value="">Any paper</option></select></label>
         <label class="field">Type<select id="fType"><option value="">Any type</option><option value="mcq">Multiple choice</option><option value="short">Short / structured</option><option value="extended">Extended response / essay</option><option value="calc">Calculations only</option></select></label>
+        <label class="field">Section<select id="fSec"><option value="">All sections</option>${IB.SECTIONS.map(([k, n]) => `<option value="${k}">${n}</option>`).join("")}</select></label>
         <label class="field">Difficulty<select id="fDiff"><option value="">Any</option><option value="1">Foundation</option><option value="2">Standard</option><option value="3">Challenging</option></select></label>
         <label class="field">Source<select id="fSource"><option value="">All questions</option><option value="site">Site questions</option><option value="mine">My past papers</option></select></label>
         <label class="field">Status<select id="fStatus"><option value="">All questions</option><option value="new">Not attempted</option><option value="weak">Scored under 60%</option><option value="saved">Saved for review</option></select></label>
@@ -30,10 +31,11 @@ IB.page = function () {
 
   const f = {
     sub: IB.qs("#fSub"), topic: IB.qs("#fTopic"), paper: IB.qs("#fPaper"), type: IB.qs("#fType"),
-    diff: IB.qs("#fDiff"), status: IB.qs("#fStatus"), source: IB.qs("#fSource"), search: IB.qs("#fSearch"),
+    diff: IB.qs("#fDiff"), sec: IB.qs("#fSec"), status: IB.qs("#fStatus"), source: IB.qs("#fSource"), search: IB.qs("#fSearch"),
   };
   f.sub.value = IB.param("subject") || "";
   f.source.value = IB.param("source") || "";
+  f.sec.value = IB.param("sec") || "";
 
   function fillTopics() {
     const subs = f.sub.value ? [IB.subjects[f.sub.value]] : IB.subjectList();
@@ -57,6 +59,7 @@ IB.page = function () {
       if (f.source.value === "site" && q.custom) return false;
       if (f.type.value === "calc" ? !q.numeric : f.type.value && q.type !== f.type.value) return false;
       if (f.diff.value && String(q.diff) !== f.diff.value) return false;
+      if (f.sec.value && (q.sec || "exam") !== f.sec.value) return false;
       if (f.status.value === "new" && q.id in last) return false;
       if (f.status.value === "weak" && !(q.id in last && last[q.id] < 0.6)) return false;
       if (f.status.value === "saved" && !data.flags[q.id]) return false;
@@ -94,7 +97,7 @@ IB.page = function () {
   Object.values(f).forEach((el) => el.addEventListener(el.tagName === "INPUT" ? "input" : "change", () => {
     if (el === f.sub) fillTopics();
     page = 1;
-    history.replaceState(null, "", `questionbank.html?subject=${f.sub.value}${f.topic.value ? "&topic=" + f.topic.value : ""}`);
+    history.replaceState(null, "", `questionbank.html?subject=${f.sub.value}${f.topic.value ? "&topic=" + f.topic.value : ""}${f.sec.value ? "&sec=" + f.sec.value : ""}`);
     render();
   }));
 

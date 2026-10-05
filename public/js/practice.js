@@ -210,7 +210,7 @@ IB.page = function () {
       IB.qs("#mStart").onclick = () => {
         const s = IB.subjects[IB.qs("#mSub").value], key = IB.qs("#mPaper").value, p = s.papers[key];
         const len = +IB.qs("#mLen").value;
-        const all = IB.allQuestions(s.id);
+        const all = IB.allQuestions(s.id).filter((q) => !q.derived || q.sec === "calc");
         const paperMatch = (q) => q.paper === key || (key === "P2" && s.id === "chem" && q.paper === "P1B") || (key === "P1A" && q.type === "mcq");
         let qs = [];
         Object.entries(p.mix).forEach(([type, n]) => {

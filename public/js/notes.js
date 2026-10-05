@@ -125,9 +125,14 @@ IB.page = function () {
       ${sections.map(([id, label]) => `<a href="#sec-${id}" class="jump ${id}">${label}</a>`).join("")}<a href="#sec-practice" class="jump practice">Practice · ${nQ}${IB.hasGenerator(t.id) ? "+∞" : ""}</a>
     </nav>
     <div class="topic-sections" style="--c:${s.color}">${sections.map((x) => x[2]).join("")}
-      <section class="card" id="sec-practice" data-reveal><h3 style="margin-top:0">Practice questions</h3>
-        <div class="btn-row no-print">${IB.hasGenerator(t.id) ? '<button class="btn primary small" id="genBtn">+ Generate a new calculation question</button>' : ""}<a class="btn small" href="questionbank.html?subject=${s.id}&topic=${t.id}">Open in question bank</a></div>
-        <div id="practiceList"></div></section>
+      <section class="card topic-bank" id="sec-practice" data-reveal>
+        <div class="tb-head"><div><span class="eyebrow">Question bank</span><h3>${nQ} questions on ${IB.esc(t.title)}</h3></div>
+          <div class="btn-row no-print">${IB.hasGenerator(t.id) ? '<button class="btn primary small" id="genBtn">+ Fresh calculation</button>' : ""}<a class="btn small" href="questionbank.html?subject=${s.id}&topic=${t.id}">Open in question bank</a><a class="btn small" href="practice.html?subject=${s.id}&topic=${t.id}">Timed quiz</a></div></div>
+        <div class="sec-tabs no-print" id="secTabs" role="tablist"></div>
+        <p class="small muted" id="secDesc"></p>
+        <div id="practiceList"></div>
+        <div class="btn-row no-print" style="justify-content:center;margin-top:12px"><button class="btn" id="moreBtn">Show more</button></div>
+      </section>
     </div>
     <div class="btn-row no-print" style="justify-content:space-between;margin-top:16px">
       ${prev ? `<a class="btn" href="#" data-t="${prev.id}">← ${IB.esc(prev.title)}</a>` : "<span></span>"}
@@ -140,13 +145,45 @@ IB.page = function () {
       if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 150, behavior: "smooth" });
     }));
     const list = IB.qs("#practiceList");
-    IB.topicQuestions(t.id).forEach((q, i) => list.appendChild(IB.renderQuestion(q, { number: i + 1, showTopic: false })));
+    const groups = IB.topicSections2(t.id);
+    const done = {};
+    data.attempts.forEach((a) => (done[a.id] = true));
+    let cur = groups[0], shown = 0;
+    const PAGE = 8;
+    const more = IB.qs("#moreBtn");
+    const showMore = () => {
+      cur.qs.slice(shown, shown + PAGE).forEach((q, i) => {
+        const card = IB.renderQuestion(q, { number: shown + i + 1, showTopic: false });
+        card.classList.add("pop-in");
+        list.appendChild(card);
+      });
+      shown = Math.min(cur.qs.length, shown + PAGE);
+      more.textContent = `Show more (${cur.qs.length - shown} left)`;
+      more.classList.toggle("hidden", shown >= cur.qs.length);
+      IB.math(list);
+    };
+    const pick = (g) => {
+      cur = g;
+      shown = 0;
+      list.innerHTML = "";
+      IB.qsa("#secTabs button").forEach((b) => b.classList.toggle("active", b.dataset.k === g.k));
+      IB.qs("#secDesc").textContent = g.desc;
+      showMore();
+    };
+    IB.qs("#secTabs").innerHTML = groups.map((g) => {
+      const n = g.qs.filter((q) => done[q.id]).length;
+      return `<button role="tab" data-k="${g.k}" class="sec-tab k-${g.k}"><span>${IB.esc(g.name)}</span><span class="sec-count">${n ? `${n}/` : ""}${g.qs.length}</span><span class="sec-bar" style="--p:${Math.round((100 * n) / g.qs.length)}%"></span></button>`;
+    }).join("");
+    IB.qsa("#secTabs button").forEach((b) => (b.onclick = () => pick(groups.find((g) => g.k === b.dataset.k))));
+    more.onclick = showMore;
+    if (groups.length) pick(groups[0]);
     const gen = IB.qs("#genBtn");
     if (gen) gen.onclick = () => {
       const q = IB.generate(t.id);
       const card = IB.renderQuestion(q, { showTopic: false });
       card.classList.add("pop-in");
       list.prepend(card);
+      IB.math(card);
     };
     IB.qsa("a[data-t]", c).forEach((a) => (a.onclick = (e) => { e.preventDefault(); go(s.id, a.dataset.t); }));
     IB.qs("#readBtn").onclick = (e) => {

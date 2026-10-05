@@ -10,7 +10,7 @@ ctx.window = ctx;
 ctx.document = { addEventListener() {}, documentElement: { dataset: {} } };
 ctx.localStorage = { getItem: () => null, setItem() {} };
 vm.createContext(ctx);
-for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "generators.js", "plot.js"]) {
+for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "data/econ-bank.js", "data/chem-bank.js", "data/geo-bank.js", "data/math-bank.js", "data/bio-bank.js", "data/engb-bank.js", "data/chia-bank.js", "generators.js", "bankbuild.js", "plot.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), ctx, { filename: f });
 }
 const IB = ctx.IB;
@@ -29,6 +29,7 @@ for (const s of IB.subjectList()) {
       if (!q.ms?.length) errors.push(`${q.id}: empty markscheme`);
       if (q.type === "mcq" && (!Array.isArray(q.options) || q.options.length !== 4 || !(q.answer >= 0 && q.answer < 4)))
         errors.push(`${q.id}: bad mcq options/answer`);
+      if (q.type === "mcq" && new Set(q.options.map((o) => String(o).trim())).size !== q.options.length) errors.push(`${q.id}: duplicate mcq options`);
       if (q.numeric && !IB.checkNumeric(q, String(q.numeric.value))) errors.push(`${q.id}: numeric self-check failed`);
       if (q.numeric && !IB.checkNumeric(q, q.ms.join(" ")))
         errors.push(`${q.id}: numeric answer ${q.numeric.value} not found in markscheme`);

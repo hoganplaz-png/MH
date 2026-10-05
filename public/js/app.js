@@ -31,6 +31,24 @@
     });
   };
 
+  // Append extra hand-written questions to topics (ids continue each topic's numbering, so they stay stable).
+  IB.addQuestions = function (subjectId, byTopic) {
+    const s = IB.subjects[subjectId];
+    if (!s) return;
+    Object.entries(byTopic).forEach(([id, list]) => {
+      const t = s.topics.find((x) => x.id === id);
+      if (!t) return;
+      t.questions = t.questions || [];
+      list.forEach((q) => {
+        q.id = q.id || `${t.id}-q${t.questions.length + 1}`;
+        Object.assign(q, { subject: s.id, topic: t.id });
+        q.type = q.type || (q.options ? "mcq" : "short");
+        q.diff = q.diff || 2;
+        t.questions.push(q);
+      });
+    });
+  };
+
   IB.subjectList = () => IB.order.map((id) => IB.subjects[id]).filter(Boolean);
   IB.topic = (topicId) => {
     for (const s of IB.subjectList()) {
@@ -315,6 +333,8 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     "the a an and or of to in on for with by is are be as at that this it its from which their there these those was were has have had will would can could may might into than then also not no more less most least such other each per using use used show shows give state award any one two both e.g. eg i.e. ie owttE owtte accept do don't allow".split(" ")
   );
   const stem = (w) => w.replace(/(ing|ed|es|s|ly)$/i, "");
+  // Chinese has no spaces, so CJK runs are split into overlapping two-character "words".
+  const cjk = (s) => (String(s).replace(/<[^>]+>/g, " ").match(/[\u3400-\u9fff]+/g) || []).flatMap((run) => (run.length < 2 ? [] : Array.from({ length: run.length - 1 }, (_, i) => run.slice(i, i + 2))));
   const words = (s) =>
     String(s)
       .toLowerCase()
@@ -322,7 +342,8 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
       .replace(/[^a-z0-9.%\-+ ]/g, " ")
       .split(/\s+/)
       .filter((w) => w.length > 2 && !STOP.has(w))
-      .map(stem);
+      .map(stem)
+      .concat(cjk(s));
 
   // Offline marker: credits a markscheme point when enough of its key words appear in the answer.
   IB.offlineMark = function (q, answer) {
@@ -346,7 +367,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     });
     const total = awarded.length + missing.length || 1;
     let score = Math.round((awarded.length / total) * max);
-    if (answer.trim().split(/\s+/).length < 6) score = Math.min(score, 1);
+    if (answer.trim().split(/\s+/).length + (answer.match(/[\u3400-\u9fff]/g) || []).length / 2 < 6) score = Math.min(score, 1);
     return {
       score, max, awarded, missing, offline: true,
       summary: "Estimated by keyword match against the markscheme - use the markscheme to check yourself, or switch on AI marking for examiner-style feedback.",
@@ -580,6 +601,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         ${q.paper ? `<span class="pill">${esc(q.paper)}</span>` : ""}
         ${diff ? `<span class="pill ${q.diff === 3 ? "bad" : q.diff === 1 ? "good" : "warn"}">${diff}</span>` : ""}
         ${q.generated ? `<span class="pill">Auto-generated</span>` : ""}
+        ${q.sec && q.sec !== "exam" && IB.sectionName ? `<span class="pill sec ${q.sec}">${esc(IB.sectionName(q.sec))}</span>` : ""}
         ${q.custom ? `<span class="pill good">My past paper · ${esc(q.source)}</span>` : ""}
         <span class="marks">[${q.marks}]</span>
       </div>
