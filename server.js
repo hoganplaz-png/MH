@@ -213,6 +213,31 @@ Write maths with \\( \\) inline delimiters.`;
   sendJson(res, 200, result);
 }
 
+// Free-form prompt that must return JSON (IA/EE predicted marking, RQ checker).
+async function handleJson(req, res) {
+  const b = await readBody(req, 400_000);
+  const prompt = str(b.prompt, 120_000);
+  if (prompt.length < 20) return sendJson(res, 400, { error: "Prompt too short." });
+  const message = await client.beta.messages.create({
+    model: MODEL,
+    max_tokens: 16000,
+    system: "You are a careful IB examiner and teacher. Reply with only the JSON value requested - no prose before or after it.",
+    messages: [{ role: "user", content: prompt }],
+    output_config: { effort: "medium" },
+    betas: [FALLBACK_BETA],
+    fallbacks: "default",
+  });
+  if (message.stop_reason === "refusal") return sendJson(res, 422, { error: "The AI declined this request." });
+  const text = textOf(message);
+  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  const candidate = fenced ? fenced[1] : text.slice(Math.min(...["{", "["].map((c) => (text.indexOf(c) + 1 || Infinity) - 1)), Math.max(text.lastIndexOf("}"), text.lastIndexOf("]")) + 1);
+  try {
+    sendJson(res, 200, JSON.parse(candidate));
+  } catch {
+    sendJson(res, 502, { error: "The AI's reply couldn't be read - please try again." });
+  }
+}
+
 async function handleTutor(req, res) {
   const b = await readBody(req, 400_000);
   const history = (Array.isArray(b.messages) ? b.messages : [])
@@ -282,6 +307,7 @@ const server = http.createServer(async (req, res) => {
       if (req.url === "/api/mark") return await handleMark(req, res);
       if (req.url === "/api/generate") return await handleGenerate(req, res);
       if (req.url === "/api/tutor") return await handleTutor(req, res);
+      if (req.url === "/api/json") return await handleJson(req, res);
       return sendJson(res, 404, { error: "Unknown endpoint" });
     }
     serveStatic(req, res);

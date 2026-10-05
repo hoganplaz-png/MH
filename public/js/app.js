@@ -482,6 +482,22 @@ Mark the student answer out of ${q.marks}. Reply with only a JSON object of this
       j.missing = (j.missing || []).map((x) => IB.esc(x));
       return j;
     },
+    // Ask for structured data with a free-form prompt (used by IA/EE marking and the RQ checker).
+    async json(prompt) {
+      if (IB.hosted) {
+        const sample = await this.sampler();
+        if (!sample) throw new Error("AI isn't available here.");
+        try {
+          return await sample.json(prompt, { modelTier: "default", cache: false });
+        } catch (e) {
+          throw sampleError(e);
+        }
+      }
+      const r = await fetch("/api/json", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || "AI request failed");
+      return j;
+    },
     async generate(opts) {
       if (IB.hosted) {
         const sample = await this.sampler();
@@ -736,11 +752,13 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       <a class="brand" href="index.html"><span class="brand-mark">IB</span>Revision Hub</a>
       <nav class="nav-links" id="navLinks">
         ${link("notes.html", "Notes", "notes")}
-        ${link("questionbank.html", "Question Bank", "bank")}
-        ${link("practice.html", "Quizzes & Mocks", "practice")}
+        ${link("questionbank.html", "Questions", "bank")}
+        ${link("practice.html", "Quizzes &amp; Mocks", "practice")}
+        ${link("skills.html", "Exam Skills", "skills")}
+        ${link("ia.html", "IA &amp; EE", "ia")}
         ${link("tutor.html", "AI Tutor", "tutor")}
-        ${link("mypapers.html", "My Past Papers", "mypapers")}
-        ${link("progress.html", "My Progress", "progress")}
+        ${link("mypapers.html", "Past Papers", "mypapers")}
+        ${link("progress.html", "Progress", "progress")}
       </nav>
       <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">◐</button>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">☰</button>
