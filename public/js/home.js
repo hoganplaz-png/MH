@@ -35,8 +35,8 @@ IB.page = function () {
         </div>
         <div style="font-size:1.05rem;line-height:1.5;font-weight:500">Using a diagram, explain how a severe drought in Brazil is likely to affect the world price of coffee.</div>
         <div class="answer">Drought reduces crop yields, so supply shifts left from S₁ to S₂. At the old price there is a shortage, so the price rises to P₂…</div>
-        <div class="verdict">
-          <div style="display:flex;align-items:center;gap:12px"><span class="big">3/4</span><span class="pill" style="background:#DDF3E6;color:#155E34">AI examiner</span></div>
+        <div class="verdict demo-anim">
+          <div style="display:flex;align-items:center;gap:12px"><span class="big"><span data-count="3">3</span>/4</span><span class="pill" style="background:#DDF3E6;color:#155E34">AI examiner</span></div>
           <div><strong style="color:#155E34">✓</strong> Supply shifts left · <strong style="color:#155E34">✓</strong> Shortage → price rises · <strong style="color:#155E34">✓</strong> Diagram</div>
           <div><strong style="color:#B42318">✗</strong> Missing: label the new equilibrium Q₂</div>
         </div>
@@ -45,8 +45,8 @@ IB.page = function () {
   </section>
 
   <section class="grid grid-4" style="margin-top:40px" aria-label="Site statistics">
-    <div class="card stat-tile"><span class="stat-big">${totalT}</span><span class="muted">syllabus topics with notes</span></div>
-    <div class="card stat-tile"><span class="stat-big">${totalQ}</span><span class="muted">exam-style questions with markschemes</span></div>
+    <div class="card stat-tile"><span class="stat-big" data-count="${totalT}">${totalT}</span><span class="muted">syllabus topics with notes</span></div>
+    <div class="card stat-tile"><span class="stat-big" data-count="${totalQ}">${totalQ}</span><span class="muted">exam-style questions with markschemes</span></div>
     <div class="card stat-tile"><span class="stat-big">∞</span><span class="muted">fresh calculation questions</span></div>
     <div class="card stat-tile accent"><span class="stat-big">${streak} day${streak === 1 ? "" : "s"}</span><span class="muted">your revision streak</span></div>
   </section>

@@ -10,7 +10,7 @@ ctx.window = ctx;
 ctx.document = { addEventListener() {}, documentElement: { dataset: {} } };
 ctx.localStorage = { getItem: () => null, setItem() {} };
 vm.createContext(ctx);
-for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "generators.js"]) {
+for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "generators.js", "plot.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), ctx, { filename: f });
 }
 const IB = ctx.IB;
@@ -32,6 +32,20 @@ for (const s of IB.subjectList()) {
       if (q.numeric && !IB.checkNumeric(q, String(q.numeric.value))) errors.push(`${q.id}: numeric self-check failed`);
       if (q.numeric && !IB.checkNumeric(q, q.ms.join(" ")))
         errors.push(`${q.id}: numeric answer ${q.numeric.value} not found in markscheme`);
+    }
+  }
+}
+
+// every topic should now have the exam-focused extras, and every diagram must render
+for (const s of IB.subjectList()) {
+  if (!s.gameplan) errors.push(`${s.id}: no game plan`);
+  for (const t of s.topics) {
+    if (!t.traps?.length) errors.push(`${t.id}: no traps`);
+    if (!(t.methods?.length || t.skills?.length)) errors.push(`${t.id}: no methods`);
+    if (!t.tips?.length) errors.push(`${t.id}: no exam tips`);
+    for (const d of t.diagrams || []) {
+      const svg = IB.plot(d);
+      if (/NaN|undefined/.test(svg)) errors.push(`${t.id}: diagram "${d.title}" has NaN/undefined`);
     }
   }
 }

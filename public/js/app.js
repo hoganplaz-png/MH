@@ -20,6 +20,17 @@
     IB.subjects[subject.id] = subject;
   };
 
+  // Merge exam-focused extras (game plan, methods, traps, tips, diagrams) into a registered subject.
+  IB.extend = function (subjectId, extra) {
+    const s = IB.subjects[subjectId];
+    if (!s) return;
+    if (extra.gameplan) s.gameplan = extra.gameplan;
+    Object.entries(extra.topics || {}).forEach(([id, add]) => {
+      const t = s.topics.find((x) => x.id === id);
+      if (t) Object.assign(t, add);
+    });
+  };
+
   IB.subjectList = () => IB.order.map((id) => IB.subjects[id]).filter(Boolean);
   IB.topic = (topicId) => {
     for (const s of IB.subjectList()) {
@@ -208,7 +219,10 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
 .keyterm{display:grid;grid-template-columns:180px 1fr;gap:8px;border-bottom:1px dashed #ddd;padding:6px 0}.keyterm dt{font-weight:700}.keyterm dd{margin:0}
 .skill,.ms{background:#f3f2ee;border-radius:8px;padding:8px 14px;margin:8px 0}.worked,.q{border:1px solid #ddd;border-radius:8px;padding:10px 14px;margin:10px 0;page-break-inside:avoid}
 .concept{border-left:3px solid #3b5bdb;padding-left:14px;margin:16px 0}.lines{border-bottom:1px solid #bbb;height:28px}
-.meta{color:#666;font-size:.85em}.page-break{page-break-before:always}@media print{body{margin:0}}</style></head>
+.meta{color:#666;font-size:.85em}.callout{border-radius:10px;padding:10px 16px;margin:12px 0;page-break-inside:avoid}.callout-title{margin:.2em 0 .4em;font-size:.95em;letter-spacing:.06em;text-transform:uppercase}
+.callout.formula{background:#EAF0FF}.callout.method{background:#E8F7EE}.callout.trap{background:#FDECEC}.callout.example{background:#F1EBFF}.callout.tip{background:#FFF4DB}.callout.terms{background:#FFF8E1}
+.formula-grid{display:flex;flex-wrap:wrap;gap:8px}.formula{background:#fff;border-radius:8px;padding:6px 12px}.plot-grid{display:flex;flex-wrap:wrap;gap:12px}.plot{margin:0;width:340px}.plot svg{width:100%;--plot-a:#D9480F;--plot-b:#2D5BFF;--plot-c:#1F8A4C;--muted:#666;--text:#222}
+.pl-grid{stroke:#e5e5e5}.pl-axis{stroke:#222;stroke-width:1.2}.pl-asym{stroke:#888;stroke-dasharray:5 4}.pl-lab,.pl-ax{font:11px sans-serif;fill:#333}figcaption{font-size:.85em;color:#555;text-align:center}.page-break{page-break-before:always}@media print{body{margin:0}}</style></head>
 <body>${bodyHtml}<p class="meta" style="margin-top:3em">Downloaded from IB Revision Hub · ${new Date().toLocaleDateString()} · Original IB-style material, not official IB content.</p></body></html>`;
   };
 
@@ -425,6 +439,10 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
       scored = true;
       IB.recordAttempt(q, score, max, mode || opts.mode || "practice");
       card.dataset.score = score;
+      card.classList.remove("pop", "shake");
+      void card.offsetWidth;
+      card.classList.add(score >= max ? "pop" : score === 0 ? "shake" : "pop");
+      if (score >= max && max > 0 && opts.mode !== "exam" && IB.celebrate) IB.celebrate(IB.qs(".q-result", card) || card);
       if (opts.onScored) opts.onScored(score, max);
     };
 
@@ -621,19 +639,45 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
   document.addEventListener("DOMContentLoaded", () => {
     chrome();
     const ret = typeof IB.page === "function" ? IB.page() : null;
-    Promise.resolve(ret).then(introBand);
+    Promise.resolve(ret).then(() => {
+      introBand();
+      const app = document.getElementById("app");
+      if (IB.floaters) IB.qsa(".band", app).forEach(IB.floaters);
+      if (IB.animate) IB.animate(app);
+    });
   });
 })();
 
 /* Shared document builders (notes & worksheet downloads). */
+// Colour-coded note sections, shared by the notes page and downloads.
+IB.CALLOUTS = [
+  ["formula", "Formulas", "What to know or recognise"],
+  ["method", "Fastest methods", "The quickest reliable route to the marks"],
+  ["trap", "Traps", "Where marks are usually lost"],
+  ["example", "Worked examples", "Full solutions in exam layout"],
+  ["tip", "Exam tips", "How the markscheme thinks"],
+  ["terms", "Key terms", "Learn these word-for-word for 2-mark definitions"],
+];
+IB.topicSections = function (t, opts = {}) {
+  const out = [];
+  const box = (kind, title, body, id) => `<section class="callout ${kind}" ${id ? `id="${id}"` : ""} data-reveal><h3 class="callout-title">${title}</h3>${body}</section>`;
+  if (t.formulas && t.formulas.length) out.push(["formulas", "Formulas", box("formula", "Formulas", `<div class="formula-grid">${t.formulas.map((f) => `<div class="formula">${f}</div>`).join("")}</div>`, "sec-formulas")]);
+  out.push(["concepts", "Concepts", `<section class="card concepts" id="sec-concepts" data-reveal><h3 class="section-title">Key concepts</h3>${t.concepts.map((x) => `<div class="concept"><h3>${x.h}</h3>${x.b}</div>`).join("")}</section>`]);
+  if (t.table) out.push(["table", "Compare", `<section class="card" id="sec-table" data-reveal><h3 class="section-title">Compare at a glance</h3><div class="table-wrap"><table class="compare"><tr>${t.table.head.map((h) => `<th>${h}</th>`).join("")}</tr>${t.table.rows.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th scope="row">${x}</th>`)).join("")}</tr>`).join("")}</table></div></section>`]);
+  if (t.diagrams && t.diagrams.length && IB.plot) out.push(["diagrams", "Diagrams", `<section class="card" id="sec-diagrams" data-reveal><h3 class="section-title">Diagrams to know</h3><div class="plot-grid">${t.diagrams.map(IB.plot).join("")}</div></section>`]);
+  const methods = (t.methods || []).concat((t.skills || []).map((x) => `<strong>${x.h}:</strong> ${x.b}`));
+  if (methods.length) out.push(["methods", "Fastest methods", box("method", "Fastest methods", `<ol>${methods.map((m) => `<li>${m}</li>`).join("")}</ol>`, "sec-methods")]);
+  if (t.traps && t.traps.length) out.push(["traps", "Traps", box("trap", "Traps", `<ul>${t.traps.map((m) => `<li>${m}</li>`).join("")}</ul>`, "sec-traps")]);
+  if (t.examples && t.examples.length) out.push(["examples", "Worked examples", box("example", "Worked examples", t.examples.map((e, i) => `<div class="worked"><strong>Example ${i + 1}.</strong> ${e.q}${opts.static ? `<div class="sol"><strong>Solution:</strong> ${e.a}</div>` : `<details class="sol"><summary>Show solution</summary><div>${e.a}</div></details>`}</div>`).join(""), "sec-examples")]);
+  if (t.tips && t.tips.length) out.push(["tips", "Exam tips", box("tip", "Exam tips", `<ul>${t.tips.map((m) => `<li>${m}</li>`).join("")}</ul>`, "sec-tips")]);
+  if (t.terms && t.terms.length) out.push(["terms", "Key terms", box("terms", "Key terms", `<dl>${t.terms.map(([k, v]) => `<div class="keyterm"><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>`, "sec-terms")]);
+  return out;
+};
+
 IB.topicHtml = function (t, opts = {}) {
   const s = IB.subjects[t.subject];
   let h = `<h2>${IB.esc(t.code)} ${IB.esc(t.title)}</h2><p class="meta">${IB.esc(s.name)} · ${IB.esc(t.unit)}</p><p><em>${t.summary}</em></p>`;
-  h += `<h3>Key concepts</h3>` + t.concepts.map((c) => `<div class="concept"><h4>${c.h}</h4>${c.b}</div>`).join("");
-  if (t.terms && t.terms.length) h += `<h3>Key terms</h3><dl>` + t.terms.map(([k, v]) => `<div class="keyterm"><dt>${k}</dt><dd>${v}</dd></div>`).join("") + `</dl>`;
-  if (t.skills && t.skills.length) h += `<h3>Exam skills</h3>` + t.skills.map((x) => `<div class="skill"><strong>${x.h}</strong>${x.b}</div>`).join("");
-  if (t.examples && t.examples.length)
-    h += `<h3>Worked examples</h3>` + t.examples.map((e, i) => `<div class="worked"><strong>Example ${i + 1}.</strong> ${e.q}<div class="sol"><strong>Solution:</strong> ${e.a}</div></div>`).join("");
+  h += IB.topicSections(t, { static: true }).map((x) => x[2]).join("");
   if (opts.questions) h += IB.worksheetHtml(t.questions, `Practice questions - ${t.title}`, true);
   return h;
 };
