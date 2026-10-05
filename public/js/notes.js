@@ -86,7 +86,7 @@ IB.page = function () {
     const m = IB.mastery(t.id, data);
     c.innerHTML = `<div class="card topic-head">
       <div class="btn-row"><span class="pill ${s.id}">${s.name}</span><span class="pill">${IB.esc(t.unit)}</span>${m !== null ? `<span class="pill ${m >= 70 ? "good" : m >= 40 ? "warn" : "bad"}">Mastery ${m}%</span>` : ""}</div>
-      <h1>${IB.esc(t.code)} ${IB.esc(t.title)}</h1>
+      <h1><span class="code">${IB.esc(t.code)}</span>${IB.esc(t.title)}</h1>
       <p class="muted">${t.summary}</p>
       <div class="btn-row no-print">
         <button class="btn ${data.read[t.id] ? "" : "primary"}" id="readBtn">${data.read[t.id] ? "✓ Revised" : "Mark as revised"}</button>

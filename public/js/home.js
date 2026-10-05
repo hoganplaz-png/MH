@@ -4,70 +4,97 @@ IB.page = function () {
   const subs = IB.subjectList();
   const totalQ = IB.allQuestions().length;
   const totalT = subs.reduce((n, s) => n + s.topics.length, 0);
-  const attempted = new Set(data.attempts.map((a) => a.id)).size;
   const recent = data.attempts.slice(-1)[0];
+  const recentTopic = recent && IB.topic(recent.t);
+
+  // revision streak (consecutive days with at least one attempt)
+  const dayKey = (ts) => new Date(ts).toISOString().slice(0, 10);
+  const days = new Set(data.attempts.map((a) => dayKey(a.at)));
+  let streak = 0;
+  for (let i = 0; ; i++) {
+    if (days.has(dayKey(Date.now() - i * 86400000))) streak++;
+    else if (i > 0) break;
+  }
 
   app.innerHTML = `
-  <section class="hero">
-    <span class="pill">Economics SL · Chemistry SL · Geography SL · Maths AA SL</span>
-    <h1>Revise smarter for your IB exams.</h1>
-    <p class="lead">Notes organised by syllabus topic, an exam-style question bank, unlimited quizzes and timed mock papers, and an AI tutor that guides you and marks your answers against the markscheme - with your progress tracked as you go.</p>
-    <div class="btn-row">
-      <a class="btn primary" href="practice.html">Start a quiz</a>
-      <a class="btn" href="notes.html">Browse notes</a>
-      ${recent ? `<a class="btn" href="questionbank.html?subject=${recent.s}&topic=${recent.t}">Continue: ${IB.esc((IB.topic(recent.t) || {}).title || "last topic")}</a>` : ""}
+  <section class="band">
+    <div class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow">IB Diploma · Econ · Chem · Geo · Maths AA (SL)</span>
+        <h1>Every topic. Every paper. <span class="hl">Marked like the real thing.</span></h1>
+        <p class="lead">Notes by syllabus topic, an exam-style question bank and mock papers, with an AI examiner that marks your answers against the markscheme.</p>
+        <div class="btn-row">
+          <a class="btn primary" href="practice.html">Start a quiz</a>
+          ${recentTopic ? `<a class="btn" href="notes.html?subject=${recentTopic.subject}&topic=${recentTopic.id}">Continue: ${IB.esc(recentTopic.title)} →</a>` : `<a class="btn" href="notes.html">Browse notes →</a>`}
+        </div>
+      </div>
+      <div class="hero-demo" aria-label="Example of AI marking">
+        <div class="btn-row" style="justify-content:space-between">
+          <span class="pill econ">Econ SL · Paper 2</span>
+          <span class="mono" style="font-weight:700">[4 marks]</span>
+        </div>
+        <div style="font-size:1.05rem;line-height:1.5;font-weight:500">Using a diagram, explain how a severe drought in Brazil is likely to affect the world price of coffee.</div>
+        <div class="answer">Drought reduces crop yields, so supply shifts left from S₁ to S₂. At the old price there is a shortage, so the price rises to P₂…</div>
+        <div class="verdict">
+          <div style="display:flex;align-items:center;gap:12px"><span class="big">3/4</span><span class="pill" style="background:#DDF3E6;color:#155E34">AI examiner</span></div>
+          <div><strong style="color:#155E34">✓</strong> Supply shifts left · <strong style="color:#155E34">✓</strong> Shortage → price rises · <strong style="color:#155E34">✓</strong> Diagram</div>
+          <div><strong style="color:#B42318">✗</strong> Missing: label the new equilibrium Q₂</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="grid grid-4" aria-label="Site statistics">
-    <div class="card"><div class="stat-big">${totalT}</div><div class="muted small">syllabus topics with notes</div></div>
-    <div class="card"><div class="stat-big">${totalQ}</div><div class="muted small">exam-style questions with markschemes</div></div>
-    <div class="card"><div class="stat-big">∞</div><div class="muted small">auto-generated calculation questions</div></div>
-    <div class="card"><div class="stat-big">${attempted}</div><div class="muted small">questions you've attempted</div></div>
+  <section class="grid grid-4" style="margin-top:40px" aria-label="Site statistics">
+    <div class="card stat-tile"><span class="stat-big">${totalT}</span><span class="muted">syllabus topics with notes</span></div>
+    <div class="card stat-tile"><span class="stat-big">${totalQ}</span><span class="muted">exam-style questions with markschemes</span></div>
+    <div class="card stat-tile"><span class="stat-big">∞</span><span class="muted">fresh calculation questions</span></div>
+    <div class="card stat-tile accent"><span class="stat-big">${streak} day${streak === 1 ? "" : "s"}</span><span class="muted">your revision streak</span></div>
   </section>
 
-  <h2>Three ways to revise</h2>
+  <div class="btn-row" style="justify-content:space-between;align-items:flex-end;margin-top:56px">
+    <h2 style="margin:0">Your subjects</h2>
+    <span class="muted small">Mastery from your last 20 attempts per topic</span>
+  </div>
+  <section class="grid grid-4" id="subjects" style="margin-top:20px"></section>
+
+  <h2 style="margin-top:56px">Three ways to revise</h2>
   <section class="grid grid-3">
-    <a class="card section-card" href="notes.html" style="color:inherit;text-decoration:none">
-      <span class="num">SECTION 1</span><h3>Topic notes</h3>
-      <ul class="feature-list"><li>Every syllabus topic: key concepts, definitions, diagrams to know</li><li>Exam skills & command terms for each topic</li><li>Worked example questions with model answers</li><li>Download any topic or a whole subject (HTML/PDF)</li></ul>
+    <a class="card section-card" href="notes.html" style="color:inherit">
+      <span class="num">01 · LEARN</span><h3>Topic notes</h3>
+      <p class="muted" style="margin:0">Key concepts, definitions to learn word-for-word, exam skills and worked examples for every syllabus topic.</p>
+      <span style="font-weight:700;color:var(--primary)">Browse notes →</span>
     </a>
-    <a class="card section-card" href="questionbank.html" style="color:inherit;text-decoration:none">
-      <span class="num">SECTION 2</span><h3>Question bank</h3>
-      <ul class="feature-list"><li>Filter by subject, topic, paper, difficulty and status</li><li>Full markschemes with M/A mark points</li><li>Fresh calculation questions generated on demand</li><li>Download printable worksheets with answers</li></ul>
+    <a class="card section-card" href="questionbank.html" style="color:inherit">
+      <span class="num">02 · PRACTISE</span><h3>Question bank</h3>
+      <p class="muted" style="margin:0">Filter by topic, paper and difficulty. Calculation topics generate new numbers every time, marked instantly. Add your own past papers too.</p>
+      <span style="font-weight:700;color:var(--primary)">Open the bank →</span>
     </a>
-    <a class="card section-card" href="tutor.html" style="color:inherit;text-decoration:none">
-      <span class="num">SECTION 3</span><h3>AI tutor, marking & tracking</h3>
-      <ul class="feature-list"><li>Ask the AI tutor for hints, explanations and feedback</li><li>AI examiner marks written answers against the markscheme</li><li>Unit quizzes and timed mock papers with grade estimates</li><li>Mastery by topic, weak-topic targeting, data export</li></ul>
+    <a class="card section-card inkcard" href="practice.html?mode=mock">
+      <span class="num eyebrow">03 · TEST YOURSELF</span><h3>Mocks + AI examiner</h3>
+      <p style="margin:0">Timed papers in the real structure, marked against the markscheme, with a grade estimate and what to fix next.</p>
+      <span style="font-weight:700">Sit a mock paper →</span>
     </a>
-  </section>
-
-  <h2>Subjects</h2>
-  <section class="grid grid-4" id="subjects"></section>
-
-  <h2>Why this beats a static question bank</h2>
-  <section class="grid grid-2">
-    <div class="card"><h3 style="margin-top:0">Never run out of practice</h3><p class="muted">Calculation topics (elasticity, moles, pH, sequences, calculus, Spearman's rank…) generate brand-new numbers every time, auto-marked instantly. With AI switched on you can also generate new written questions for any topic.</p></div>
-    <div class="card"><h3 style="margin-top:0">Feedback like an examiner</h3><p class="muted">Write a full answer and get a mark out of the total, which markscheme points you hit and missed, how to improve, and a model answer - not just a reveal button.</p></div>
-    <div class="card"><h3 style="margin-top:0">Targets your weak topics</h3><p class="muted">Every attempt updates a recency-weighted mastery score per topic. The "Smart quiz" pulls questions from the topics you're weakest in.</p></div>
-    <div class="card"><h3 style="margin-top:0">Yours to keep</h3><p class="muted">Progress is stored in your browser - no account needed. Export a backup file any time and import it on another device.</p></div>
   </section>`;
 
   const grid = IB.qs("#subjects");
   subs.forEach((s) => {
     const qs = IB.allQuestions(s.id);
-    const ms = s.topics.map((t) => IB.mastery(t.id, data)).filter((m) => m !== null);
-    const avg = ms.length ? Math.round(ms.reduce((a, b) => a + b, 0) / ms.length) : null;
+    const rows = s.topics.map((t) => IB.mastery(t.id, data));
+    const tried = rows.filter((m) => m !== null);
+    const pct = tried.length ? Math.round(rows.reduce((n, m) => n + (m ?? 0), 0) / rows.length) : 0;
+    const next = s.topics.map((t, i) => ({ t, m: rows[i] })).sort((a, b) => (a.m ?? -1) - (b.m ?? -1))[0].t;
     grid.appendChild(
-      IB.el(`<div class="card subject-card" style="--c:${s.color}">
-        <h3>${s.name}</h3>
-        <div class="stats">${s.topics.length} topics · ${qs.length} questions${avg !== null ? ` · mastery ${avg}%` : ""}</div>
-        <div class="btn-row" style="margin-top:8px">
-          <a class="btn small" href="notes.html?subject=${s.id}">Notes</a>
-          <a class="btn small" href="questionbank.html?subject=${s.id}">Questions</a>
-          <a class="btn small" href="practice.html?subject=${s.id}">Quiz</a>
+      IB.el(`<a class="card subject-card" href="notes.html?subject=${s.id}" style="--c:${s.color}">
+        <div class="stripe"></div>
+        <div class="body">
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+            <div><h3>${s.name}</h3><div class="stats">${s.topics.length} topics · ${qs.length} questions</div></div>
+            <span class="grade" style="width:48px;height:48px;font-size:1.5rem" title="Estimated grade">${tried.length ? IB.grade(pct, s.id) : "–"}</span>
+          </div>
+          <div class="bar"><span style="width:${pct}%"></span></div>
+          <div style="display:flex;justify-content:space-between;gap:8px;font-size:.9rem"><span class="muted">Next: ${IB.esc(next.title)}</span><strong class="mono">${tried.length ? pct + "%" : "new"}</strong></div>
         </div>
-      </div>`)
+      </a>`)
     );
   });
 };

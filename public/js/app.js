@@ -604,9 +604,24 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     if (th) document.documentElement.dataset.theme = th;
   } catch (e) { /* ignore */ }
 
+  // Wrap each page's opening heading + intro paragraph in the dark header band.
+  function introBand() {
+    const app = document.getElementById("app");
+    const h1 = app && app.firstElementChild;
+    if (!h1 || h1.tagName !== "H1" || h1.closest(".band")) return;
+    const band = document.createElement("section");
+    band.className = "band";
+    band.style.paddingBlock = "8px 32px";
+    app.insertBefore(band, h1);
+    band.appendChild(h1);
+    h1.style.marginTop = "18px";
+    while (band.nextElementSibling && band.nextElementSibling.tagName === "P") band.appendChild(band.nextElementSibling);
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     chrome();
-    if (typeof IB.page === "function") IB.page();
+    const ret = typeof IB.page === "function" ? IB.page() : null;
+    Promise.resolve(ret).then(introBand);
   });
 })();
 
