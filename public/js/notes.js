@@ -9,6 +9,7 @@ IB.page = function () {
     <div class="subject-tabs" id="subTabs"></div>
     <div class="notes-layout"><aside class="side card" id="side"></aside><section id="content"></section></div>`;
 
+  const hlOn = () => { try { return localStorage.getItem("ibrev:hl") !== "0"; } catch (e) { return true; } };
   const go = (sid, tid) => {
     subjectId = sid;
     topicId = tid || null;
@@ -69,7 +70,7 @@ IB.page = function () {
       <h1>${s.name} revision notes</h1>
       <div class="chip-row">${s.topics.slice(0, 12).map((t) => `<a href="#" data-t="${t.id}" class="chip">${IB.esc(t.title)}</a>`).join("")}${s.topics.length > 12 ? `<span class="chip">+${s.topics.length - 12} more</span>` : ""}</div>
       <div class="hero-progress"><div class="bar"><span style="width:${IB.pct(read, s.topics.length)}%"></span></div><span class="small">${read}/${s.topics.length} topics revised</span></div>
-      <div class="btn-row no-print"><button class="btn mark" id="dlAll">⬇ Download all notes</button><button class="btn" id="dlAllQ">⬇ Notes + practice questions</button></div>
+      <div class="btn-row no-print"><button class="btn mark" id="dlAll">⬇ PDF: all notes</button><button class="btn" id="dlAllQ">⬇ PDF: notes + practice paper</button><button class="btn" id="dlHtml">⬇ HTML version</button></div>
     </div>
     <h2>How to read these notes</h2>
     ${legend()}
@@ -92,8 +93,13 @@ IB.page = function () {
       const body = `<h1>${s.name} - Revision notes</h1><p class="meta">${s.guide}</p>` + s.topics.map((t) => IB.topicHtml(t, { questions: withQ })).join('<div class="page-break"></div>');
       IB.download(`IB-${s.short.replace(/\s+/g, "-")}-notes${withQ ? "-with-questions" : ""}.html`, IB.standaloneDoc(`${s.name} notes`, body));
     };
-    IB.qs("#dlAll").onclick = () => dl(false);
-    IB.qs("#dlAllQ").onclick = () => dl(true);
+    const pdfAll = (btn, n) => {
+      btn.disabled = true;
+      IB.pdfNotes({ subject: s.id, topics: s.topics, questions: n }).catch(() => {}).finally(() => (btn.disabled = false));
+    };
+    IB.qs("#dlAll").onclick = (e) => pdfAll(e.currentTarget, 0);
+    IB.qs("#dlAllQ").onclick = (e) => pdfAll(e.currentTarget, 3);
+    IB.qs("#dlHtml").onclick = () => dl(true);
     IB.math(c);
     IB.animate(c);
   }
@@ -117,14 +123,17 @@ IB.page = function () {
       <button class="btn ${data.read[t.id] ? "" : "primary"}" id="readBtn">${data.read[t.id] ? "✓ Revised" : "Mark as revised"}</button>
       <a class="btn" href="practice.html?subject=${s.id}&topic=${t.id}">Quiz this topic</a>
       <a class="btn" href="tutor.html?subject=${s.id}&topic=${t.id}">Ask the AI tutor</a>
-      <button class="btn" id="dlTopic">⬇ Notes</button>
+      <button class="btn mark" id="dlTopic">⬇ PDF notes</button>
+      <button class="btn" id="dlTopicQ">⬇ PDF + practice paper</button>
       <button class="btn" id="dlSheet">⬇ Worksheet</button>
+      <button class="btn ${hlOn() ? "on" : ""}" id="hlBtn" aria-pressed="${hlOn()}">🖍 Highlights</button>
       <button class="btn" id="printBtn">Print</button>
     </div>
+    <div class="hl-legend no-print ${hlOn() ? "" : "hidden"}">${IB.highlightKey()}</div>
     <nav class="jumpbar no-print" aria-label="Jump to section" style="--c:${s.color}">
       ${sections.map(([id, label]) => `<a href="#sec-${id}" class="jump ${id}">${label}</a>`).join("")}<a href="#sec-practice" class="jump practice">Practice · ${nQ}${IB.hasGenerator(t.id) ? "+∞" : ""}</a>
     </nav>
-    <div class="topic-sections" style="--c:${s.color}">${sections.map((x) => x[2]).join("")}
+    <div class="topic-sections ${hlOn() ? "" : "hl-off"}" style="--c:${s.color}">${sections.map((x) => x[2]).join("")}
       <section class="card topic-bank" id="sec-practice" data-reveal>
         <div class="tb-head"><div><span class="eyebrow">Question bank</span><h3>${nQ} questions on ${IB.esc(t.title)}</h3></div>
           <div class="btn-row no-print">${IB.hasGenerator(t.id) ? '<button class="btn primary small" id="genBtn">+ Fresh calculation</button>' : ""}<a class="btn small" href="questionbank.html?subject=${s.id}&topic=${t.id}">Open in question bank</a><a class="btn small" href="practice.html?subject=${s.id}&topic=${t.id}">Timed quiz</a></div></div>
@@ -192,14 +201,39 @@ IB.page = function () {
       if (!was) IB.celebrate(e.currentTarget);
       setTimeout(render, was ? 0 : 450);
     };
-    IB.qs("#dlTopic").onclick = () => IB.download(`IB-${s.short.replace(/\s+/g, "-")}-${t.code.replace(/[^\w.-]+/g, "_")}-${t.title.replace(/[^\w]+/g, "-")}.html`, IB.standaloneDoc(t.title, `<h1>${IB.esc(t.title)}</h1>` + IB.topicHtml(t)));
-    IB.qs("#dlSheet").onclick = () => IB.download(`IB-${s.short.replace(/\s+/g, "-")}-${t.title.replace(/[^\w]+/g, "-")}-worksheet.html`, IB.standaloneDoc(`${t.title} worksheet`, `<h1>${IB.esc(s.name)}: ${IB.esc(t.title)}</h1>` + IB.worksheetHtml(t.questions, "Worksheet")));
+    const pdf = (btn, n) => {
+      btn.disabled = true;
+      IB.pdfNotes({ subject: s.id, topics: [t], questions: n }).catch(() => {}).finally(() => (btn.disabled = false));
+    };
+    IB.qs("#dlTopic").onclick = (e) => pdf(e.currentTarget, 0);
+    IB.qs("#dlTopicQ").onclick = (e) => pdf(e.currentTarget, 12);
+    IB.qs("#dlSheet").onclick = () => IB.download(`IB-${s.short.replace(/\s+/g, "-")}-${t.title.replace(/[^\w]+/g, "-")}-worksheet.html`, IB.standaloneDoc(`${t.title} worksheet`, `<h1>${IB.esc(s.name)}: ${IB.esc(t.title)}</h1>` + IB.worksheetHtml(t.questions.filter((q) => !q.derived), "Worksheet")));
+    IB.qs("#hlBtn").onclick = (e) => {
+      const on = !hlOn();
+      try { localStorage.setItem("ibrev:hl", on ? "1" : "0"); } catch (err) { /* ignore */ }
+      e.currentTarget.classList.toggle("on", on);
+      e.currentTarget.setAttribute("aria-pressed", on);
+      IB.qs(".topic-sections", c).classList.toggle("hl-off", !on);
+      IB.qs(".hl-legend", c).classList.toggle("hidden", !on);
+    };
     IB.qs("#printBtn").onclick = () => {
       IB.qsa("details").forEach((d) => (d.open = true));
       IB.print();
     };
     IB.math(c);
+    IB.highlight(IB.qs(".topic-sections", c), { terms: (t.terms || []).map((x) => x[0]) });
+    marker(c);
     IB.animate(c);
+  }
+
+  // Highlights "draw on" like a marker pen as each section scrolls into view.
+  function marker(root) {
+    const secs = IB.qsa(".topic-sections > section, .topic-sections > .callout", root);
+    if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return secs.forEach((x) => x.classList.add("lit"));
+    const io = new IntersectionObserver((es) => es.forEach((en) => {
+      if (en.isIntersecting) { en.target.classList.add("lit"); io.unobserve(en.target); }
+    }), { rootMargin: "0px 0px -15% 0px" });
+    secs.forEach((x) => io.observe(x));
   }
 
   render();

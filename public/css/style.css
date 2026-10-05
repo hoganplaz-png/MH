@@ -537,3 +537,42 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
 .sec-tab.k-concepts { --k: var(--c-formula); } .sec-tab.k-terms { --k: var(--c-terms); } .sec-tab.k-traps { --k: var(--c-trap); }
 .sec-tab.active { border-color: var(--k); background: color-mix(in srgb, var(--k) 10%, var(--surface)); box-shadow: inset 0 0 0 1px var(--k); }
 #secDesc { margin: 10px 0 4px; }
+
+/* ---------- highlight key: green key terms, yellow statistics, blue dates, pink places/policies ---------- */
+:root { --hl-k: #C9EBCF; --hl-s: #FFE873; --hl-d: #C5E3FF; --hl-p: #F9C6DA; --hl-ink: #10251A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --hl-k: rgba(74, 222, 128, .28); --hl-s: rgba(255, 213, 61, .32); --hl-d: rgba(116, 185, 255, .3); --hl-p: rgba(244, 114, 182, .3); --hl-ink: inherit; } }
+:root[data-theme="dark"] { --hl-k: rgba(74, 222, 128, .28); --hl-s: rgba(255, 213, 61, .32); --hl-d: rgba(116, 185, 255, .3); --hl-p: rgba(244, 114, 182, .3); --hl-ink: inherit; }
+.hl { --hlc: var(--hl-k); font-weight: 700; border-radius: 3px; padding: 0 2px; -webkit-box-decoration-break: clone; box-decoration-break: clone; background-image: linear-gradient(var(--hlc), var(--hlc)); background-repeat: no-repeat; background-size: 100% 100%; }
+.hl-k { --hlc: var(--hl-k); } .hl-s { --hlc: var(--hl-s); } .hl-d { --hlc: var(--hl-d); } .hl-p { --hlc: var(--hl-p); }
+.topic-sections .hl { background-size: 0% 100%; transition: background-size .9s cubic-bezier(.3, .7, .2, 1); }
+.topic-sections .lit .hl, .topic-sections .lit.hl { background-size: 100% 100%; }
+.topic-sections .lit .hl:nth-of-type(2n) { transition-delay: .12s; } .topic-sections .lit .hl:nth-of-type(3n) { transition-delay: .24s; }
+.topic-sections.hl-off .hl { background-image: none; padding: 0; }
+.topic-sections.hl-off span.hl { font-weight: inherit; }
+.hl-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .86rem; }
+.hl-key > span:first-child { font-weight: 800; margin-right: 2px; }
+.hl-key .hl { padding: 2px 8px; }
+.hl-legend { margin: 4px 0 12px; }
+.btn.on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+@media (prefers-reduced-motion: reduce) { .topic-sections .hl { transition: none; background-size: 100% 100%; } }
+
+/* definition + essay-plan tables (as in the printed notes) */
+.def-table, .plan-table { width: 100%; border-collapse: collapse; font-size: .95rem; background: var(--surface); border-radius: 10px; overflow: hidden; }
+.def-table th, .def-table td, .plan-table th, .plan-table td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; vertical-align: top; }
+.def-table thead th, .plan-table thead th { background: var(--ink, #0F1B2D); color: #fff; border-color: var(--ink, #0F1B2D); font-size: .82rem; letter-spacing: .03em; }
+.def-table tbody th, .plan-table tbody th { width: 30%; color: var(--primary); background: var(--surface-2); font-weight: 800; }
+.plan-table tbody th { width: 16%; }
+.plan-table tbody tr:nth-child(even) td, .def-table tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+.plan { margin: 18px 0 8px; }
+.plan-q { font-size: 1rem; margin: 0 0 8px; color: var(--text); }
+.plan-q .marks { font-family: "JetBrains Mono", monospace; color: var(--muted); font-size: .85rem; }
+
+/* PDF progress overlay */
+.pdf-progress { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; background: rgba(15, 27, 45, .45); backdrop-filter: blur(3px); animation: fade-in .25s ease; }
+.pdf-progress.out { opacity: 0; transition: opacity .35s; }
+.pdf-card { width: min(360px, calc(100vw - 32px)); background: var(--surface); color: var(--text); border-radius: 18px; padding: 24px; box-shadow: 0 24px 60px rgba(0, 0, 0, .25); display: grid; gap: 10px; text-align: center; justify-items: center; }
+.pdf-card .bar { width: 100%; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.pdf-card .bar span { display: block; height: 100%; width: 3%; background: linear-gradient(90deg, var(--primary), #D6336C); transition: width .3s ease; }
+.pdf-spin { width: 44px; height: 44px; border-radius: 50%; border: 4px solid var(--surface-2); border-top-color: var(--primary); animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fade-in { from { opacity: 0; } }

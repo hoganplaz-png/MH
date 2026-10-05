@@ -852,8 +852,10 @@ IB.topicSections = function (t, opts = {}) {
   if (methods.length) out.push(["methods", "Fastest methods", box("method", "Fastest methods", `<ol>${methods.map((m) => `<li>${m}</li>`).join("")}</ol>`, "sec-methods")]);
   if (t.traps && t.traps.length) out.push(["traps", "Traps", box("trap", "Traps", `<ul>${t.traps.map((m) => `<li>${m}</li>`).join("")}</ul>`, "sec-traps")]);
   if (t.examples && t.examples.length) out.push(["examples", "Worked examples", box("example", "Worked examples", t.examples.map((e, i) => `<div class="worked"><strong>Example ${i + 1}.</strong> ${e.q}${opts.static ? `<div class="sol"><strong>Solution:</strong> ${e.a}</div>` : `<details class="sol"><summary>Show solution</summary><div>${e.a}</div></details>`}</div>`).join(""), "sec-examples")]);
+  const plans = IB.essayPlansHtml ? IB.essayPlansHtml(t) : "";
+  if (plans) out.push(["plans", "Essay plans", `<section class="card plans" id="sec-plans" data-reveal><h3 class="section-title">Practice essay plans</h3><p class="small muted" style="margin-top:0">Built from the markschemes: intro → for → against → examples → evaluate → conclusion. Use at least two evaluation lenses (scale, time, stakeholders, place, evidence).</p>${plans}</section>`]);
   if (t.tips && t.tips.length) out.push(["tips", "Exam tips", box("tip", "Exam tips", `<ul>${t.tips.map((m) => `<li>${m}</li>`).join("")}</ul>`, "sec-tips")]);
-  if (t.terms && t.terms.length) out.push(["terms", "Key terms", box("terms", "Key terms", `<dl>${t.terms.map(([k, v]) => `<div class="keyterm"><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>`, "sec-terms")]);
+  if (t.terms && t.terms.length) out.push(["terms", "Key terms", box("terms", "Key definitions to learn", `<div class="table-wrap"><table class="def-table"><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody>${t.terms.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${v}</td></tr>`).join("")}</tbody></table></div>`, "sec-terms")]);
   return out;
 };
 
@@ -861,7 +863,7 @@ IB.topicHtml = function (t, opts = {}) {
   const s = IB.subjects[t.subject];
   let h = `<h2>${IB.esc(t.code)} ${IB.esc(t.title)}</h2><p class="meta">${IB.esc(s.name)} · ${IB.esc(t.unit)}</p><p><em>${t.summary}</em></p>`;
   h += IB.topicSections(t, { static: true }).map((x) => x[2]).join("");
-  if (opts.questions) h += IB.worksheetHtml(t.questions, `Practice questions - ${t.title}`, true);
+  if (opts.questions) h += IB.worksheetHtml(t.questions.filter((q) => !q.derived), `Practice questions - ${t.title}`, true);
   return h;
 };
 
@@ -880,3 +882,105 @@ IB.worksheetHtml = function (qs, title, inline) {
   return h + `</div>`;
 };
 
+
+/* ---------- highlight key (green = key terms, yellow = statistics & formulas, blue = dates, pink = places, policies & names) ---------- */
+IB.HIGHLIGHTS = [
+  ["k", "Key / command terms"],
+  ["s", "Statistics & formulas"],
+  ["d", "Dates"],
+  ["p", "Places, policies, names"],
+];
+(function () {
+  const PLACES = ("Afghanistan|Algeria|Angola|Argentina|Australia|Austria|Bangladesh|Belgium|Bhutan|Bolivia|Botswana|Brazil|Cambodia|Cameroon|Canada|Chad|Chile|China|Colombia|Congo|Costa Rica|Cuba|Denmark|Egypt|Ethiopia|Finland|France|Germany|Ghana|Greece|Guatemala|Haiti|Hong Kong|Hungary|Iceland|India|Indonesia|Iran|Iraq|Ireland|Israel|Italy|Japan|Jordan|Kenya|Kiribati|Kuwait|Laos|Lebanon|Libya|Macau|Madagascar|Malawi|Malaysia|Maldives|Mali|Mexico|Mongolia|Morocco|Mozambique|Myanmar|Nepal|Netherlands|New Zealand|Niger|Nigeria|North Korea|Norway|Pakistan|Panama|Peru|Philippines|Poland|Portugal|Qatar|Russia|Rwanda|Saudi Arabia|Senegal|Sierra Leone|Singapore|Somalia|South Africa|South Korea|South Sudan|Spain|Sri Lanka|Sudan|Sweden|Switzerland|Syria|Taiwan|Tanzania|Thailand|Tunisia|Turkey|Tuvalu|Uganda|Ukraine|United Arab Emirates|UAE|United Kingdom|UK|United States|USA|US|Uruguay|Venezuela|Vietnam|Yemen|Zambia|Zimbabwe|Greenland|Scotland|England|Wales|" +
+    "London|Paris|Berlin|Tokyo|Osaka|Kyoto|Beijing|Shanghai|Shenzhen|Guangzhou|Mumbai|Delhi|Kolkata|Dhaka|Karachi|Lagos|Nairobi|Cairo|Jakarta|Manila|Bangkok|Seoul|Sydney|Melbourne|New York|Los Angeles|Chicago|Mexico City|São Paulo|Rio de Janeiro|Curitiba|Medellín|Bogotá|Lima|Buenos Aires|Toronto|Vancouver|Rotterdam|Amsterdam|Copenhagen|Stockholm|Freiburg|Vienna|Rome|Madrid|Barcelona|Istanbul|Dubai|Riyadh|Tehran|Kabul|Kathmandu|Christchurch|Fukushima|Port-au-Prince|Kobe|Dharavi|Kibera|Cox's Bazar|Berlin|Venice|" +
+    "Sahel|Sahara|Amazon|Himalayas|Arctic|Antarctica|Ganges|Brahmaputra|Mekong|Yangtze|Nile|Mississippi|Murray-Darling|Aral Sea|Mediterranean|Pacific|Atlantic|Indian Ocean|Ring of Fire|Great Barrier Reef|Europe|Africa|Asia|Latin America|Middle East|Sub-Saharan Africa|" +
+    "EU|ASEAN|USMCA|NAFTA|OPEC|WTO|IMF|World Bank|UN|UNHCR|WHO|IPCC|OECD|NATO|G20|Paris Agreement|Kyoto Protocol|Montreal Protocol|Stop at Two|one-child policy|two-child policy|Maternity Capital|Green Revolution|Marshall Plan|Belt and Road|Brexit|Gavi|GiveDirectly|Haber process").split("|");
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const DATE = String.raw`\b(?:1[6-9]\d\d|20\d\d)(?:s\b|\s?[-–]\s?(?:1[6-9]\d\d|20\d\d)\b)?(?!\s?(?:%|km|kg|kJ|mm|ppm|m\b|people|units|tonnes))`;
+  const STAT = String.raw`(?:[$£€¥]\s?)?\b\d[\d,]*(?:\.\d+)?\s?(?:%|per cent|percent|million|billion|trillion|bn\b|km²|km|kg|tonnes|°C|ppm|years?\b|per\s1,?000|per 100\b|times\b|mm\b|kJ\b|mol\b)|[$£€¥]\s?\d[\d,]*(?:\.\d+)?|\b\d+\.\d+\b`;
+  const PLACE = PLACES.sort((a, b) => b.length - a.length).map(esc).join("|");
+  const SKIP = "script,style,code,pre,svg,.banner,.bar,.toc,.qh,.foot,.katex,.plot,button,a,h1,h2,h3,h4,.callout-title,.hl,mark,input,textarea,select,.q-card,.no-hl";
+  const classify = (txt) =>
+    new RegExp("^\\s*" + DATE + "\\s*$").test(txt) ? "d" : new RegExp(STAT).test(txt) && /\d/.test(txt) && txt.length < 40 ? "s" : new RegExp("^(?:" + PLACE + ")$").test(txt.trim()) ? "p" : "k";
+
+  IB.highlight = function (root, opts = {}) {
+    if (!root) return;
+    const doc = root.ownerDocument || document;
+    // 1) bold phrases the notes already stress become highlighted key phrases (or stats/dates/places)
+    root.querySelectorAll("strong, b").forEach((el) => {
+      if (el.closest(SKIP) || el.closest(".keyterm dt, th")) return;
+      el.classList.add("hl", "hl-" + classify(el.textContent));
+    });
+    // 2) dates, statistics, places and the topic's key terms inside running text
+    const terms = (opts.terms || []).filter((t) => t && t.length > 2).sort((a, b) => b.length - a.length);
+    const latin = terms.filter((t) => /^[\w(]/.test(t)).map(esc);
+    const cjk = terms.filter((t) => !/^[\w(]/.test(t)).map(esc);
+    const parts = [`(${DATE})`, `(${STAT})`, `\\b(${PLACE})\\b`];
+    parts.push(latin.length ? `\\b(${latin.join("|")})\\b` : "(?!x)x");
+    parts.push(cjk.length ? `(${cjk.join("|")})` : "(?!x)x");
+    const re = new RegExp(parts.join("|"), "gi");
+    const kinds = ["d", "s", "p", "k", "k"];
+    const walker = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (!n.nodeValue.trim() || (n.parentElement && n.parentElement.closest(SKIP + ",strong,b")) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    const seen = {};
+    nodes.forEach((node) => {
+      const text = node.nodeValue;
+      re.lastIndex = 0;
+      let m, last = 0, frag = null;
+      while ((m = re.exec(text))) {
+        if (!m[0].trim()) { re.lastIndex++; continue; }
+        const g = m.slice(1).findIndex((x) => x !== undefined);
+        const kind = kinds[g];
+        // key terms: only the first two mentions per block, so pages don't turn green
+        if (kind === "k") {
+          const key = m[0].toLowerCase();
+          seen[key] = (seen[key] || 0) + 1;
+          if (seen[key] > 2) continue;
+        }
+        frag = frag || doc.createDocumentFragment();
+        frag.appendChild(doc.createTextNode(text.slice(last, m.index)));
+        const span = doc.createElement("span");
+        span.className = "hl hl-" + kind;
+        span.textContent = m[0];
+        frag.appendChild(span);
+        last = m.index + m[0].length;
+      }
+      if (frag) {
+        frag.appendChild(doc.createTextNode(text.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      }
+    });
+  };
+  IB.highlightKey = () => `<div class="hl-key"><span>Highlight key:</span>${IB.HIGHLIGHTS.map(([k, n]) => `<span class="hl hl-${k}">${n}</span>`).join("")}</div>`;
+})();
+
+/* ---------- essay plans built from extended-response markschemes ---------- */
+IB.essayPlan = function (q) {
+  if (q.type !== "extended" || !q.ms || q.subject === "engb" || q.subject === "chia") return null;
+  const rows = { Intro: [], Diagram: [], For: [], Against: [], Examples: [], Evaluate: [] };
+  q.ms.forEach((p) => {
+    const x = p.replace(/<[^>]+>/g, "").trim();
+    if (/^level\b|^\d+\s*-\s*\d+|^\[?\d+\]/i.test(x)) return;
+    const body = x.replace(/^(for|against|evaluation|evaluate|advantages?|disadvantages?)\s*[:-]\s*/i, "");
+    if (/^(define|definition|describe .*(stages|types))/i.test(x)) rows.Intro.push(x);
+    else if (/^diagram/i.test(x)) rows.Diagram.push(x.replace(/^diagram\s*[:-]\s*/i, ""));
+    else if (/^(for|advantages?|benefits?|strengths?|successes?|some success|useful|gains?|positive|opportunit)/i.test(x)) rows.For.push(body);
+    else if (/^(against|disadvantages?|costs?|limitations?|limits|weakness|problems?|failures?|losers|negative|challenges?|not necessarily|limited success|concerns?)/i.test(x)) rows.Against.push(body);
+    else if (/^(evaluation|evaluate|overall|judgement|it depends)/i.test(x)) rows.Evaluate.push(body);
+    else if (/^(example|evidence|e\.g\.|compare|real-world)/i.test(x) || /, e\.g\. /.test(x)) rows.Examples.push(x);
+    else (rows.For.length && !rows.Against.length ? rows.For : rows.Examples).push(x);
+  });
+  if (!rows.For.length || !rows.Against.length) return null;
+  if (!rows.Intro.length) rows.Intro.push("Define the key terms in the question and state your line of argument (e.g. 'largely true, but it depends on scale and time').");
+  const out = Object.entries(rows).filter(([, v]) => v.length).map(([k, v]) => [k, v.join(" ")]);
+  out.push(["Conclusion", "Answer the question directly with a clear judgement ('largely', 'partly', 'only in the short term'), say what it depends on, and add no new examples."]);
+  return out;
+};
+IB.essayPlansHtml = function (t) {
+  const plans = (t.questions || []).filter((q) => q.type === "extended" && !q.derived).map((q) => [q, IB.essayPlan(q)]).filter((x) => x[1]).slice(0, 4);
+  if (!plans.length) return "";
+  return plans.map(([q, rows], i) => `<div class="plan"><h4 class="plan-q">${"ABCDEFG"[i]}. ${q.q.replace(/\s*\[\d+\]\s*$/, "")} <span class="marks">[${q.marks}]</span></h4><table class="plan-table"><thead><tr><th>Section</th><th>Plan</th></tr></thead><tbody>${rows.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${v}</td></tr>`).join("")}</tbody></table></div>`).join("");
+};
