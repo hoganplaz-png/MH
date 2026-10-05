@@ -342,6 +342,62 @@
           ms: [`\\(v = ${3 * a}t^2 ${2 * b < 0 ? "-" : "+"} ${Math.abs(2 * b)}t ${c < 0 ? "-" : "+"} ${Math.abs(c)}\\) [A1]`, `v(${t}) = ${v} m s⁻¹ [A1]`] };
       },
     ],
+    // ===================== BIOLOGY =====================
+    "bio-1": [
+      () => {
+        const a = R(15, 35), base = P([["thymine", a], ["adenine", a]]), want = P(["guanine", "cytosine"]);
+        const v = (100 - 2 * a) / 2;
+        return { paper: "P2", marks: 2, diff: 1, q: `In a sample of double-stranded DNA, ${a}% of the bases are ${base[0]}. Calculate the percentage of ${want}.`, numeric: { value: v, tol: 0.05 }, ms: [`A = T = ${a}%, so C + G = ${100 - 2 * a}% [M1]`, `${want} = ${v}% [A1]`] };
+      },
+    ],
+    "bio-2": [
+      () => {
+        const actual = P([2, 3, 5, 8, 10, 20, 25, 50]), unit = P(["µm"]), mag = P([400, 1000, 2000, 5000, 10000, 20000]);
+        const imgMm = (actual * mag) / 1000;
+        return Math.random() < 0.5
+          ? { paper: "P2", marks: 2, diff: 1, q: `An image of a structure measures ${imgMm} mm. Its actual size is ${actual} ${unit}. Calculate the magnification.`, numeric: { value: mag, tol: 0.5 }, ms: [`${imgMm} mm = ${imgMm * 1000} µm; ${imgMm * 1000} ÷ ${actual} [M1]`, `×${mag} [A1]`] }
+          : { paper: "P2", marks: 2, diff: 2, q: `A micrograph at ×${mag} shows a cell ${imgMm} mm long. Calculate the actual length in µm.`, numeric: { value: actual, tol: 0.01 }, ms: [`${imgMm} mm = ${imgMm * 1000} µm; ÷ ${mag} [M1]`, `= ${actual} µm [A1]`] };
+      },
+    ],
+    "bio-4": [
+      () => {
+        const N = R(8, 60) * 10, M = R(20, 80), n = R(30, 90);
+        const m = Math.max(1, Math.round((M * n) / N));
+        const est = (M * n) / m;
+        return { paper: "P2", marks: 2, diff: 2, q: `${M} animals were captured, marked and released. Later ${n} were captured, of which ${m} were marked. Estimate the population size using the Lincoln index.`, numeric: { value: Math.round(est), tol: 1 }, ms: [`${M} × ${n} ÷ ${m} [M1]`, `≈ ${Math.round(est)} [A1]`] };
+      },
+    ],
+    "bio-6": [
+      () => {
+        const l = R(1, 10);
+        return { paper: "P2", marks: 2, diff: 1, q: `Calculate the surface area to volume ratio of a cube-shaped cell with sides of ${l} µm. Give the answer as x : 1.`, numeric: { value: dp(6 / l, 2), tol: 0.01 }, ms: [`SA = ${6 * l * l} µm², V = ${l ** 3} µm³ [M1]`, `${dp(6 / l, 2)} : 1 [A1]`] };
+      },
+    ],
+    "bio-10": [
+      () => {
+        const sf = dp(R(60, 100) / 10, 1), rf = dp(R(10, 95) / 100, 2), d = dp(sf * rf, 2);
+        return { paper: "P2", marks: 2, diff: 1, q: `In paper chromatography, a pigment moved ${d} cm and the solvent front moved ${sf} cm. Calculate the Rf value.`, numeric: { value: dp(d / sf, 2), tol: 0.011 }, ms: [`${d} ÷ ${sf} [M1]`, `= ${dp(d / sf, 2)} [A1]`] };
+      },
+    ],
+    "bio-13": [
+      () => {
+        const low = R(5, 50) * 1000, pct = P([5, 8, 10, 12, 15, 20]), high = (low * pct) / 100;
+        return { paper: "P2", marks: 2, diff: 1, q: `Producers contain ${low.toLocaleString()} kJ m⁻² yr⁻¹ and primary consumers ${high.toLocaleString()} kJ m⁻² yr⁻¹. Calculate the percentage energy transfer.`, numeric: { value: pct, tol: 0.05 }, ms: [`${high} ÷ ${low} × 100 [M1]`, `= ${pct}% [A1]`] };
+      },
+    ],
+    "bio-15": [
+      () => {
+        const tot = R(10, 40) * 10, mit = R(5, Math.round(tot / 3));
+        return { paper: "P2", marks: 2, diff: 1, q: `In a sample of ${tot} cells from a root tip, ${mit} were in mitosis. Calculate the mitotic index (to 2 d.p.).`, numeric: { value: dp(mit / tot, 2), tol: 0.006 }, ms: [`${mit} ÷ ${tot} [M1]`, `= ${dp(mit / tot, 2)} [A1]`] };
+      },
+    ],
+    "bio-16": [
+      () => {
+        const m1 = dp(R(150, 400) / 100, 2), pct = P([-12, -8, -6, -4, 3, 5, 7, 10]), m2 = dp(m1 * (1 + pct / 100), 2);
+        const v = dp(((m2 - m1) / m1) * 100, 1);
+        return { paper: "P2", marks: 2, diff: 1, q: `A potato cylinder's mass changed from ${m1} g to ${m2} g in a sucrose solution. Calculate the percentage change in mass.`, numeric: { value: v, tol: 0.15 }, ms: [`(${m2} − ${m1}) ÷ ${m1} × 100 [M1]`, `= ${v}% [A1]`] };
+      },
+    ],
   };
 
   let counter = 0;

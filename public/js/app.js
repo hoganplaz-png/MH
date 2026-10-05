@@ -4,7 +4,7 @@
 
   const IB = (window.IB = window.IB || {});
   IB.subjects = IB.subjects || {};
-  IB.order = ["econ", "chem", "geo", "math"];
+  IB.order = ["econ", "chem", "geo", "math", "bio", "engb", "chia"];
 
   IB.register = function (subject) {
     subject.topics.forEach((t) => {
@@ -56,6 +56,9 @@
     chem: [["P1A", "Paper 1A (MCQ)"], ["P1B", "Paper 1B"], ["P2", "Paper 2"]],
     geo: [["P1", "Paper 1"], ["P2", "Paper 2"]],
     math: [["P1", "Paper 1"], ["P2", "Paper 2"]],
+    bio: [["P1A", "Paper 1A (MCQ)"], ["P1B", "Paper 1B"], ["P2", "Paper 2"]],
+    engb: [["P1", "Paper 1 (writing)"], ["P2", "Paper 2 (reading/listening)"], ["IO", "Individual oral"]],
+    chia: [["P1", "試卷一"], ["P2", "試卷二"], ["IO", "個人口試"]],
   };
   IB.paperName = (subjectId, code) => ((IB.paperOptions[subjectId] || []).find(([c]) => c === code) || [code, code])[1];
   IB.mySource = (r) => [r.session, IB.paperName(r.subject, r.paper), r.qnum ? "Q" + r.qnum : ""].filter(Boolean).join(" · ");
@@ -296,6 +299,9 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     chem: [0, 18, 30, 42, 53, 64, 76],
     geo: [0, 15, 28, 40, 51, 62, 73],
     math: [0, 15, 28, 41, 54, 67, 80],
+    bio: [0, 17, 29, 41, 52, 63, 74],
+    engb: [0, 14, 30, 45, 58, 70, 82],
+    chia: [0, 13, 26, 40, 53, 66, 78],
   };
   IB.grade = function (pct, subjectId) {
     const b = BOUNDS[subjectId] || BOUNDS.math;
@@ -352,7 +358,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
       .replace(/[−–]/g, "-")
       .replace(/\\d?frac\{([^{}]+)\}\{([^{}]+)\}/g, "$1/$2")
       .replace(/(\d)[, ](?=\d{3}\b)/g, "$1")
-      .replace(/(-?\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/g, (m, a, b) => `${m} ${parseFloat(a) / parseFloat(b)}`).replace(/×\s*10\^?/g, "e").match(/-?\d*\.?\d+(e-?\d+)?/gi);
+      .replace(/(-?\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/g, (m, a, b) => `${m} ${parseFloat(a) / parseFloat(b)}`).replace(/(\d)\s*[×x]\s*10\^(-?\d+)/g, "$1e$2").match(/-?\d*\.?\d+(e-?\d+)?/gi);
     if (!nums) return false;
     const target = q.numeric.value;
     const tol = q.numeric.tol ?? Math.max(Math.abs(target) * 0.01, 1e-9);
@@ -365,8 +371,8 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
   // Two back ends with one interface:
   //  - hosted on claude.ai: the page's built-in "ask Claude" ability (runs on the viewer's Claude account);
   //  - self-hosted: server.js (/api/*) with an Anthropic API key.
-  const SUBJECT_NAMES = { econ: "IB Economics SL", chem: "IB Chemistry SL", geo: "IB Geography SL", math: "IB Mathematics: Analysis and Approaches SL" };
-  const TUTOR_RULES = `You are an experienced IB Diploma teacher and examiner tutoring a student in IB Economics SL, Chemistry SL, Geography SL and Mathematics: Analysis & Approaches SL.
+  const SUBJECT_NAMES = { econ: "IB Economics SL", chem: "IB Chemistry SL", geo: "IB Geography SL", math: "IB Mathematics: Analysis and Approaches SL", bio: "IB Biology SL", engb: "IB English B HL", chia: "IB Chinese A: Language and Literature SL (answer in Traditional Chinese)" };
+  const TUTOR_RULES = `You are an experienced IB Diploma teacher and examiner tutoring a student in IB Economics SL, Chemistry SL, Geography SL, Mathematics: Analysis & Approaches SL, Biology SL, English B HL and Chinese A: Language & Literature SL. For Chinese A, reply in Traditional Chinese unless the student writes in English.
 - Guide rather than hand over answers: when asked for help with a problem, give the next hint or ask what they have tried, unless they explicitly ask for the full worked solution.
 - Use IB command terms precisely and say what each demands in marks.
 - Use correct IB terminology, units, significant figures and notation. Economics: say which diagram to draw and how to label it. Geography: push for named, located case studies with data. Chemistry: units, state symbols, s.f. Maths: show working and note Paper 1 (no calculator) vs Paper 2.
@@ -742,7 +748,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     document.body.prepend(header);
     document.body.appendChild(
       IB.el(`<footer class="site-footer"><div class="container">
-      <p><strong>IB Revision Hub</strong> · Economics SL · Chemistry SL · Geography SL · Mathematics AA SL</p>
+      <p><strong>IB Revision Hub</strong> · Economics SL · Chemistry SL · Geography SL · Mathematics AA SL · Biology SL · English B HL · 中文A 語言與文學 SL</p>
       <p>All notes and questions are original IB-style material written for revision. They are not official IB past-paper questions and this site is not affiliated with or endorsed by the International Baccalaureate Organization. Get official past papers and markschemes from your school or the IB store.</p>
     </div></footer>`)
     );

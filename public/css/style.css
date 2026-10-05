@@ -22,7 +22,7 @@
   --good: #1F8A4C; --good-soft: #DDF3E6; --good-ink: #155E34;
   --warn: #B26A00; --warn-soft: #FFF1CC; --warn-ink: #6B4A00;
   --bad: #C2410C;  --bad-soft: #FDE7DC;  --bad-ink: #8A2C05;
-  --econ: #D9480F; --chem: #0B8AA8; --geo: #2F9E44; --math: #6741D9;
+  --econ: #D9480F; --chem: #0B8AA8; --geo: #2F9E44; --math: #6741D9; --bio: #C2255C; --engb: #1864AB; --chia: #9C6500;
   --c-formula: #2D5BFF; --c-formula-bg: #EDF1FF;
   --c-method: #1F8A4C;  --c-method-bg: #EAF8EF;
   --c-trap: #D0312D;    --c-trap-bg: #FDEEEE;
@@ -46,7 +46,7 @@
     --good: #3DDC84; --good-soft: #10331F; --good-ink: #7BEAAB;
     --warn: #FFC53D; --warn-soft: #3A2F0E; --warn-ink: #FFD978;
     --bad: #FF8A65; --bad-soft: #3B1A10; --bad-ink: #FFB59D;
-    --econ: #D9622B; --chem: #1C9FB5; --geo: #2F9E44; --math: #9775FA;
+    --econ: #D9622B; --chem: #1C9FB5; --geo: #2F9E44; --math: #9775FA; --bio: #E64980; --engb: #4D8FDB; --chia: #C08A1E;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3);
     --c-formula: #8DA6FF; --c-formula-bg: #17244A;
     --c-method: #4ADE80;  --c-method-bg: #10291C;
@@ -66,7 +66,7 @@
   --good: #3DDC84; --good-soft: #10331F; --good-ink: #7BEAAB;
   --warn: #FFC53D; --warn-soft: #3A2F0E; --warn-ink: #FFD978;
   --bad: #FF8A65; --bad-soft: #3B1A10; --bad-ink: #FFB59D;
-  --econ: #D9622B; --chem: #1C9FB5; --geo: #2F9E44; --math: #9775FA;
+  --econ: #D9622B; --chem: #1C9FB5; --geo: #2F9E44; --math: #9775FA; --bio: #E64980; --engb: #4D8FDB; --chia: #C08A1E;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3);
   --c-formula: #8DA6FF; --c-formula-bg: #17244A;
   --c-method: #4ADE80;  --c-method-bg: #10291C;
@@ -156,6 +156,9 @@ main { padding-bottom: 72px; min-height: 70vh; }
 .pill.chem { background: color-mix(in srgb, var(--chem) 18%, transparent); color: var(--text); }
 .pill.geo { background: color-mix(in srgb, var(--geo) 18%, transparent); color: var(--text); }
 .pill.math { background: color-mix(in srgb, var(--math) 18%, transparent); color: var(--text); }
+.pill.bio { background: color-mix(in srgb, var(--bio) 18%, transparent); color: var(--text); }
+.pill.engb { background: color-mix(in srgb, var(--engb) 18%, transparent); color: var(--text); }
+.pill.chia { background: color-mix(in srgb, var(--chia) 18%, transparent); color: var(--text); }
 .pill.good { background: var(--good-soft); color: var(--good-ink); }
 .pill.warn { background: var(--warn-soft); color: var(--warn-ink); }
 .pill.bad { background: var(--bad-soft); color: var(--bad-ink); }

@@ -45,9 +45,12 @@ const SUBJECT_NAMES = {
   chem: "IB Chemistry SL",
   geo: "IB Geography SL",
   math: "IB Mathematics: Analysis and Approaches SL",
+  bio: "IB Biology SL",
+  engb: "IB English B HL",
+  chia: "IB Chinese A: Language and Literature SL (answer in Traditional Chinese)",
 };
 
-const TUTOR_SYSTEM = `You are an experienced IB Diploma teacher and examiner tutoring a student in IB Economics SL, Chemistry SL, Geography SL and Mathematics: Analysis & Approaches SL.
+const TUTOR_SYSTEM = `You are an experienced IB Diploma teacher and examiner tutoring a student in IB Economics SL, Chemistry SL, Geography SL, Mathematics: Analysis & Approaches SL, Biology SL, English B HL and Chinese A: Language & Literature SL. For Chinese A, reply in Traditional Chinese unless the student writes in English.
 
 How to tutor:
 - Guide rather than hand over answers. When a student asks for help with a problem, first ask what they have tried or give the next hint, unless they explicitly ask for the full worked solution.
