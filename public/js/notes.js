@@ -102,7 +102,7 @@ IB.page = function () {
       <button data-tab="terms">Key terms</button>
       <button data-tab="skills">Exam skills</button>
       <button data-tab="examples">Worked examples</button>
-      <button data-tab="practice">Practice (${t.questions.length}${IB.hasGenerator(t.id) ? "+∞" : ""})</button>
+      <button data-tab="practice">Practice (${IB.topicQuestions(t.id).length}${IB.hasGenerator(t.id) ? "+∞" : ""})</button>
     </div>
     <div class="card" id="panels" style="--c:${s.color}">
       <div data-panel="concepts">${t.concepts.map((x) => `<div class="concept"><h3>${x.h}</h3>${x.b}</div>`).join("")}</div>
@@ -122,7 +122,7 @@ IB.page = function () {
       IB.qsa("[data-panel]").forEach((p) => p.classList.toggle("hidden", p.dataset.panel !== b.dataset.tab));
     }));
     const list = IB.qs("#practiceList");
-    t.questions.forEach((q, i) => list.appendChild(IB.renderQuestion(q, { number: i + 1, showTopic: false })));
+    IB.topicQuestions(t.id).forEach((q, i) => list.appendChild(IB.renderQuestion(q, { number: i + 1, showTopic: false })));
     const gen = IB.qs("#genBtn");
     if (gen) gen.onclick = () => {
       const q = IB.generate(t.id);

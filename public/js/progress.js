@@ -111,6 +111,9 @@ IB.page = function () {
             cur.attempts.sort((x, y) => x.at - y.at);
             Object.assign(cur.read, inc.read || {});
             Object.assign(cur.flags, inc.flags || {});
+            cur.custom = cur.custom || [];
+            const ck = new Set(cur.custom.map((x) => x.id));
+            (inc.custom || []).forEach((x) => { if (!ck.has(x.id)) cur.custom.push(x); });
             const ek = new Set(cur.exams.map((x) => x.at));
             (inc.exams || []).forEach((x) => { if (!ek.has(x.at)) cur.exams.push(x); });
           });

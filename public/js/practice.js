@@ -323,5 +323,18 @@ IB.page = function () {
   };
   IB.qsa("#modes button").forEach((b) => (b.onclick = () => switchMode(b.dataset.mode)));
   switchMode(IB.param("mode") || "quiz");
+
+  // Sit one of your imported past papers as a timed mock.
+  const myKey = IB.param("mypaper");
+  if (myKey) {
+    const qs = IB.myQuestions().filter((q) => q.paperKey === myKey);
+    if (qs.length) {
+      const [sid, session, paper] = myKey.split("|");
+      const p = IB.subjects[sid].papers[paper];
+      const marks = qs.reduce((n, q) => n + q.marks, 0);
+      const minutes = p ? Math.round((p.minutes * marks) / p.marks) : Math.round(marks * 1.2);
+      startRun({ title: `${IB.subjects[sid].short} · ${session || "My paper"} · ${IB.paperName(sid, paper)}`, subject: sid, questions: qs, minutes, kind: "mock", paper });
+    } else IB.toast("That paper has no questions yet.");
+  }
   renderHistory();
 };

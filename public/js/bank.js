@@ -14,6 +14,7 @@ IB.page = function () {
         <label class="field">Paper<select id="fPaper"><option value="">Any paper</option></select></label>
         <label class="field">Type<select id="fType"><option value="">Any type</option><option value="mcq">Multiple choice</option><option value="short">Short / structured</option><option value="extended">Extended response / essay</option><option value="calc">Calculations only</option></select></label>
         <label class="field">Difficulty<select id="fDiff"><option value="">Any</option><option value="1">Foundation</option><option value="2">Standard</option><option value="3">Challenging</option></select></label>
+        <label class="field">Source<select id="fSource"><option value="">All questions</option><option value="site">Site questions</option><option value="mine">My past papers</option></select></label>
         <label class="field">Status<select id="fStatus"><option value="">All questions</option><option value="new">Not attempted</option><option value="weak">Scored under 60%</option><option value="saved">Saved for review</option></select></label>
         <label class="field field-wide">Search<input type="search" id="fSearch" placeholder="e.g. elasticity, pH, Spearman, tariff…"></label>
       </div>
@@ -29,9 +30,10 @@ IB.page = function () {
 
   const f = {
     sub: IB.qs("#fSub"), topic: IB.qs("#fTopic"), paper: IB.qs("#fPaper"), type: IB.qs("#fType"),
-    diff: IB.qs("#fDiff"), status: IB.qs("#fStatus"), search: IB.qs("#fSearch"),
+    diff: IB.qs("#fDiff"), status: IB.qs("#fStatus"), source: IB.qs("#fSource"), search: IB.qs("#fSearch"),
   };
   f.sub.value = IB.param("subject") || "";
+  f.source.value = IB.param("source") || "";
 
   function fillTopics() {
     const subs = f.sub.value ? [IB.subjects[f.sub.value]] : IB.subjectList();
@@ -51,6 +53,8 @@ IB.page = function () {
     return qs.filter((q) => {
       if (f.topic.value && q.topic !== f.topic.value) return false;
       if (f.paper.value && q.paper !== f.paper.value) return false;
+      if (f.source.value === "mine" && !q.custom) return false;
+      if (f.source.value === "site" && q.custom) return false;
       if (f.type.value === "calc" ? !q.numeric : f.type.value && q.type !== f.type.value) return false;
       if (f.diff.value && String(q.diff) !== f.diff.value) return false;
       if (f.status.value === "new" && q.id in last) return false;

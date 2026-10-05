@@ -30,7 +30,71 @@
   };
   IB.allQuestions = (subjectId) => {
     const subs = subjectId ? [IB.subjects[subjectId]] : IB.subjectList();
-    return subs.filter(Boolean).flatMap((s) => s.topics.flatMap((t) => t.questions || []));
+    const site = subs.filter(Boolean).flatMap((s) => s.topics.flatMap((t) => t.questions || []));
+    const mine = IB.myQuestions().filter((q) => !subjectId || q.subject === subjectId);
+    return site.concat(mine);
+  };
+  IB.topicQuestions = (topicId) => IB.allQuestions(topicId.split("-")[0]).filter((q) => q.topic === topicId);
+
+  // ---------- "My past papers": questions the student imports from their own copies ----------
+  // Stored privately in this browser inside the progress store (so backups include them).
+  // Text is kept raw and escaped when converted, because it is user-supplied.
+  let myCache = null;
+  IB.paperOptions = {
+    econ: [["P1", "Paper 1"], ["P2", "Paper 2"]],
+    chem: [["P1A", "Paper 1A (MCQ)"], ["P1B", "Paper 1B"], ["P2", "Paper 2"]],
+    geo: [["P1", "Paper 1"], ["P2", "Paper 2"]],
+    math: [["P1", "Paper 1"], ["P2", "Paper 2"]],
+  };
+  IB.paperName = (subjectId, code) => ((IB.paperOptions[subjectId] || []).find(([c]) => c === code) || [code, code])[1];
+  IB.mySource = (r) => [r.session, IB.paperName(r.subject, r.paper), r.qnum ? "Q" + r.qnum : ""].filter(Boolean).join(" · ");
+  IB.myQuestions = function () {
+    if (myCache) return myCache;
+    const html = (s) => IB.esc(s).replace(/\n/g, "<br>");
+    myCache = (IB.store.get().custom || [])
+      .filter((r) => IB.subjects[r.subject] && IB.topic(r.topic))
+      .map((r) => {
+        const q = {
+          id: r.id, subject: r.subject, topic: r.topic, paper: r.paper || "", marks: Math.max(1, r.marks | 0), diff: r.diff || 2,
+          type: r.type === "mcq" && r.options && r.options.length >= 2 ? "mcq" : r.type === "extended" ? "extended" : "short",
+          q: html(r.q), ms: (r.ms && r.ms.length ? r.ms : ["(No markscheme added yet - add it in My past papers.)"]).map(IB.esc),
+          custom: true, source: IB.mySource(r), paperKey: r.subject + "|" + (r.session || "") + "|" + (r.paper || ""),
+        };
+        if (q.type === "mcq") Object.assign(q, { options: r.options.map(IB.esc), answer: r.answer >= 0 ? r.answer : 0, marks: 1 });
+        if (r.numeric !== undefined && r.numeric !== null && r.numeric !== "" && isFinite(r.numeric)) q.numeric = { value: Number(r.numeric), tol: Math.max(Math.abs(Number(r.numeric)) * 0.01, 0.001) };
+        return q;
+      });
+    return myCache;
+  };
+  IB.saveMy = function (fn) {
+    IB.store.update((d) => {
+      d.custom = d.custom || [];
+      fn(d.custom);
+    });
+    myCache = null;
+  };
+
+  // Suggest the best-matching topic for a piece of question text (keyword overlap with the notes).
+  IB.suggestTopic = function (subjectId, text) {
+    const s = IB.subjects[subjectId];
+    if (!s) return { topic: null, score: 0 };
+    const tok = (x) => String(x).toLowerCase().replace(/<[^>]+>/g, " ").split(/[^a-z0-9₀-₉⁺⁻]+/).filter((w) => w.length > 3);
+    const words = new Set(tok(text));
+    let best = { topic: s.topics[0].id, score: 0 };
+    s.topics.forEach((t) => {
+      if (!t._kw) {
+        const kw = {};
+        const add = (str, w) => tok(str).forEach((k) => (kw[k] = Math.max(kw[k] || 0, w)));
+        add(t.title, 4); add(t.summary, 2);
+        (t.terms || []).forEach(([k, v]) => { add(k, 4); add(v, 1); });
+        (t.concepts || []).forEach((c) => { add(c.h, 3); add(c.b, 1); });
+        t._kw = kw;
+      }
+      let score = 0;
+      words.forEach((w) => (score += t._kw[w] || 0));
+      if (score > best.score) best = { topic: t.id, score };
+    });
+    return best;
   };
   IB.question = (id) => IB.allQuestions().find((q) => q.id === id) || (IB._generated && IB._generated[id]) || null;
 
@@ -150,7 +214,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
 
   // ---------- storage / progress ----------
   const KEY = "ibrev:v1";
-  const blank = () => ({ attempts: [], read: {}, flags: {}, exams: [], created: Date.now() });
+  const blank = () => ({ attempts: [], read: {}, flags: {}, exams: [], custom: [], created: Date.now() });
   IB.store = {
     get() {
       try {
@@ -161,6 +225,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
       }
     },
     save(d) {
+      myCache = null;
       try {
         localStorage.setItem(KEY, JSON.stringify(d));
       } catch (e) {
@@ -342,6 +407,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
         ${q.paper ? `<span class="pill">${esc(q.paper)}</span>` : ""}
         ${diff ? `<span class="pill ${q.diff === 3 ? "bad" : q.diff === 1 ? "good" : "warn"}">${diff}</span>` : ""}
         ${q.generated ? `<span class="pill">Auto-generated</span>` : ""}
+        ${q.custom ? `<span class="pill good">My past paper · ${esc(q.source)}</span>` : ""}
         <span class="marks">[${q.marks}]</span>
       </div>
       <div class="q-text rich">${q.q}</div>
@@ -512,6 +578,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
         ${link("questionbank.html", "Question Bank", "bank")}
         ${link("practice.html", "Quizzes & Mocks", "practice")}
         ${link("tutor.html", "AI Tutor", "tutor")}
+        ${link("mypapers.html", "My Past Papers", "mypapers")}
         ${link("progress.html", "My Progress", "progress")}
       </nav>
       <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">◐</button>
