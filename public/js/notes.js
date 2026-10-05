@@ -138,7 +138,7 @@ IB.page = function () {
     IB.qs("#printBtn").onclick = () => {
       document.body.classList.add("print-all");
       IB.qsa("details").forEach((d) => (d.open = true));
-      window.print();
+      IB.print();
       document.body.classList.remove("print-all");
     };
     IB.math(c);

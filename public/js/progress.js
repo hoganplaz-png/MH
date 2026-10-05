@@ -121,11 +121,18 @@ IB.page = function () {
         }
       });
     };
-    IB.qs("#reset").onclick = () => {
-      if (confirm("Delete all your saved progress in this browser? Export a backup first if you might want it later.")) {
-        IB.store.save({ attempts: [], read: {}, flags: {}, exams: [], created: Date.now() });
-        render();
+    const reset = IB.qs("#reset");
+    reset.onclick = () => {
+      // Two-step confirmation inside the page (browser confirm dialogs are blocked in some views).
+      if (!reset.dataset.armed) {
+        reset.dataset.armed = "1";
+        reset.textContent = "Click again to delete all progress";
+        setTimeout(() => { if (reset.isConnected) { delete reset.dataset.armed; reset.textContent = "Reset all progress"; } }, 5000);
+        return;
       }
+      IB.store.save({ attempts: [], read: {}, flags: {}, exams: [], created: Date.now() });
+      IB.toast("All progress deleted.");
+      render();
     };
   }
   render();

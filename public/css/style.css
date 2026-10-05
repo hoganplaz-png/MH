@@ -25,6 +25,7 @@
     --border: #34332f; --primary: #748ffc; --primary-ink: #0b0b0a;
     --econ: #d9622b; --chem: #1c9fb5; --geo: #2f9e44; --math: #9775fa;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+    color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
@@ -32,6 +33,7 @@
   --border: #34332f; --primary: #748ffc; --primary-ink: #0b0b0a;
   --econ: #d9622b; --chem: #1c9fb5; --geo: #2f9e44; --math: #9775fa;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -53,7 +55,7 @@ th { background: var(--surface-2); }
 
 /* ---------- layout ---------- */
 .container { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
-.site-header { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.site-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
 .nav { display: flex; align-items: center; gap: 4px; height: 60px; }
 .brand { font-weight: 800; font-size: 1.1rem; color: var(--text); margin-right: auto; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 .brand:hover { text-decoration: none; }

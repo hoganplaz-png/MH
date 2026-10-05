@@ -110,7 +110,14 @@
     return html;
   };
 
+  // In the hosted preview (a sandboxed page) the browser blocks file downloads and printing.
+  IB.hosted = !!window.IB_HOSTED;
+  IB.print = function () {
+    if (IB.hosted) return IB.toast("Printing isn't available in this preview. Run the full site to print or save as PDF.");
+    window.print();
+  };
   IB.download = function (filename, content, mime = "text/html") {
+    if (IB.hosted) return IB.toast("Downloads aren't available in this preview. Run the full site to download files.");
     const blob = new Blob([content], { type: mime + ";charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
