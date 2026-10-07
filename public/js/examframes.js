@@ -33,6 +33,8 @@
       t.mc = (t.mc || []).concat(add.mc || []);
       if (add.concepts) t.concepts = t.concepts.concat(add.concepts);
       if (add.terms) t.terms = (t.terms || []).concat(add.terms);
+      if (add.diagrams) t.diagrams = (t.diagrams || []).concat(add.diagrams);
+      if (add.figures) t.figures = (t.figures || []).concat(add.figures);
       const qs = [];
       (add.frames || []).forEach((f) => {
         if (!f.q || f.bank === false) return;
@@ -69,10 +71,16 @@
         <table class="mf-table"><thead><tr><th>Mark</th><th>${ZH(opts.sid) ? "考官要見到 What the examiner must see" : "What the examiner must see 考官要見到"}</th></tr></thead>
         <tbody>${r.map((x) => `<tr><th scope="row"><span class="mf-lab">${x.l}</span>${x.m > 1 ? `<small>${x.m} marks</small>` : ""}</th><td>${kw(x.t)}</td></tr>`).join("")}</tbody></table>
         ${f.diagram && IB.plot ? `<div class="mf-diagram"><b>Expected sketch</b>${IB.plot(f.diagram)}</div>` : ""}
+        ${f.svg ? `<div class="mf-diagram"><b>Expected diagram</b>${IB.figureHtml({ svg: f.svg, caption: f.svgCaption })}</div>` : ""}
         ${f.model ? `<div class="mf-model"><b>📝 Model answer 標準答案</b><div>${kw(f.model)}</div></div>` : ""}
         ${acc || rej ? `<div class="mf-ar${acc && rej ? "" : " one"}">${acc}${rej}</div>` : ""}
         ${f.tip ? `<p class="mf-tip" lang="zh-HK">💡 ${f.tip}</p>` : ""}
       </div></article>`;
+  };
+  // Hand-drawn SVG figures (orbital boxes, spectra, structures, cells, circuits...). SVGs use currentColor and
+  // the --fig-* colours so they work in light and dark mode and in the PDF.
+  IB.figureHtml = function (x) {
+    return `<figure class="fig">${x.svg}${x.caption || x.title ? `<figcaption>${x.title ? `<strong>${x.title}</strong>${x.caption ? " · " : ""}` : ""}${x.caption || ""}</figcaption>` : ""}</figure>`;
   };
   IB.mcSkillsHtml = function (t) {
     return `<ol class="mc-skills">${t.mc.map((m) => `<li>${m.skill}${m.q ? `<details class="mc-eg"><summary>Try it</summary><div>${m.q}<ol type="A">${m.options.map((o) => `<li>${o}</li>`).join("")}</ol><p><b>Answer ${"ABCD"[m.answer]}.</b> ${m.why || ""}</p></div></details>` : ""}</li>`).join("")}</ol>`;

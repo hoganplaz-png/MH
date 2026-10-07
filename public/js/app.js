@@ -1017,7 +1017,9 @@ IB.topicSections = function (t, opts = {}) {
   const concepts = t.concepts.filter((x) => IB.showItem(t.subject, x));
   out.push(["concepts", "Concepts", `<section class="card concepts" id="sec-concepts" data-reveal><h3 class="section-title">Key concepts</h3>${t.yue ? `<aside class="yue yue-top" lang="zh-HK"><strong class="yue-tag">廣東話重點</strong> ${t.yue}</aside>` : ""}${concepts.map((x) => `<div class="concept${x.hl ? " is-ahl" : ""}"><h3>${x.h}${ahl(x)}</h3>${x.b}${yue(x)}</div>`).join("")}</section>`]);
   if (t.table) out.push(["table", "Compare", `<section class="card" id="sec-table" data-reveal><h3 class="section-title">Compare at a glance</h3><div class="table-wrap"><table class="compare"><tr>${t.table.head.map((h) => `<th>${h}</th>`).join("")}</tr>${t.table.rows.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th scope="row">${x}</th>`)).join("")}</tr>`).join("")}</table></div></section>`]);
-  if (t.diagrams && t.diagrams.length && IB.plot) out.push(["diagrams", "Diagrams", `<section class="card" id="sec-diagrams" data-reveal><h3 class="section-title">Diagrams to know</h3><div class="plot-grid">${t.diagrams.map(IB.plot).join("")}</div></section>`]);
+  const figs = (t.figures || []).filter((x) => IB.showItem(t.subject, x));
+  const plots = (t.diagrams || []).filter((x) => IB.showItem(t.subject, x));
+  if ((plots.length && IB.plot) || figs.length) out.push(["diagrams", "Diagrams", `<section class="card" id="sec-diagrams" data-reveal><h3 class="section-title">Diagrams & graphs to know</h3><div class="plot-grid">${plots.map(IB.plot).join("")}${figs.map(IB.figureHtml).join("")}</div></section>`]);
   const methods = (t.methods || []).concat((t.skills || []).map((x) => `<strong>${x.h}:</strong> ${x.b}`));
   if (methods.length) out.push(["methods", "Fastest methods", box("method", "Fastest methods", `<ol>${methods.map((m) => `<li>${m}</li>`).join("")}</ol>`, "sec-methods")]);
   if (t.traps && t.traps.length) out.push(["traps", "Traps", box("trap", "Traps", `<ul>${t.traps.map((m) => `<li>${m}</li>`).join("")}</ul>`, "sec-traps")]);

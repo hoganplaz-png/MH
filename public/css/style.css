@@ -854,3 +854,7 @@ u.kw { text-decoration: underline; text-decoration-color: #E03131; text-decorati
 .mf-table thead th:last-child { width: auto; }
 table.mf-table thead { display: table-header-group; } table.mf-table tbody { display: table-row-group; } table.mf-table tr { display: table-row; }
 table.mf-table th, table.mf-table td { display: table-cell; }
+.fig { margin: 0; color: var(--text); --fig-a: var(--c, var(--primary)); --fig-b: #2D5BFF; --fig-c: #2F9E44; --fig-d: #E03131; --fig-muted: var(--muted); --fig-fill: color-mix(in srgb, var(--text) 6%, var(--surface)); }
+.fig svg { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; }
+.fig figcaption { font-size: .85rem; color: var(--muted); text-align: center; margin-top: 4px; }
+.fig text { fill: currentColor; font-family: inherit; }
