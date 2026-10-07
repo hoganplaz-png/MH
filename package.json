@@ -1,0 +1,15 @@
+{
+  "name": "ib-revision-hub",
+  "version": "1.0.0",
+  "description": "IB revision website (SL/HL): notes with answer frameworks, a question bank with strict markscheme marking, IB-style PDF papers, mocks, a mistakes notebook, XP, friends and Google sign-in.",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node scripts/check-data.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  }
+}
