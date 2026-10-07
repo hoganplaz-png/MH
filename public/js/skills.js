@@ -7,10 +7,10 @@ IB.page = function () {
   app.innerHTML = `<h1 style="margin-bottom:.2em">Exam skills</h1>
     <p class="muted" style="margin-top:0">An answer framework for every question type, sentence starters, worked examples, and the markscheme decoded - so you know exactly where every mark comes from.</p>
     <div class="subject-tabs" id="subTabs"></div>
-    <div class="tabs" id="modeTabs" style="margin-top:14px"><button data-m="frameworks" class="active">Answer frameworks</button><button data-m="decoder">Markscheme decoder</button><button data-m="terms">Command terms</button></div>
+    <div class="tabs" id="modeTabs" style="margin-top:14px"><button data-m="frameworks" class="active">Answer frameworks</button><button data-m="mframes">Markscheme frames by topic</button><button data-m="phrases">Full-mark phrases</button><button data-m="decoder">Markscheme decoder</button><button data-m="terms">Command terms</button></div>
     <div id="skillBody"></div>`;
 
-  let mode = "frameworks";
+  let mode = IB.param("topic") ? "mframes" : "frameworks";
   const go = (s) => { sid = s; history.replaceState(null, "", `skills.html?subject=${s}`); render(); };
 
   function render() {
@@ -31,6 +31,21 @@ IB.page = function () {
       };
       IB.qsa(".fw-chip", body).forEach((c) => (c.onclick = () => show(+c.dataset.i)));
       show(0);
+    } else if (mode === "mframes") {
+      const ts = s.topics.filter((t) => (t.mframes || []).length);
+      let tid = IB.param("topic");
+      if (!ts.some((t) => t.id === tid)) tid = ts[0] && ts[0].id;
+      body.innerHTML = ts.length ? `<div class="card" style="margin-top:16px"><label class="field" for="mfTopic">Topic</label><select id="mfTopic">${ts.map((t) => `<option value="${t.id}" ${t.id === tid ? "selected" : ""}>${IB.esc(t.code)} ${IB.esc(t.title)} (${t.mframes.length})</option>`).join("")}</select></div><div id="mfBody"></div>` : `<p class="muted">No frames yet for this subject.</p>`;
+      const showT = (id) => {
+        const t = IB.topic(id);
+        const secs = IB.examFrameSections(t);
+        IB.qs("#mfBody").innerHTML = secs.map((x) => x[2]).join("") + `<p class="btn-row"><a class="btn" href="notes.html?subject=${s.id}&topic=${t.id}">Open the full notes</a><a class="btn primary" href="questionbank.html?subject=${s.id}&topic=${t.id}">Practise this topic</a></p>`;
+        history.replaceState(null, "", `skills.html?subject=${s.id}&topic=${id}`);
+        IB.math(IB.qs("#mfBody"));
+      };
+      if (ts.length) { IB.qs("#mfTopic").onchange = (e) => showT(e.target.value); showT(tid); }
+    } else if (mode === "phrases") {
+      body.innerHTML = IB.examFrameOverviewHtml(s.id) || `<p class="muted">Coming soon for this subject.</p>`;
     } else if (mode === "decoder") {
       body.innerHTML = F.decoder.map((d) => `<section class="card" data-reveal style="margin-top:16px"><h2 style="margin-top:0">${IB.esc(d.title)}</h2><div class="table-wrap"><table class="compare"><tr><th>Band / code</th><th>What the markscheme says</th><th>What it means</th><th>How to get there</th></tr>${d.rows.map((r) => `<tr><th scope="row" class="mono">${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("")}</table></div></section>`).join("") + (s.gameplan && s.gameplan.codes ? `<section class="callout tip"><h3 class="callout-title">Quick reference</h3><div class="table-wrap"><table class="compare">${s.gameplan.codes.map((r) => `<tr><th scope="row" class="mono">${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("")}</table></div></section>` : "");
     } else {

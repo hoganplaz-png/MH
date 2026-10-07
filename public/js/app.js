@@ -1022,6 +1022,7 @@ IB.topicSections = function (t, opts = {}) {
   if (methods.length) out.push(["methods", "Fastest methods", box("method", "Fastest methods", `<ol>${methods.map((m) => `<li>${m}</li>`).join("")}</ol>`, "sec-methods")]);
   if (t.traps && t.traps.length) out.push(["traps", "Traps", box("trap", "Traps", `<ul>${t.traps.map((m) => `<li>${m}</li>`).join("")}</ul>`, "sec-traps")]);
   if (t.examples && t.examples.length) out.push(["examples", "Worked examples", box("example", "Worked examples", t.examples.map((e, i) => `<div class="worked"><strong>Example ${i + 1}.</strong> ${e.q}${opts.static ? `<div class="sol"><strong>Solution:</strong> ${e.a}</div>` : `<details class="sol"><summary>Show solution</summary><div>${e.a}</div></details>`}</div>`).join(""), "sec-examples")]);
+  if (IB.examFrameSections) out.push(...IB.examFrameSections(t));
   const plans = IB.essayPlansHtml ? IB.essayPlansHtml(t) : "";
   if (plans) out.push(["plans", "Essay plans", `<section class="card plans" id="sec-plans" data-reveal><h3 class="section-title">Practice essay plans</h3><p class="small muted" style="margin-top:0">Built from the markschemes: intro → for → against → examples → evaluate → conclusion. Use at least two evaluation lenses (scale, time, stakeholders, place, evidence).</p>${plans}</section>`]);
   const frames = IB.topicFrames ? IB.topicFrames(t) : t.frame || [];
@@ -1080,7 +1081,7 @@ IB.HIGHLIGHTS = [
     const doc = root.ownerDocument || document;
     // 1) bold phrases the notes already stress become highlighted key phrases (or stats/dates/places)
     root.querySelectorAll("strong, b").forEach((el) => {
-      if (el.closest(SKIP) || el.closest(".keyterm dt, th")) return;
+      if (el.closest(SKIP) || el.closest(".keyterm dt, th, .mf-q > b, .mf-model > b, .mf-acc > b, .mf-rej > b, .mf-diagram > b, .mc-eg b")) return;
       el.classList.add("hl", "hl-" + classify(el.textContent));
     });
     // 2) dates, statistics, places and the topic's key terms inside running text

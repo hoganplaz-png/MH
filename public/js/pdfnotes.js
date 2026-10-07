@@ -97,6 +97,22 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
 .ms{border-left:4px solid ${c};background:#F7F8FB;border-radius:8px;padding:7px 12px;margin:0 0 8px}
 .ms .a{font-weight:800;color:${c}}
 .katex{font-size:1.05em}
+/* markscheme frames */
+.mframe{border:1.6px solid #13897A;border-radius:12px;overflow:hidden;margin:0 0 12px;background:#fff}
+.mf-head{background:linear-gradient(100deg,#0F7B6C,#16B3A0);color:#fff;padding:8px 14px}
+.mf-title{font:800 13.5px Figtree,sans-serif}.mf-n{opacity:.9}.mf-where{font-size:11px;opacity:.92;margin-top:2px}.mf-star{color:#FFE066}
+.mf-body{padding:8px 12px 6px}
+.mf-q{font-size:11.8px;background:#F6F8FB;border-radius:8px;padding:6px 10px;margin:0 0 8px}.mf-q b{color:#13897A;margin-right:4px}.mf-m{font:700 10.5px "JetBrains Mono",monospace;color:#55607A}
+table.mf-table{margin:0 0 8px}.mf-table thead th{background:#1F2937}.mf-table tbody th{width:52px;background:#7048E8;color:#fff;text-align:center;vertical-align:middle}.mf-table tbody th small{display:block;font-size:9px;font-weight:600}
+.mf-lab{font:800 11.5px Figtree,sans-serif}
+u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thickness:1.5px;text-underline-offset:2px}
+.mf-model{border-left:4px solid #1C7ED6;background:#EEF6FF;border-radius:6px;padding:6px 10px;margin:0 0 8px}.mf-model>b{display:block;font-size:10.5px;color:#1864AB;letter-spacing:.04em;text-transform:uppercase}
+.mf-ar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 6px}.mf-ar.one{grid-template-columns:1fr}
+.mf-acc,.mf-rej{border-radius:6px;padding:6px 10px;font-size:11.5px}.mf-acc{background:#E6F8EC}.mf-rej{background:#FDECEC}
+.mf-acc b,.mf-rej b{display:block;font-size:10px;letter-spacing:.04em;text-transform:uppercase}.mf-acc b{color:#1F8A4C}.mf-rej b{color:#C92A2A}
+.mf-tip{color:#C2255C;font-weight:700;margin:4px 0 2px}
+.mf-diagram{margin:0 0 8px}.mf-diagram>b{display:block;font-size:10.5px;color:#55607A;text-transform:uppercase}.mf-diagram svg{width:300px;height:auto;--plot-a:${c};--plot-b:#2D5BFF;--plot-c:#1F8A4C;--muted:#6B7487;--text:#1B2436}
+.mf-legend{font-size:11px;color:#55607A}
 `;
 
   // ---------- content builders ----------
@@ -119,6 +135,13 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
       t.examples.forEach((e, i) => b.push(box("example", `${L(s, "Worked example", "例題")} ${i + 1}`, `<p><strong>${e.q}</strong></p><div class="sol">${e.a}</div>`)));
     }
     if (t.tips && t.tips.length) b.push(head(L(s, "Exam tips", "考試貼士")) + box("tip", L(s, "Exam tip", "考試貼士"), `<ul>${t.tips.map((m) => `<li>${m}</li>`).join("")}</ul>`));
+    const mfr = (t.mframes || []).filter((f) => IB.showItem(s.id, f));
+    if (mfr.length) {
+      b.push(head("答題框架 & markschemes · " + L(s, "What the examiner must see", "考官要見到")));
+      mfr.forEach((f, i) => b.push(IB.frameCardHtml(f, i + 1, { sid: s.id })));
+    }
+    const mcs = (t.mc || []).filter((m) => IB.showItem(s.id, m));
+    if (mcs.length) b.push(head(L(s, "MC speed skills", "選擇題快速技巧")) + box("method", "MC speed skills · 選擇題快速技巧", `<ol>${mcs.map((m) => `<li>${m.skill}</li>`).join("")}</ol>`));
     const frames = IB.topicFrames ? IB.topicFrames(t) : [];
     if (frames.length) {
       b.push(head("答題框架 · " + L(s, "Answer frameworks", "答題步驟")));
