@@ -768,6 +768,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
   };
 
   function chrome() {
+    IB.qsa("body > .site-header, body > .site-footer").forEach((el) => el.remove());
     const page = document.body.dataset.page || "";
     const link = (href, label, id) => `<a href="${href}" class="${page === id ? "active" : ""}">${label}</a>`;
     const header = IB.el(`<header class="site-header"><div class="container nav">
@@ -819,15 +820,23 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     while (band.nextElementSibling && band.nextElementSibling.tagName === "P") band.appendChild(band.nextElementSibling);
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    chrome();
+  // Run the current page's IB.page(), then the shared intro band and motion.
+  IB.renderChrome = chrome;
+  IB.runPage = function () {
     const ret = typeof IB.page === "function" ? IB.page() : null;
-    Promise.resolve(ret).then(() => {
+    return Promise.resolve(ret).then(() => {
       introBand();
       const app = document.getElementById("app");
       if (IB.floaters) IB.qsa(".band", app).forEach(IB.floaters);
       if (IB.animate) IB.animate(app);
     });
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // The hosted copy is a single page with a router (js/router.js) so every screen keeps the AI connection.
+    if (IB.router) return IB.router();
+    chrome();
+    IB.runPage();
   });
 })();
 

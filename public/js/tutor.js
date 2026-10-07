@@ -8,7 +8,9 @@ IB.page = async function () {
 
   app.innerHTML = `<h1 style="margin-bottom:.2em">AI tutor</h1>
     <p class="muted" style="margin-top:0">Ask for an explanation, a hint, a diagram description, feedback on an essay plan, or a step-by-step method. The tutor guides you like a teacher - ask for the full solution if you want it.</p>
-    ${ai ? "" : `<div class="notice warn small"><strong>AI is offline on this copy of the site.</strong> You'll get answers drawn from the revision notes instead. To switch on the full AI tutor and examiner-style marking, run the site with an Anthropic API key (see README).</div>`}
+    ${ai ? "" : IB.hosted
+      ? `<div class="notice warn small"><strong>AI isn't connected in this view.</strong> Open the site from its claude.ai link while signed in to Claude (not in a separate tab or saved copy), and allow AI if the page asks. Meanwhile you'll get answers drawn from the revision notes.</div>`
+      : `<div class="notice warn small"><strong>AI is offline on this copy of the site.</strong> You'll get answers drawn from the revision notes instead. To switch on the full AI tutor and examiner-style marking, run the site with an Anthropic API key (see README).</div>`}
     <div class="card">
       <div class="filters">
         <label class="field">Subject<select id="tSub"><option value="">Any subject</option>${IB.subjectList().map((s) => `<option value="${s.id}">${s.name}</option>`).join("")}</select></label>
