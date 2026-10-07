@@ -57,8 +57,8 @@
   };
 
   function derive(s) {
-    const allTerms = s.topics.flatMap((t) => (t.terms || []).map(([k, v]) => ({ k, v, topic: t.id })));
-    s.topics.forEach((t) => {
+    const allTerms = s.allTopics.flatMap((t) => (t.terms || []).map(([k, v]) => ({ k, v, topic: t.id })));
+    s.allTopics.forEach((t) => {
       const r = rng(seedOf(t.id));
       const qs = (t.questions = t.questions || []);
       qs.forEach((q) => (q.sec = q.sec || (q.numeric ? "calc" : "exam")));

@@ -4,20 +4,83 @@
 
   const IB = (window.IB = window.IB || {});
   IB.subjects = IB.subjects || {};
-  IB.order = ["econ", "chem", "geo", "math", "bio", "engb", "chia"];
+  IB.order = ["econ", "chem", "phys", "geo", "math", "bio", "engb", "chia"];
+
+  // ---------- SL / HL ----------
+  // Each subject remembers the level the student takes. HL shows every topic; SL hides topics (and
+  // concepts/questions) marked hl:true. s.topics, s.name, s.short and s.papers follow the level.
+  const LEVEL_KEY = "ibrev:levels";
+  let levelCache = null;
+  const readLevels = () => {
+    if (levelCache) return levelCache;
+    try { levelCache = JSON.parse(localStorage.getItem(LEVEL_KEY) || "{}") || {}; } catch (e) { levelCache = {}; }
+    return levelCache;
+  };
+  IB.levelOf = (sid) => {
+    const s = IB.subjects[sid];
+    if (!s) return "SL";
+    if (s.levels.length === 1) return s.levels[0];
+    return readLevels()[sid] === "HL" ? "HL" : "SL";
+  };
+  IB.hasHL = (sid) => !!(IB.subjects[sid] && IB.subjects[sid].levels.length > 1);
+  IB.setLevel = (sid, lv) => {
+    const all = readLevels();
+    all[sid] = lv === "HL" ? "HL" : "SL";
+    try { localStorage.setItem(LEVEL_KEY, JSON.stringify(all)); } catch (e) { /* ignore */ }
+    if (IB.onLevelChange) IB.onLevelChange(sid, all[sid]);
+  };
+  IB.isHLItem = (x) => !!(x && x.hl);
+  IB.showItem = (sid, x) => !IB.isHLItem(x) || IB.levelOf(sid) === "HL";
+
+  const prepTopic = (subject, t) => {
+    t.subject = subject.id;
+    (t.questions || []).forEach((q, i) => {
+      q.id = q.id || `${t.id}-q${i + 1}`;
+      q.subject = subject.id;
+      q.topic = t.id;
+      q.type = q.type || (q.options ? "mcq" : "short");
+      q.diff = q.diff || 2;
+      if (t.hl) q.hl = true;
+    });
+  };
 
   IB.register = function (subject) {
-    subject.topics.forEach((t) => {
-      t.subject = subject.id;
-      (t.questions || []).forEach((q, i) => {
-        q.id = q.id || `${t.id}-q${i + 1}`;
-        q.subject = subject.id;
-        q.topic = t.id;
-        q.type = q.type || (q.options ? "mcq" : "short");
-        q.diff = q.diff || 2;
-      });
+    subject.levels = subject.levels || (/\bHL$/.test(subject.name) ? ["HL"] : /\bSL$/.test(subject.name) && !subject.hlAvailable ? ["SL"] : ["SL", "HL"]);
+    subject.baseName = subject.baseName || subject.name.replace(/\s+(SL|HL)$/, "");
+    subject.baseShort = subject.baseShort || (subject.short || subject.baseName).replace(/\s+(SL|HL)$/, "");
+    subject.allTopics = subject.topics;
+    subject.allPapers = subject.papers || {};
+    subject.allTopics.forEach((t) => prepTopic(subject, t));
+    const level = () => IB.levelOf(subject.id);
+    Object.defineProperty(subject, "topics", { configurable: true, get: () => (level() === "HL" ? subject.allTopics : subject.allTopics.filter((t) => !t.hl)) });
+    Object.defineProperty(subject, "name", { configurable: true, get: () => `${subject.baseName} ${level()}` });
+    Object.defineProperty(subject, "short", { configurable: true, get: () => `${subject.baseShort} ${level()}` });
+    Object.defineProperty(subject, "papers", {
+      configurable: true,
+      get: () => {
+        const out = {};
+        Object.entries(subject.allPapers).forEach(([k, p]) => {
+          if (p.hl && level() !== "HL") return;
+          out[k] = level() === "HL" && p.hlVersion ? Object.assign({}, p, p.hlVersion) : p;
+        });
+        return out;
+      },
     });
     IB.subjects[subject.id] = subject;
+  };
+
+  // HL-only topics (AHL) added from separate data files.
+  IB.addTopics = function (subjectId, topics) {
+    const s = IB.subjects[subjectId];
+    if (!s) return;
+    if (!s.levels.includes("HL")) s.levels = ["SL", "HL"];
+    topics.forEach((t) => {
+      t.hl = t.hl !== false;
+      prepTopic(s, t);
+      const after = t.after ? s.allTopics.findIndex((x) => x.id === t.after) : -1;
+      if (after >= 0) s.allTopics.splice(after + 1, 0, t);
+      else s.allTopics.push(t);
+    });
   };
 
   // Merge exam-focused extras (game plan, methods, traps, tips, diagrams) into a registered subject.
@@ -26,7 +89,7 @@
     if (!s) return;
     if (extra.gameplan) s.gameplan = extra.gameplan;
     Object.entries(extra.topics || {}).forEach(([id, add]) => {
-      const t = s.topics.find((x) => x.id === id);
+      const t = s.allTopics.find((x) => x.id === id);
       if (t) Object.assign(t, add);
     });
   };
@@ -36,7 +99,7 @@
     const s = IB.subjects[subjectId];
     if (!s) return;
     Object.entries(byTopic).forEach(([id, list]) => {
-      const t = s.topics.find((x) => x.id === id);
+      const t = s.allTopics.find((x) => x.id === id);
       if (!t) return;
       t.questions = t.questions || [];
       list.forEach((q) => {
@@ -44,6 +107,7 @@
         Object.assign(q, { subject: s.id, topic: t.id });
         q.type = q.type || (q.options ? "mcq" : "short");
         q.diff = q.diff || 2;
+        if (t.hl) q.hl = true;
         t.questions.push(q);
       });
     });
@@ -52,14 +116,14 @@
   IB.subjectList = () => IB.order.map((id) => IB.subjects[id]).filter(Boolean);
   IB.topic = (topicId) => {
     for (const s of IB.subjectList()) {
-      const t = s.topics.find((x) => x.id === topicId);
+      const t = s.allTopics.find((x) => x.id === topicId);
       if (t) return t;
     }
     return null;
   };
   IB.allQuestions = (subjectId) => {
     const subs = subjectId ? [IB.subjects[subjectId]] : IB.subjectList();
-    const site = subs.filter(Boolean).flatMap((s) => s.topics.flatMap((t) => t.questions || []));
+    const site = subs.filter(Boolean).flatMap((s) => s.topics.flatMap((t) => (t.questions || []).filter((q) => !q.hl || IB.levelOf(s.id) === "HL")));
     const mine = IB.myQuestions().filter((q) => !subjectId || q.subject === subjectId);
     return site.concat(mine);
   };
@@ -70,10 +134,11 @@
   // Text is kept raw and escaped when converted, because it is user-supplied.
   let myCache = null;
   IB.paperOptions = {
-    econ: [["P1", "Paper 1"], ["P2", "Paper 2"]],
+    econ: [["P1", "Paper 1"], ["P2", "Paper 2"], ["P3", "Paper 3 (HL)"]],
     chem: [["P1A", "Paper 1A (MCQ)"], ["P1B", "Paper 1B"], ["P2", "Paper 2"]],
-    geo: [["P1", "Paper 1"], ["P2", "Paper 2"]],
-    math: [["P1", "Paper 1"], ["P2", "Paper 2"]],
+    phys: [["P1A", "Paper 1A (MCQ)"], ["P1B", "Paper 1B"], ["P2", "Paper 2"]],
+    geo: [["P1", "Paper 1"], ["P2", "Paper 2"], ["P3", "Paper 3 (HL)"]],
+    math: [["P1", "Paper 1"], ["P2", "Paper 2"], ["P3", "Paper 3 (HL)"]],
     bio: [["P1A", "Paper 1A (MCQ)"], ["P1B", "Paper 1B"], ["P2", "Paper 2"]],
     engb: [["P1", "Paper 1 (writing)"], ["P2", "Paper 2 (reading/listening)"], ["IO", "Individual oral"]],
     chia: [["P1", "試卷一"], ["P2", "試卷二"], ["IO", "個人口試"]],
@@ -320,9 +385,17 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     bio: [0, 17, 29, 41, 52, 63, 74],
     engb: [0, 14, 30, 45, 58, 70, 82],
     chia: [0, 13, 26, 40, 53, 66, 78],
+    phys: [0, 16, 28, 40, 51, 63, 75],
+    // HL boundaries (approximate - they vary by session)
+    "econ:HL": [0, 15, 29, 41, 52, 63, 74],
+    "chem:HL": [0, 17, 29, 41, 52, 63, 74],
+    "geo:HL": [0, 14, 27, 39, 50, 61, 72],
+    "math:HL": [0, 13, 26, 38, 51, 64, 77],
+    "bio:HL": [0, 16, 28, 40, 51, 62, 73],
+    "phys:HL": [0, 15, 27, 39, 50, 62, 74],
   };
   IB.grade = function (pct, subjectId) {
-    const b = BOUNDS[subjectId] || BOUNDS.math;
+    const b = BOUNDS[subjectId + ":" + IB.levelOf(subjectId)] || BOUNDS[subjectId] || BOUNDS.math;
     let g = 1;
     for (let i = 0; i < b.length; i++) if (pct >= b[i]) g = i + 1;
     return g;

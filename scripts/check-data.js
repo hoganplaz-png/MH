@@ -10,7 +10,7 @@ ctx.window = ctx;
 ctx.document = { addEventListener() {}, documentElement: { dataset: {} } };
 ctx.localStorage = { getItem: () => null, setItem() {} };
 vm.createContext(ctx);
-for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "data/econ-bank.js", "data/chem-bank.js", "data/geo-bank.js", "data/math-bank.js", "data/bio-bank.js", "data/engb-bank.js", "data/chia-bank.js", "generators.js", "bankbuild.js", "plot.js"]) {
+for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "data/econ-bank.js", "data/chem-bank.js", "data/geo-bank.js", "data/math-bank.js", "data/bio-bank.js", "data/engb-bank.js", "data/chia-bank.js", "data/phys.js", "data/phys2.js", "generators.js", "bankbuild.js", "plot.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), ctx, { filename: f });
 }
 const IB = ctx.IB;
@@ -19,7 +19,7 @@ const ids = new Set();
 let total = 0;
 
 for (const s of IB.subjectList()) {
-  for (const t of s.topics) {
+  for (const t of s.allTopics) {
     if (!t.concepts?.length) errors.push(`${t.id}: no concepts`);
     for (const q of t.questions) {
       total++;
@@ -40,7 +40,7 @@ for (const s of IB.subjectList()) {
 // every topic should now have the exam-focused extras, and every diagram must render
 for (const s of IB.subjectList()) {
   if (!s.gameplan) errors.push(`${s.id}: no game plan`);
-  for (const t of s.topics) {
+  for (const t of s.allTopics) {
     if (!t.traps?.length) errors.push(`${t.id}: no traps`);
     if (!(t.methods?.length || t.skills?.length)) errors.push(`${t.id}: no methods`);
     if (!t.tips?.length) errors.push(`${t.id}: no exam tips`);
@@ -65,8 +65,8 @@ for (const tid of IB.generatorTopics()) {
   }
 }
 
-console.log(`${IB.subjectList().length} subjects, ${IB.subjectList().reduce((n, s) => n + s.topics.length, 0)} topics, ${total} bank questions, ${IB.generatorTopics().length} generator topics (${gens} samples checked)`);
-for (const s of IB.subjectList()) console.log(`  ${s.name}: ${s.topics.length} topics, ${IB.allQuestions(s.id).length} questions`);
+console.log(`${IB.subjectList().length} subjects, ${IB.subjectList().reduce((n, s) => n + s.allTopics.length, 0)} topics, ${total} bank questions, ${IB.generatorTopics().length} generator topics (${gens} samples checked)`);
+for (const s of IB.subjectList()) console.log(`  ${s.name}: ${s.allTopics.length} topics, ${IB.allQuestions(s.id).length} questions`);
 if (errors.length) {
   console.error(`\n${errors.length} problem(s):\n - ` + errors.join("\n - "));
   process.exit(1);

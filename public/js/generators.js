@@ -15,6 +15,78 @@
   const money = (x) => x.toLocaleString("en-US", { maximumFractionDigits: 2 });
 
   const G = {
+
+    // ===================== PHYSICS =====================
+    "phys-1": [
+      () => {
+        const u = R(0, 15), a = dp(R(5, 40) / 10, 1), t = R(2, 12), s = dp(u * t + 0.5 * a * t * t, 1);
+        return { paper: "P2", marks: 2, diff: 1, q: `A car moving at ${u} m s⁻¹ accelerates uniformly at ${a} m s⁻² for ${t} s. Calculate the distance travelled in m.`, numeric: { value: s, tol: Math.max(0.5, s * 0.01) }, ms: [`s = ut + ½at² [M1]`, `= ${s} m [A1]`] };
+      },
+      () => {
+        const h = R(5, 80), v = dp(Math.sqrt(2 * 9.81 * h), 1);
+        return { paper: "P2", marks: 2, diff: 2, q: `A stone is dropped from rest from a height of ${h} m. Ignoring air resistance, calculate its speed in m s⁻¹ just before it hits the ground. (g = 9.81 m s⁻²)`, numeric: { value: v, tol: 0.2 }, ms: [`v² = 2gh [M1]`, `v = ${v} m s⁻¹ [A1]`] };
+      },
+    ],
+    "phys-2": [
+      () => {
+        const m = R(2, 40) * 50, F = R(5, 60) * 100, a = dp(F / m, 2);
+        return { paper: "P2", marks: 2, diff: 1, q: `A resultant force of ${F} N acts on a mass of ${m} kg. Calculate its acceleration in m s⁻².`, numeric: { value: a, tol: Math.max(0.02, a * 0.01) }, ms: [`a = F/m [M1]`, `= ${a} m s⁻² [A1]`] };
+      },
+      () => {
+        const m1 = R(1, 10), u1 = R(2, 12), m2 = R(1, 10), v = dp((m1 * u1) / (m1 + m2), 2);
+        return { paper: "P2", marks: 2, diff: 2, q: `A ${m1} kg trolley moving at ${u1} m s⁻¹ collides and sticks to a stationary ${m2} kg trolley. Calculate their common velocity in m s⁻¹.`, numeric: { value: v, tol: 0.02 }, ms: [`${m1} × ${u1} = (${m1} + ${m2})v [M1]`, `v = ${v} m s⁻¹ [A1]`] };
+      },
+    ],
+    "phys-3": [
+      () => {
+        const m = R(20, 120), h = R(2, 30), t = R(4, 40), P = dp((m * 9.81 * h) / t, 0);
+        return { paper: "P2", marks: 2, diff: 2, q: `A motor lifts a ${m} kg load through ${h} m in ${t} s at constant speed. Calculate the useful power output in W. (g = 9.81 m s⁻²)`, numeric: { value: P, tol: Math.max(2, P * 0.01) }, ms: [`P = mgh/t [M1]`, `= ${P} W [A1]`] };
+      },
+      () => {
+        const inp = R(20, 200) * 10, eff = P([20, 25, 35, 40, 60, 75, 85]), out = dp((inp * eff) / 100, 1);
+        return { paper: "P2", marks: 1, diff: 1, q: `A device takes in ${inp} J of energy and delivers ${out} J of useful energy. Calculate its efficiency as a percentage.`, numeric: { value: eff, tol: 0.2 }, ms: [`${out} ÷ ${inp} × 100 = ${eff}% [A1]`] };
+      },
+    ],
+    "phys-6": [
+      () => {
+        const m = dp(R(2, 30) / 10, 1), dT = R(10, 60), c = P([4200, 900, 390, 2100]), Q = Math.round(m * c * dT);
+        return { paper: "P2", marks: 2, diff: 1, q: `Calculate the energy, in J, needed to raise the temperature of ${m} kg of a substance (c = ${c} J kg⁻¹ K⁻¹) by ${dT} K.`, numeric: { value: Q, tol: Math.max(1, Q * 0.005) }, ms: [`Q = mcΔT [M1]`, `= ${Q} J [A1]`] };
+      },
+    ],
+    "phys-8": [
+      () => {
+        const p1 = R(80, 200), V1 = R(2, 20), T1 = R(270, 320), T2 = T1 + R(20, 150), V2 = V1, p2 = dp((p1 * T2) / T1, 1);
+        return { paper: "P2", marks: 2, diff: 2, q: `A sealed rigid container of gas is at ${p1} kPa and ${T1} K. It is heated to ${T2} K. Calculate the new pressure in kPa.`, numeric: { value: p2, tol: 0.5 }, ms: [`p/T constant: ${p1}/${T1} = p₂/${T2} [M1]`, `p₂ = ${p2} kPa [A1]`] };
+      },
+    ],
+    "phys-10": [
+      () => {
+        const V = R(3, 24), r1 = R(2, 20), r2 = R(2, 20), I = dp(V / (r1 + r2), 3);
+        return { paper: "P2", marks: 2, diff: 1, q: `Resistors of ${r1} Ω and ${r2} Ω are connected in series to a ${V} V supply of negligible internal resistance. Calculate the current in A.`, numeric: { value: I, tol: Math.max(0.005, I * 0.01) }, ms: [`R = ${r1 + r2} Ω [M1]`, `I = ${I} A [A1]`] };
+      },
+      () => {
+        const r1 = R(2, 30), r2 = R(2, 30), Rt = dp((r1 * r2) / (r1 + r2), 2);
+        return { paper: "P2", marks: 2, diff: 2, q: `Calculate the total resistance, in Ω, of ${r1} Ω and ${r2} Ω in parallel.`, numeric: { value: Rt, tol: 0.02 }, ms: [`1/R = 1/${r1} + 1/${r2} [M1]`, `R = ${Rt} Ω [A1]`] };
+      },
+    ],
+    "phys-12": [
+      () => {
+        const f = R(50, 900) / 10, v = 3.0e8, l = dp(v / (f * 1e6), 2);
+        return { paper: "P2", marks: 2, diff: 1, q: `A radio station broadcasts at ${f} MHz. Calculate the wavelength in m. (c = 3.00 × 10⁸ m s⁻¹)`, numeric: { value: l, tol: Math.max(0.01, l * 0.01) }, ms: [`λ = c/f [M1]`, `= ${l} m [A1]`] };
+      },
+    ],
+    "phys-13": [
+      () => {
+        const lam = R(40, 70) * 10, d = dp(R(10, 50) / 100, 2), D = dp(R(10, 30) / 10, 1), s = dp((lam * 1e-9 * D) / (d * 1e-3) * 1000, 2);
+        return { paper: "P2", marks: 2, diff: 2, q: `Light of wavelength ${lam} nm passes through two slits ${d} mm apart. The screen is ${D} m away. Calculate the fringe spacing in mm.`, numeric: { value: s, tol: Math.max(0.02, s * 0.01) }, ms: [`s = λD/d [M1]`, `= ${s} mm [A1]`] };
+      },
+    ],
+    "phys-22": [
+      () => {
+        const T = R(2, 30), n = R(2, 5), A0 = P([800, 1600, 3200, 6400]), A = A0 / Math.pow(2, n);
+        return { paper: "P2", marks: 2, diff: 1, q: `A radioactive source has a half-life of ${T} hours and an initial activity of ${A0} Bq. Calculate its activity, in Bq, after ${n * T} hours.`, numeric: { value: A, tol: 0.5 }, ms: [`${n} half-lives [M1]`, `${A0} ÷ 2^${n} = ${A} Bq [A1]`] };
+      },
+    ],
     // ===================== ECONOMICS =====================
     "econ-5": [
       () => {
