@@ -15,7 +15,7 @@ IB.register({
     P2: { name: "Paper 2 (calculator)", minutes: 90, marks: 80, mix: { short: 12 } },
   },
   commandTerms: [
-    ["Show that", "Obtain the required result (possibly using information given) without a calculator. Every step must be shown."],
+    ["Show that", "Obtain the required result (possibly using information given). Every step must be shown; on Paper 1, or when the question says so, without a calculator."],
     ["Hence", "Use the preceding work to obtain the required result."],
     ["Hence or otherwise", "Using the preceding work is suggested but other methods could also receive credit."],
     ["Find / Calculate", "Obtain an answer showing relevant stages in the working."],

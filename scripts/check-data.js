@@ -10,7 +10,7 @@ ctx.window = ctx;
 ctx.document = { addEventListener() {}, documentElement: { dataset: {} } };
 ctx.localStorage = { getItem: () => null, setItem() {} };
 vm.createContext(ctx);
-for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "data/econ-bank.js", "data/chem-bank.js", "data/geo-bank.js", "data/math-bank.js", "data/bio-bank.js", "data/engb-bank.js", "data/chia-bank.js", "data/phys.js", "data/phys2.js", "data/phys-bank.js", "data/econ-hl.js", "data/chem-hl.js", "data/math-hl.js", "data/bio-hl.js", "data/geo-hl.js", "data/hl-bank.js", "data/frameworks.js", "data/yue.js", "data/markdb.js", "marker.js", "game.js", "generators.js", "bankbuild.js", "plot.js"]) {
+for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "data/econ-bank.js", "data/chem-bank.js", "data/geo-bank.js", "data/math-bank.js", "data/bio-bank.js", "data/engb-bank.js", "data/chia-bank.js", "data/phys.js", "data/phys2.js", "data/phys-bank.js", "data/econ-hl.js", "data/chem-hl.js", "data/math-hl.js", "data/bio-hl.js", "data/geo-hl.js", "data/hl-bank.js", "data/frameworks.js", "examframes.js", ...fs.readdirSync(path.join(root, "data/frames")).filter((f) => f.endsWith(".js")).sort().map((f) => "data/frames/" + f), "data/yue.js", "data/markdb.js", "marker.js", "game.js", "generators.js", "bankbuild.js", "plot.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), ctx, { filename: f });
 }
 const IB = ctx.IB;
@@ -48,6 +48,27 @@ for (const s of IB.subjectList()) {
       const svg = IB.plot(d);
       if (/NaN|undefined/.test(svg)) errors.push(`${t.id}: diagram "${d.title}" has NaN/undefined`);
     }
+  }
+}
+
+// every topic needs markscheme frames (question types with marking points) and MC speed skills
+for (const s of IB.subjectList()) {
+  for (const t of s.allTopics) {
+    const fr = t.mframes || [];
+    if (fr.length < 4) errors.push(`${t.id}: only ${fr.length} markscheme frames`);
+    if ((t.mc || []).length < 3) errors.push(`${t.id}: only ${(t.mc || []).length} MC speed skills`);
+    fr.forEach((f, i) => {
+      const where = `${t.id} frame ${i + 1} "${String(f.title).slice(0, 40)}"`;
+      if (!f.title || !(f.marks || []).length || !f.model || !f.tip) errors.push(`${where}: needs title, marks, model and tip`);
+      if (f.q && !f.paper) errors.push(`${where}: question without paper`);
+      if (f.paper && !s.allPapers[f.paper] && !["P1A", "P1B", "P2", "P1", "P3", "IO"].includes(f.paper)) errors.push(`${where}: unknown paper ${f.paper}`);
+      if (f.diagram && /NaN|undefined/.test(IB.plot(f.diagram))) errors.push(`${where}: diagram has NaN/undefined`);
+      if (/undefined|NaN/.test(IB.frameCardHtml(f, i + 1))) errors.push(`${where}: renders undefined`);
+    });
+    (t.mc || []).forEach((m, i) => {
+      if (!m.skill) errors.push(`${t.id} mc ${i + 1}: no skill text`);
+      if (m.q && !(Array.isArray(m.options) && m.options.length === 4 && m.answer >= 0 && m.answer < 4)) errors.push(`${t.id} mc ${i + 1}: bad example question`);
+    });
   }
 }
 

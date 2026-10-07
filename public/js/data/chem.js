@@ -6,7 +6,7 @@ IB.register({
   color: "var(--chem)",
   guide: "IB Chemistry guide, first assessment 2025",
   assessment: [
-    ["Paper 1 (1A + 1B)", "1h 30m", "1A: 30 MCQ · 1B: data-based questions", "36%", "1A: multiple-choice questions on the whole syllabus. 1B: data-based questions linked to experimental work. Data booklet allowed, no calculator for 1A."],
+    ["Paper 1 (1A + 1B)", "1h 30m", "1A: 30 MCQ · 1B: data-based questions", "36%", "1A: multiple-choice questions on the whole syllabus. 1B: data-based questions linked to experimental work. Data booklet and calculator allowed in both 1A and 1B."],
     ["Paper 2", "1h 30m", "50 marks", "44%", "Short-answer and extended-response questions across the syllabus. Calculator and data booklet allowed."],
     ["Internal assessment", "10 h", "24 marks", "20%", "Scientific investigation: research design, data analysis, conclusion, evaluation (report max 3000 words)."],
   ],

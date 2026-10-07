@@ -86,6 +86,7 @@ IB.page = function () {
     ${gp.codes ? `<section class="callout tip" data-reveal><h3 class="callout-title">How the markscheme gives marks</h3><div class="table-wrap"><table class="compare"><tr><th>Code</th><th>Meaning</th><th>What it means for you</th></tr>${gp.codes.map((r) => `<tr><th scope="row" class="mono">${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("")}</table></div></section>` : ""}
     <section class="callout method" data-reveal><h3 class="callout-title">Habits of 7-scorers</h3><ol class="habits">${gp.habits.map((h) => `<li>${h}</li>`).join("")}</ol></section>
     ${gp.extra ? `<section class="callout formula" data-reveal><h3 class="callout-title">${gp.extra.title}</h3><div class="table-wrap">${gp.extra.html}</div></section>` : ""}` : ""}
+    ${IB.examFrameOverviewHtml ? IB.examFrameOverviewHtml(s.id) : ""}
     <h2>Assessment overview</h2>
     <div class="card" data-reveal><div class="table-wrap"><table class="compare"><tr><th>Component</th><th>Time</th><th>Marks</th><th>Weight</th><th>Format</th></tr>
       ${s.assessment.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th scope="row">${x}</th>`)).join("")}</tr>`).join("")}</table></div>
