@@ -911,7 +911,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     const page = document.body.dataset.page || "";
     const link = (href, label, id) => `<a href="${href}" class="${page === id ? "active" : ""}">${label}</a>`;
     const header = IB.el(`<header class="site-header"><div class="container nav">
-      <a class="brand" href="index.html"><span class="brand-mark">IB</span>Revision Hub</a>
+      <a class="brand" href="index.html"><span class="brand-mark">IB</span><span class="brand-text">Revision Hub</span></a>
       <nav class="nav-links" id="navLinks">
         ${link("notes.html", "Notes", "notes")}
         ${link("questionbank.html", "Questions", "bank")}
@@ -923,6 +923,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         ${link("friends.html", "Friends", "friends")}
         ${link("progress.html", "Progress", "progress")}
         ${IB.config.ai ? link("tutor.html", "AI Tutor", "tutor") : ""}
+        <a href="#" class="nav-lvl" id="navLvl">SL / HL levels</a>
       </nav>
       ${IB.gameChip ? IB.gameChip() : ""}
       <span id="acctSlot"></span>
@@ -939,6 +940,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     );
     IB.qs("#menuBtn").onclick = () => IB.qs("#navLinks").classList.toggle("open");
     const lvlBtn = IB.qs("#lvlBtn");
+    IB.qs("#navLvl").onclick = (e) => { e.preventDefault(); IB.qs("#navLinks").classList.remove("open"); lvlBtn.onclick(e); };
     lvlBtn.onclick = (e) => {
       e.stopPropagation();
       let panel = IB.qs("#lvlPanel");

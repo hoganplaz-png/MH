@@ -800,3 +800,13 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
 .lvl-switch button.on { animation: lvlOn .3s ease-out; }
 @keyframes lvlOn { from { transform: scale(.85); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { #app.page-in, .pop-li, .qbar span, .lvbar span, .hero-progress .bar span, .lvl-switch button.on { animation: none; } }
+.nav-lvl { display: none; }
+@media (max-width: 1420px) { .nav-lvl { display: block; } }
+@media (max-width: 640px) {
+  .nav { gap: 5px; }
+  .brand-text { display: none; }
+  .lvl-btn { display: none; }
+  .xp-chip { padding: 4px 8px; gap: 5px; }
+  .icon-btn { padding: 6px 9px; }
+  .lvl-panel { right: 8px; left: 8px; width: auto; }
+}
