@@ -65,6 +65,11 @@ for (const s of IB.subjectList()) {
       if (f.diagram && /NaN|undefined/.test(IB.plot(f.diagram))) errors.push(`${where}: diagram has NaN/undefined`);
       if (/undefined|NaN/.test(IB.frameCardHtml(f, i + 1))) errors.push(`${where}: renders undefined`);
     });
+    (t.figures || []).concat(fr.filter((f) => f.svg)).forEach((x, i) => {
+      const svg = x.svg || "";
+      if (!/^\s*<svg[^>]*viewBox=/.test(svg) || !/<\/svg>\s*$/.test(svg)) errors.push(`${t.id} figure ${i + 1} "${String(x.title || "").slice(0, 30)}": svg must start with <svg viewBox=...> and end with </svg>`);
+      if (/undefined|NaN|<script|on\w+=/.test(svg)) errors.push(`${t.id} figure ${i + 1}: svg contains undefined/NaN/script`);
+    });
     (t.mc || []).forEach((m, i) => {
       if (!m.skill) errors.push(`${t.id} mc ${i + 1}: no skill text`);
       if (m.q && !(Array.isArray(m.options) && m.options.length === 4 && m.answer >= 0 && m.answer < 4)) errors.push(`${t.id} mc ${i + 1}: bad example question`);

@@ -112,6 +112,7 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
 .mf-acc b,.mf-rej b{display:block;font-size:10px;letter-spacing:.04em;text-transform:uppercase}.mf-acc b{color:#1F8A4C}.mf-rej b{color:#C92A2A}
 .mf-tip{color:#C2255C;font-weight:700;margin:4px 0 2px}
 .mf-diagram{margin:0 0 8px}.mf-diagram>b{display:block;font-size:10.5px;color:#55607A;text-transform:uppercase}.mf-diagram svg{width:300px;height:auto;--plot-a:${c};--plot-b:#2D5BFF;--plot-c:#1F8A4C;--muted:#6B7487;--text:#1B2436}
+.fig{margin:0;width:330px;--fig-a:${c};--fig-b:#2D5BFF;--fig-c:#1F8A4C;--fig-d:#D0312D;--fig-muted:#6B7487;--fig-fill:#F3F5F9;color:#1B2436}.fig svg{width:100%;height:auto}.fig figcaption{font-size:10.5px;color:#55607A;text-align:center}
 .mf-legend{font-size:11px;color:#55607A}
 `;
 
@@ -126,7 +127,8 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
     if (t.yue && !ZH(s)) b.push(box("zh", "廣東話重點", `<p>${t.yue}</p>`));
     t.concepts.filter((x) => IB.showItem(s.id, x)).forEach((x) => b.push(`<div class="concept"><h3>${x.h}${x.hl ? ' <span class="ahl">AHL</span>' : ""}</h3>${x.b}${x.yue ? `<p class="yue"><b>廣東話：</b>${x.yue}</p>` : ""}</div>`));
     if (t.table) b.push(head(L(s, "Compare at a glance", "比較")) + `<table><thead><tr>${t.table.head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${t.table.rows.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th>${x}</th>`)).join("")}</tr>`).join("")}</tbody></table>`);
-    if (t.diagrams && t.diagrams.length && IB.plot) b.push(head(L(s, "Diagrams to know", "圖表")) + `<div class="plots">${t.diagrams.map(IB.plot).join("")}</div>`);
+    const figs = (t.figures || []).filter((x) => IB.showItem(s.id, x)), plots = (t.diagrams || []).filter((x) => IB.showItem(s.id, x));
+    if (plots.length || figs.length) b.push(head(L(s, "Diagrams & graphs to know", "圖表")) + `<div class="plots">${plots.map(IB.plot).join("")}${figs.map(IB.figureHtml).join("")}</div>`);
     const methods = (t.methods || []).concat((t.skills || []).map((x) => `<strong>${x.h}:</strong> ${x.b}`));
     if (methods.length) b.push(head(L(s, "Fastest methods", "最快方法")) + box("method", L(s, "Fastest method", "最快方法"), `<ol>${methods.map((m) => `<li>${m}</li>`).join("")}</ol>`));
     if (t.traps && t.traps.length) b.push(head(L(s, "Traps", "陷阱")) + box("trap", L(s, "Trap", "陷阱"), `<ul>${t.traps.map((m) => `<li>${m}</li>`).join("")}</ul>`));
