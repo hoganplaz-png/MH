@@ -109,4 +109,56 @@
     }
     host.prepend(layer);
   };
+
+  // Page enter: the main content fades and rises in each time a page renders.
+  IB.pageEnter = function () {
+    const app = document.getElementById("app");
+    if (!app || reduce()) return;
+    app.classList.remove("page-in");
+    void app.offsetWidth;
+    app.classList.add("page-in");
+  };
+
+  // Ripple on buttons.
+  document.addEventListener("pointerdown", (e) => {
+    const b = e.target.closest && e.target.closest(".btn, .subject-tabs button, .lvl-switch button, .seg button, .sec-tab");
+    if (!b || reduce() || b.disabled) return;
+    const r = b.getBoundingClientRect();
+    const s = document.createElement("span");
+    s.className = "ripple";
+    const d = Math.max(r.width, r.height) * 2;
+    s.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX - r.left - d / 2}px;top:${e.clientY - r.top - d / 2}px`;
+    if (getComputedStyle(b).position === "static") b.style.position = "relative";
+    b.style.overflow = "hidden";
+    b.appendChild(s);
+    setTimeout(() => s.remove(), 600);
+  }, { passive: true });
+
+  // Score in marking feedback counts up; checklist chips pop in one by one.
+  IB.animateFeedback = function (el) {
+    if (!el || reduce()) return;
+    const h = el.querySelector("h4");
+    const m = h && h.firstChild && /^(\d+)\/(\d+)/.exec(h.firstChild.textContent || "");
+    if (m) {
+      const target = +m[1], rest = h.firstChild.textContent.slice(m[1].length), t0 = performance.now();
+      const step = (now) => { const p = Math.min(1, (now - t0) / 600); h.firstChild.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + rest; if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }
+    el.querySelectorAll(".mk-check span, ul li").forEach((x, i) => { x.style.animationDelay = `${120 + i * 70}ms`; x.classList.add("pop-li"); });
+  };
+
+  // Scroll-spy: the notes section bar highlights the section on screen.
+  IB.scrollSpy = function (root) {
+    const bar = root && root.querySelector(".jumpbar");
+    if (!bar || !("IntersectionObserver" in window)) return;
+    const links = Array.from(bar.querySelectorAll("a[href^='#sec-']"));
+    const map = new Map(links.map((a) => [a.getAttribute("href").slice(1), a]));
+    const io = new IntersectionObserver((es) => es.forEach((en) => {
+      if (!en.isIntersecting) return;
+      links.forEach((a) => a.classList.remove("here"));
+      const a = map.get(en.target.id);
+      if (a) { a.classList.add("here"); a.scrollIntoView({ block: "nearest", inline: "center", behavior: reduce() ? "auto" : "smooth" }); }
+    }), { rootMargin: "-45% 0px -50% 0px" });
+    map.forEach((a, id) => { const el = document.getElementById(id); if (el) io.observe(el); });
+  };
 })();

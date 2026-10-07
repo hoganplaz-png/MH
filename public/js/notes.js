@@ -230,6 +230,7 @@ IB.page = function () {
     IB.highlight(IB.qs(".topic-sections", c), { terms: (t.terms || []).map((x) => x[0]) });
     marker(c);
     IB.animate(c);
+    if (IB.scrollSpy) IB.scrollSpy(c);
   }
 
   // Highlights "draw on" like a marker pen as each section scrolls into view.

@@ -273,7 +273,7 @@ IB.topicFrames = function (t) {
   const pick = want.slice(0, Math.max(2, 4 - own.length)).map((id) => F.frameworks.find((f) => f.id === id));
   return own.concat(pick.map((f) => ({
     type: `${f.type} [${f.marks}]`,
-    steps: (f.structure || []).map(([h, b]) => `<strong>${h}</strong>: ${b}`).concat(f.example ? [`<em>Example:</em> ${f.example.q}<br><span class="muted">→ ${f.example.a}</span>`] : []),
+    steps: (f.structure || []).map(([h, b]) => `<strong>${h}</strong>: ${b}`).concat(f.checklist && f.checklist.length ? [`<em>Check:</em> ${f.checklist.join(" · ")}`] : []),
     yue: (IB.frameYue || {})[f.id] || "",
   })));
 };

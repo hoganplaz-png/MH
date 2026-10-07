@@ -838,7 +838,9 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         aiBtn.disabled = false;
         IB.qsa(".feedback", result).forEach((n) => n.remove());
         card._lastFb = fb;
-        result.prepend(IB.feedbackEl(fb));
+        const fbEl = IB.feedbackEl(fb);
+        result.prepend(fbEl);
+        if (IB.animateFeedback) IB.animateFeedback(fbEl);
         IB.math(result);
         finish(fb.score, fb.max, fb.offline ? "offline" : "ai");
         showMs();
@@ -979,6 +981,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     const ret = typeof IB.page === "function" ? IB.page() : null;
     return Promise.resolve(ret).then(() => {
       introBand();
+      if (IB.pageEnter) IB.pageEnter();
       const app = document.getElementById("app");
       if (IB.floaters) IB.qsa(".band", app).forEach(IB.floaters);
       if (IB.animate) IB.animate(app);
