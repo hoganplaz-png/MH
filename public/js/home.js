@@ -20,15 +20,15 @@ IB.page = function () {
   <section class="band">
     <div class="hero">
       <div class="hero-copy">
-        <span class="eyebrow">IB Diploma · 7 subjects · Notes · Questions · Mocks · IA &amp; EE</span>
+        <span class="eyebrow">IB Diploma · 8 subjects · SL &amp; HL · Notes · Questions · Mocks · IA &amp; EE</span>
         <h1>Every topic. Every paper. <span class="hl">Marked like the real thing.</span></h1>
-        <p class="lead">Notes by syllabus topic, an exam-style question bank and mock papers, with an AI examiner that marks your answers against the markscheme.</p>
+        <p class="lead">Notes with 答題框架 for every topic, an exam-style question bank, IB-style PDF papers and mocks, marked instantly and strictly against the markscheme.</p>
         <div class="btn-row">
           <a class="btn primary" href="practice.html">Start a quiz</a>
           ${recentTopic ? `<a class="btn" href="notes.html?subject=${recentTopic.subject}&topic=${recentTopic.id}">Continue: ${IB.esc(recentTopic.title)} →</a>` : `<a class="btn" href="notes.html">Browse notes →</a>`}
         </div>
       </div>
-      <div class="hero-demo" aria-label="Example of AI marking">
+      <div class="hero-demo" aria-label="Example of markscheme marking">
         <div class="btn-row" style="justify-content:space-between">
           <span class="pill econ">Econ SL · Paper 2</span>
           <span class="mono" style="font-weight:700">[4 marks]</span>
@@ -36,7 +36,7 @@ IB.page = function () {
         <div style="font-size:1.05rem;line-height:1.5;font-weight:500">Using a diagram, explain how a severe drought in Brazil is likely to affect the world price of coffee.</div>
         <div class="answer">Drought reduces crop yields, so supply shifts left from S₁ to S₂. At the old price there is a shortage, so the price rises to P₂…</div>
         <div class="verdict demo-anim">
-          <div style="display:flex;align-items:center;gap:12px"><span class="big"><span data-count="3">3</span>/4</span><span class="pill" style="background:#DDF3E6;color:#155E34">AI examiner</span></div>
+          <div style="display:flex;align-items:center;gap:12px"><span class="big"><span data-count="3">3</span>/4</span><span class="pill" style="background:#DDF3E6;color:#155E34">Markscheme marker</span></div>
           <div><strong style="color:#155E34">✓</strong> Supply shifts left · <strong style="color:#155E34">✓</strong> Shortage → price rises · <strong style="color:#155E34">✓</strong> Diagram</div>
           <div><strong style="color:#B42318">✗</strong> Missing: label the new equilibrium Q₂</div>
         </div>
@@ -64,8 +64,8 @@ IB.page = function () {
       ["questionbank.html", "?", "Practise", `${totalQ.toLocaleString()} questions`, "A structured bank for every topic: exam-style, calculations, worked-example replays, explain-the-concept, key-term drills and spot-the-mistake.", "Open the bank"],
       ["practice.html?mode=mock", "⏱", "Test yourself", "Quizzes & mock papers", "Timed papers in the real structure, unit quizzes and smart quizzes that target your weakest topics - marked instantly.", "Sit a mock"],
       ["skills.html", "✎", "Exam technique", "Answer frameworks", "A framework for every question type, sentence starters, top-band checklists and the markscheme decoded band by band.", "Learn the frameworks"],
-      ["ia.html", "◎", "Coursework", "IA & EE predictor", "Score yourself on every criterion, get an AI predicted mark for your draft, and see your predicted grade and core points.", "Predict my grade"],
-      ["tutor.html", "✦", "Get unstuck", "AI tutor & marking", "An IB examiner-style tutor that gives hints, not just answers - and marks written answers against the markscheme.", "Ask the tutor"],
+      ["ia.html", "◎", "Coursework", "IA & EE predictor", "Score yourself on every criterion against the official descriptors and see your predicted grade and core points.", "Predict my grade"],
+      ["mistakes.html", "✗", "Fix your gaps", "Mistakes notebook", "Every question you get wrong is saved automatically. Retry them until you get them right, then they graduate out.", "Open my mistakes"],
     ].map(([href, icon, eyebrow, title, text, cta], i) => `<a class="card feature" href="${href}" data-reveal style="--i:${i}">
       <span class="f-icon" aria-hidden="true">${icon}</span>
       <span class="eyebrow">${String(i + 1).padStart(2, "0")} · ${eyebrow}</span>

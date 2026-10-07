@@ -470,7 +470,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     if (answer.trim().split(/\s+/).length + (answer.match(/[\u3400-\u9fff]/g) || []).length / 2 < 6) score = Math.min(score, 1);
     return {
       score, max, awarded, missing, offline: true,
-      summary: "Estimated by keyword match against the markscheme - use the markscheme to check yourself, or switch on AI marking for examiner-style feedback.",
+      summary: "Estimated by keyword match against the markscheme.",
     };
   };
 
@@ -524,6 +524,9 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     return err;
   };
 
+  // AI is off by default: answers are marked by the built-in markscheme marker (js/marker.js).
+  // A self-hosted copy with an API key can switch it back on with window.IB_CONFIG = { ai: true }.
+  IB.config = Object.assign({ ai: false }, window.IB_CONFIG || {});
   IB.ai = {
     _health: null,
     _sample: null,
@@ -537,6 +540,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
       return this._sample;
     },
     async available() {
+      if (!IB.config.ai) return false;
       if (this._health === null) {
         if (IB.hosted) {
           this._health = !!(await this.sampler());
@@ -775,7 +779,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       const rows = q.type === "extended" ? 14 : Math.min(10, 3 + q.marks);
       ansBox.innerHTML = `<textarea rows="${rows}" placeholder="${q.numeric ? "Show your working, then give your final answer…" : "Write your answer here…"}"></textarea>`;
       const ta = IB.qs("textarea", ansBox);
-      const aiBtn = IB.el(`<button class="btn primary small">✦ AI mark my answer</button>`);
+      const aiBtn = IB.el(`<button class="btn primary small">✓ Mark my answer</button>`);
       const msBtn = IB.el(`<button class="btn small">Show markscheme & self-mark</button>`);
       if (!opts.hideActions && opts.mode !== "exam") {
         actions.append(aiBtn, msBtn);
@@ -805,7 +809,8 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
           IB.toast(e.message + " - using offline marker.");
           fb = IB.offlineMark(q, answer);
         }
-        aiBtn.textContent = fb.offline ? "Marked (offline estimate)" : "✦ Marked by AI";
+        aiBtn.textContent = fb.offline ? "✓ Marked - mark again" : "✦ Marked by AI";
+        aiBtn.disabled = false;
         IB.qsa(".feedback", result).forEach((n) => n.remove());
         result.prepend(IB.feedbackEl(fb));
         IB.math(result);
@@ -831,9 +836,12 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         IB.toggleFlag(q.id);
         flag.textContent = IB.store.get().flags[q.id] ? "★ Saved" : "☆ Save for review";
       };
-      const tutor = IB.el(`<a class="btn small" href="tutor.html?q=${encodeURIComponent(q.id)}">Ask the AI tutor</a>`);
-      if (q.generated) tutor.href = `tutor.html?subject=${q.subject}&prompt=${encodeURIComponent("Help me with this question: " + q.q.replace(/<[^>]+>/g, " "))}`;
-      actions.append(flag, tutor);
+      actions.append(flag);
+      if (IB.config.ai) {
+        const tutor = IB.el(`<a class="btn small" href="tutor.html?q=${encodeURIComponent(q.id)}">Ask the AI tutor</a>`);
+        if (q.generated) tutor.href = `tutor.html?subject=${q.subject}&prompt=${encodeURIComponent("Help me with this question: " + q.q.replace(/<[^>]+>/g, " "))}`;
+        actions.append(tutor);
+      }
     }
     IB.math(card);
     card.q = q;
@@ -845,10 +853,13 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     const p = fb.score / fb.max;
     const list = (title, arr) => (arr && arr.length ? `<p class="small" style="margin:.6em 0 .2em"><strong>${title}</strong></p><ul class="small">${arr.map((x) => `<li>${x}</li>`).join("")}</ul>` : "");
     return IB.el(`<div class="feedback ${p >= 0.7 ? "good" : p >= 0.4 ? "mid" : "low"}">
-      <h4>${fb.score}/${fb.max}${fb.level ? ` · ${esc(fb.level)}` : ""} ${fb.offline ? '<span class="pill">offline estimate</span>' : '<span class="pill good">AI examiner</span>'}</h4>
+      <h4>${fb.score}/${fb.max}${fb.level ? ` · ${esc(fb.level)}` : ""} ${fb.offline ? '<span class="pill">markscheme marker</span>' : '<span class="pill good">AI examiner</span>'}</h4>
       <div class="small">${esc(fb.summary || "")}</div>
       ${list("✓ Credited", fb.awarded)}
       ${list("✗ Missing", fb.missing)}
+      ${fb.errors && fb.errors.length ? `<div class="mk-errors small"><strong>⚠ Examiner would penalise:</strong><ul>${fb.errors.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+      ${list("Hints", (fb.hints || []).map(esc))}
+      ${fb.checklist && fb.checklist.length ? `<div class="mk-check small">${fb.checklist.map(([label, ok]) => `<span class="${ok ? "ok" : "no"}">${ok ? "✓" : "✗"} ${esc(label)}</span>`).join("")}</div>` : ""}
       ${list("How to improve", (fb.improvements || []).map(esc))}
       ${fb.model_answer ? `<details style="margin-top:6px"><summary>Model answer</summary><div class="small" style="white-space:pre-line">${esc(fb.model_answer)}</div></details>` : ""}
     </div>`);
@@ -879,7 +890,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         ${link("practice.html", "Quizzes &amp; Mocks", "practice")}
         ${link("skills.html", "Exam Skills", "skills")}
         ${link("ia.html", "IA &amp; EE", "ia")}
-        ${link("tutor.html", "AI Tutor", "tutor")}
+        ${IB.config.ai ? link("tutor.html", "AI Tutor", "tutor") : link("mistakes.html", "Mistakes", "mistakes")}
         ${link("mypapers.html", "Past Papers", "mypapers")}
         ${link("progress.html", "Progress", "progress")}
       </nav>

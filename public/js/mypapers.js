@@ -6,7 +6,7 @@ IB.page = function () {
   const topicOpts = (sid, val) => IB.subjects[sid].topics.map((t) => `<option value="${t.id}" ${t.id === val ? "selected" : ""}>${IB.esc(t.code)} ${IB.esc(t.title)}</option>`).join("");
 
   app.innerHTML = `<h1 style="margin-bottom:.2em">My past papers</h1>
-    <p class="muted" style="margin-top:0">Add questions from the official past papers and markschemes you already have (from your school or the IB store). They are sorted into topics and then appear in the question bank, topic notes, quizzes and mocks - with AI marking and progress tracking.</p>
+    <p class="muted" style="margin-top:0">Add questions from the official past papers and markschemes you already have (from your school or the IB store). They are sorted into topics and then appear in the question bank, topic notes, quizzes and mocks - with instant markscheme marking and progress tracking.</p>
     <div class="notice small">Private to you: everything you add is saved only in this browser and is never published. Include it in your backup from <a href="progress.html">My Progress</a> → Export.</div>
     <div class="tabs" id="tabs"><button data-tab="import" class="active">Import a paper</button><button data-tab="one">Add one question</button><button data-tab="list">My questions (<span id="count">0</span>)</button></div>
     <section data-panel="import"></section>

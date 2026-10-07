@@ -5,7 +5,7 @@ IB.page = function () {
   let extra = []; // generated / AI questions added this session
 
   app.innerHTML = `<h1 style="margin-bottom:.2em">Question bank</h1>
-    <p class="muted" style="margin-top:0">Exam-style questions by subject and topic with full markschemes. Answer in the box, then get AI/offline marking or self-mark against the markscheme. Every attempt is saved to your progress.</p>
+    <p class="muted" style="margin-top:0">Exam-style questions by subject and topic with full markschemes. Answer in the box and it is marked instantly against the markscheme (or self-mark). Every attempt is saved to your progress.</p>
     <div class="notice warn small">These are <strong>original IB-style questions</strong> modelled on the format, command terms and markscheme style of IB papers - official IB past papers are copyright of the IBO and are not reproduced here. Use them alongside the official past papers from your school.</div>
     <div class="card no-print">
       <div class="filters">
@@ -21,7 +21,7 @@ IB.page = function () {
       </div>
       <div class="btn-row" style="margin-top:14px">
         <button class="btn primary" id="genBtn">+ 5 fresh calculation questions</button>
-        <button class="btn" id="aiGenBtn">✦ AI: write new questions for this topic</button>
+        ${IB.config.ai ? '<button class="btn" id="aiGenBtn">✦ AI: write new questions for this topic</button>' : ""}
         <button class="btn" id="sheetBtn">⬇ Download filtered set as worksheet</button>
         <span class="muted small" id="count"></span>
       </div>
@@ -104,7 +104,7 @@ IB.page = function () {
   IB.qs("#genBtn").onclick = () => {
     let topics = f.topic.value ? [f.topic.value] : IB.generatorTopics(f.sub.value || undefined);
     topics = topics.filter(IB.hasGenerator);
-    if (!topics.length) return IB.toast("This topic is not calculation-based - try the AI question writer instead.");
+    if (!topics.length) return IB.toast("This topic is not calculation-based - use the question bank sections instead.");
     const fresh = Array.from({ length: 5 }, () => IB.generate(IB.pick(topics)));
     extra = fresh.concat(extra);
     f.type.value = "";

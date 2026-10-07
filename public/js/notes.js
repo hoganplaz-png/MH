@@ -128,7 +128,7 @@ IB.page = function () {
     <div class="btn-row no-print" style="margin:14px 0">
       <button class="btn ${data.read[t.id] ? "" : "primary"}" id="readBtn">${data.read[t.id] ? "✓ Revised" : "Mark as revised"}</button>
       <a class="btn" href="practice.html?subject=${s.id}&topic=${t.id}">Quiz this topic</a>
-      <a class="btn" href="tutor.html?subject=${s.id}&topic=${t.id}">Ask the AI tutor</a>
+      ${IB.config.ai ? `<a class="btn" href="tutor.html?subject=${s.id}&topic=${t.id}">Ask the AI tutor</a>` : ""}
       <button class="btn mark" id="dlTopic">⬇ PDF notes</button>
       <button class="btn" id="dlTopicQ">⬇ PDF + practice paper</button>
       <button class="btn" id="dlSheet">⬇ Worksheet</button>

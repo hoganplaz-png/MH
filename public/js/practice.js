@@ -121,7 +121,7 @@ IB.page = function () {
         <h2 style="margin-top:0">Result</h2>
         <div class="btn-row" style="gap:20px"><span class="score-ring">${got}/${totalMarks}</span><span class="stat-big">${pct}%</span>
         <span title="Estimated IB grade - boundaries vary by session"><span class="grade">${grade}</span> <span class="small muted">estimated grade</span></span></div>
-        <p class="small muted">${ai ? "Written answers were marked by the AI examiner." : "Written answers were marked by the offline estimator - check them against the markschemes below and adjust with self-marking if needed."} Grade estimates use typical recent boundaries and are a guide only.</p>
+        <p class="small muted">${ai ? "Written answers were marked by the AI examiner." : "Written answers were marked by the built-in markscheme marker - check them against the markschemes below and adjust with self-marking if needed."} Grade estimates use typical recent boundaries and are a guide only.</p>
         <h3>By topic</h3>
         ${Object.entries(byTopic).map(([tid, v]) => { const t = IB.topic(tid); const p = IB.pct(v.sc, v.mx); return `<div class="mastery-row"><a href="notes.html?subject=${t.subject}&topic=${tid}">${IB.esc(t.code)} ${IB.esc(t.title)}</a><div class="bar"><span style="width:${p}%"></span></div><span class="small">${p}%</span></div>`; }).join("")}
         <div class="btn-row" style="margin-top:14px"><button class="btn primary" id="again">New ${kind === "mock" ? "mock" : "quiz"}</button><a class="btn" href="progress.html">View progress</a></div>

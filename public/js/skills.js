@@ -59,7 +59,7 @@ IB.page = function () {
         <p class="small muted">Write an answer using this framework (to the example question or your own) and get feedback on how well it follows the structure.</p>
         <label class="field" for="fwQ">Question you're answering</label><input type="text" id="fwQ" value="${IB.esc(f.example.q.replace(/<[^>]+>/g, ""))}">
         <label class="field" for="fwA" style="margin-top:10px">Your answer</label><textarea id="fwA" rows="8" placeholder="Write your answer here…"></textarea>
-        <div class="btn-row" style="margin-top:10px"><button class="btn primary" id="fwMark">✦ Check against the framework</button></div>
+        <div class="btn-row" style="margin-top:10px"><button class="btn primary" id="fwMark">✓ Check against the framework</button></div>
         <div id="fwOut"></div>
       </section>
     </article>`;
@@ -81,7 +81,7 @@ IB.page = function () {
       IB.qs("#fwOut").appendChild(IB.feedbackEl(fb));
       IB.math(IB.qs("#fwOut"));
       btn.disabled = false;
-      btn.textContent = "✦ Check again";
+      btn.textContent = "✓ Check again";
     };
     IB.math(panel);
   }

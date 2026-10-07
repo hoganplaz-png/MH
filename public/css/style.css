@@ -659,3 +659,9 @@ input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 
 .frame-steps { margin: 0; padding-left: 1.2em; counter-reset: none; }
 .frame-steps li { margin: 4px 0; line-height: 1.55; }
 .jump.frame { border-color: #7048E8; }
+.mk-errors { margin: 8px 0; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, #D0312D 10%, var(--surface)); border: 1px solid color-mix(in srgb, #D0312D 40%, transparent); }
+.mk-errors ul { margin: 4px 0 0; padding-left: 18px; }
+.mk-check { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
+.mk-check span { padding: 3px 10px; border-radius: 999px; font-weight: 700; }
+.mk-check .ok { background: color-mix(in srgb, #1F8A4C 15%, transparent); }
+.mk-check .no { background: color-mix(in srgb, #D0312D 12%, transparent); }

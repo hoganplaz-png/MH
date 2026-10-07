@@ -8,7 +8,7 @@ IB.page = function () {
   if (!IB.ia[sid]) sid = "econ";
 
   app.innerHTML = `<h1 style="margin-bottom:.2em">IA &amp; Extended Essay</h1>
-    <p class="muted" style="margin-top:0">Criteria explained in plain language, a self-assessment marker that predicts your IA mark and subject grade, AI predicted marking of your draft, a research-question checker, and the TOK/EE points calculator.</p>
+    <p class="muted" style="margin-top:0">Criteria explained in plain language, a self-assessment marker that predicts your IA mark and subject grade, a research-question checker, and the TOK/EE points calculator.</p>
     <div class="tabs" id="viewTabs"><button data-v="ia">Internal assessment</button><button data-v="ee">Extended Essay</button><button data-v="core">TOK / EE points</button></div>
     <div id="iaBody"></div>`;
   IB.qsa("#viewTabs button").forEach((b) => (b.onclick = () => { view = b.dataset.v; render(); }));
@@ -174,7 +174,7 @@ Reply with only a JSON object: {"criteria": [{"k": "<criterion name exactly as g
     };
     const block = criteriaBlock(spec, sid, recompute);
     left.appendChild(block);
-    left.appendChild(aiBlock(spec, s.name, "internal assessment", (marks) => { block.setScores(marks); IB.toast("Sliders updated with the AI's predicted marks."); }));
+    if (IB.config.ai) left.appendChild(aiBlock(spec, s.name, "internal assessment", (marks) => { block.setScores(marks); IB.toast("Sliders updated with the AI's predicted marks."); }));
     right.appendChild(timelineBlock(spec.timeline, sid + "-tl"));
     IB.qs("#examPct").oninput = () => {
       save(sid, Object.assign({}, st()[sid] || {}, { exam: +IB.qs("#examPct").value }));
@@ -191,7 +191,7 @@ Reply with only a JSON object: {"criteria": [{"k": "<criterion name exactly as g
     const rq = IB.el(`<section class="card"><h3 style="margin-top:0">Research question checker</h3>
       <label class="field" for="eeSubj">EE subject</label><select id="eeSubj">${IB.subjectList().map((s) => `<option>${s.name}</option>`).join("")}<option>History</option><option>Psychology</option><option>Business Management</option><option>World Studies</option><option>Other</option></select>
       <label class="field" for="rqText" style="margin-top:10px">Your research question</label><textarea id="rqText" rows="3" placeholder="To what extent…">${IB.esc((st().ee || {}).rq || "")}</textarea>
-      <div class="btn-row" style="margin-top:10px"><button class="btn primary" id="rqBtn">✦ Check my RQ</button></div><div id="rqOut"></div>
+      <div class="btn-row" style="margin-top:10px"><button class="btn primary" id="rqBtn">✓ Check my RQ</button></div><div id="rqOut"></div>
       <ul class="small muted" style="margin-top:12px">${spec.rqTips.map((t) => `<li>${t}</li>`).join("")}</ul></section>`);
     left.appendChild(rq);
     IB.qs("#rqBtn").onclick = async () => {
@@ -201,7 +201,7 @@ Reply with only a JSON object: {"criteria": [{"k": "<criterion name exactly as g
       const out = IB.qs("#rqOut");
       if (!(await IB.ai.available())) {
         const checks = [[/\?$/.test(q), "Ends as a question"], [q.split(/\s+/).length >= 10 && q.split(/\s+/).length <= 40, "Length 10-40 words"], [/to what extent|how (far|effectively|significantly)|why|what is the (effect|impact|relationship)/i.test(q), "Uses an arguable stem (to what extent / how / what is the effect)"], [/\d{4}|[A-Z][a-z]+/.test(q.slice(1)), "Names a specific case, place, text or period"]];
-        out.innerHTML = `<div class="feedback mid"><h4>Quick check (offline)</h4><ul class="small">${checks.map(([ok, t]) => `<li>${ok ? "✓" : "✗"} ${t}</li>`).join("")}</ul></div>`;
+        out.innerHTML = `<div class="feedback mid"><h4>Research question checklist</h4><ul class="small">${checks.map(([ok, t]) => `<li>${ok ? "✓" : "✗"} ${t}</li>`).join("")}</ul></div>`;
         return;
       }
       IB.qs("#rqBtn").disabled = true;
@@ -221,7 +221,7 @@ Judge it on: focus/specificity, arguability, feasibility in 4000 words with acce
     };
     const block = criteriaBlock(spec, "ee-scores", update);
     left.appendChild(block);
-    left.appendChild(aiBlock(spec, IB.qs("#eeSubj").value, "Extended Essay", (marks) => { block.setScores(marks); IB.toast("Sliders updated with the AI's predicted marks."); }));
+    if (IB.config.ai) left.appendChild(aiBlock(spec, IB.qs("#eeSubj").value, "Extended Essay", (marks) => { block.setScores(marks); IB.toast("Sliders updated with the AI's predicted marks."); }));
     right.appendChild(IB.el(`<section class="card"><h3 style="margin-top:0">EE grade bands</h3><table class="compare">${spec.grades.map(([g, lo, hi]) => `<tr><th scope="row">${g}</th><td class="mono">${lo}-${hi}</td></tr>`).join("")}</table><p class="small muted">Approximate - boundaries are set each session.</p></section>`));
     right.appendChild(timelineBlock(spec.timeline, "ee-tl"));
   }
