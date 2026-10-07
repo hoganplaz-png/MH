@@ -58,6 +58,9 @@
       fb.initializeApp(window.IB_FIREBASE);
       auth = fb.auth();
       db = fb.firestore();
+      // Local testing against the Firebase emulators: { ..., emulator: { auth: "http://127.0.0.1:9099", firestore: ["127.0.0.1", 8085] } }
+      const em = window.IB_FIREBASE.emulator;
+      if (em) { auth.useEmulator(em.auth); db.useEmulator(em.firestore[0], em.firestore[1]); }
       auth.onAuthStateChanged(onUser);
       return true;
     })();

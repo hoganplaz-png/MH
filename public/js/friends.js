@@ -87,7 +87,7 @@ IB.page = async function () {
         <span class="small muted">Your friend code</span>
         <div class="btn-row"><span class="code-box mono">${IB.esc(cloud.profile.code)}</span><button class="btn small" id="copyLink">Copy invite link</button></div>
         <label class="field" for="fCode" style="margin-top:12px">Enter a friend's code</label>
-        <div class="btn-row"><input id="fCode" placeholder="IB-XXXXX" style="flex:1;min-width:140px"><button class="btn primary" id="fSend">Send request</button></div>
+        <div class="btn-row"><input type="text" id="fCode" placeholder="IB-XXXXX" style="flex:1;min-width:140px"><button class="btn primary" id="fSend">Send request</button></div>
         ${requests.map((r) => `<div class="req">${av(r.name, r.photo, colorOf(r.uid))}<span style="flex:1"><strong>${IB.esc(r.name)}</strong> wants to be friends</span><button class="btn small primary" data-acc="${r.uid}">Accept</button><button class="btn small" data-dec="${r.uid}">Decline</button></div>`).join("")}
       </section>
       <section class="card" data-reveal><h3 style="margin-top:0">What friends can see</h3>
@@ -95,7 +95,7 @@ IB.page = async function () {
         <label class="pv"><input type="checkbox" id="pvB" ${priv.badges ? "checked" : ""}> Badges</label>
         <label class="pv"><input type="checkbox" id="pvS" ${priv.subjects ? "checked" : ""}> Subject progress (mastery %)</label>
         <label class="pv"><input type="checkbox" disabled> Answers, essays, mistakes and past papers <span class="small muted">never shared</span></label>
-        <label class="field" for="pvName" style="margin-top:10px">Display name</label><div class="btn-row"><input id="pvName" value="${IB.esc(cloud.profile.name)}" maxlength="40" style="flex:1"><button class="btn small" id="pvSave">Save</button></div>
+        <label class="field" for="pvName" style="margin-top:10px">Display name</label><div class="btn-row"><input type="text" id="pvName" value="${IB.esc(cloud.profile.name)}" maxlength="40" style="flex:1"><button class="btn small" id="pvSave">Save</button></div>
       </section>
       ${myCard}
     </aside></div>`;
