@@ -22,8 +22,24 @@ IB.page = function () {
       <div class="btn-row" style="margin-top:14px">
         <button class="btn primary" id="genBtn">+ 5 fresh calculation questions</button>
         ${IB.config.ai ? '<button class="btn" id="aiGenBtn">✦ AI: write new questions for this topic</button>' : ""}
-        <button class="btn" id="sheetBtn">⬇ Download filtered set as worksheet</button>
+        <button class="btn mark" id="paperBtn">⬇ IB-style PDF paper</button>
+        <button class="btn" id="sheetBtn">⬇ Worksheet (HTML)</button>
         <span class="muted small" id="count"></span>
+      </div>
+    </div>
+    <div class="card paper-opts hidden no-print" id="paperOpts">
+      <strong>Export the filtered questions as an IB-style paper</strong>
+      <p class="small muted" style="margin:4px 0 10px">Cover page with instructions, numbered questions with marks, lined answer boxes, and the markscheme at the end.</p>
+      <div class="filters">
+        <label class="field">Questions<select id="pN"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option></select></label>
+        <label class="field">Order<select id="pOrder"><option value="mix">Shuffle</option><option value="list">As listed</option></select></label>
+        <label class="field">Paper title<input type="text" id="pTitle" placeholder="Practice paper"></label>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <label class="small"><input type="checkbox" id="pMs" checked> Markscheme at the end</label>
+        <label class="small"><input type="checkbox" id="pTopics"> Show topic under each question</label>
+        <label class="small"><input type="checkbox" id="pExam" checked> Exam-style questions first</label>
+        <button class="btn primary" id="pGo" style="margin-left:auto">⬇ Create PDF</button>
       </div>
     </div>
     <div id="list"></div>
@@ -114,7 +130,7 @@ IB.page = function () {
     IB.toast("Added 5 fresh questions at the top.");
   };
 
-  IB.qs("#aiGenBtn").onclick = async () => {
+  if (IB.qs("#aiGenBtn")) IB.qs("#aiGenBtn").onclick = async () => {
     const t = f.topic.value ? IB.topic(f.topic.value) : null;
     if (!t) return IB.toast("Choose a topic first.");
     if (!(await IB.ai.available())) return IB.toast("AI is not switched on for this site (see README). Use the calculation generator or the bank.");
@@ -142,6 +158,25 @@ IB.page = function () {
     b.textContent = "✦ AI: write new questions for this topic";
   };
 
+  IB.qs("#paperBtn").onclick = () => IB.qs("#paperOpts").classList.toggle("hidden");
+  IB.qs("#pGo").onclick = (ev) => {
+    let qs = filtered();
+    if (!qs.length) return IB.toast("No questions match these filters.");
+    if (IB.qs("#pExam").checked) qs = qs.filter((q) => !q.derived).concat(qs.filter((q) => q.derived));
+    if (IB.qs("#pOrder").value === "mix") {
+      const head = qs.filter((q) => !q.derived), tail = qs.filter((q) => q.derived);
+      qs = IB.qs("#pExam").checked ? IB.shuffle(head).concat(IB.shuffle(tail)) : IB.shuffle(qs);
+    }
+    qs = qs.slice(0, +IB.qs("#pN").value);
+    const sub = f.sub.value || (new Set(qs.map((q) => q.subject)).size === 1 ? qs[0].subject : null);
+    const t = f.topic.value && IB.topic(f.topic.value);
+    const b = ev.currentTarget;
+    b.disabled = true;
+    IB.paperPdf({
+      title: IB.qs("#pTitle").value.trim() || (t ? `${t.code} ${t.title}` : f.paper.value ? IB.paperName(sub, f.paper.value) : "Practice paper"),
+      subject: sub, questions: qs, markscheme: IB.qs("#pMs").checked, showTopics: IB.qs("#pTopics").checked, paper: f.paper.value,
+    }).catch(() => {}).finally(() => (b.disabled = false));
+  };
   IB.qs("#sheetBtn").onclick = () => {
     const qs = filtered().slice(0, 40);
     if (!qs.length) return IB.toast("Nothing to download.");

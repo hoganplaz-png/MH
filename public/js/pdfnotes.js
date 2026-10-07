@@ -7,7 +7,7 @@
   "use strict";
   const IB = window.IB;
   const PW = 794, PH = 1123, FOOT = 44, TOP = 46, SIDE = 56;
-  const HEX = { econ: "#D9480F", chem: "#0B8AA8", geo: "#2F9E44", math: "#6741D9", bio: "#C2255C", engb: "#1864AB", chia: "#9C6500" };
+  const HEX = { econ: "#D9480F", chem: "#0B8AA8", phys: "#364FC7", geo: "#2F9E44", math: "#6741D9", bio: "#C2255C", engb: "#1864AB", chia: "#9C6500" };
   const DOTS = ["#2D5BFF", "#0B8AA8", "#7C3AED", "#E8590C", "#2F9E44", "#D6336C", "#5F3DC4", "#C27803", "#E03131", "#1098AD", "#334155", "#0CA678"];
   const ZH = (s) => s.id === "chia";
   const L = (s, en, zh) => (ZH(s) ? `${en} ${zh}` : en);
@@ -150,12 +150,12 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
       return page;
     };
     const over = () => body.scrollHeight > body.clientHeight + 1;
-    const isHead = (el) => el && el.nodeType === 1 && (/^H[1-4]$/.test(el.tagName) || el.classList.contains("bar") || el.classList.contains("banner"));
+    const isHead = (el) => el && el.nodeType === 1 && (/^H[1-4]$/.test(el.tagName) || el.classList.contains("bar") || el.classList.contains("banner") || el.classList.contains("keep"));
     const splittable = (n) => {
       if (n.nodeType !== 1) return false;
       if (n.tagName === "TABLE") return !!(n.tBodies[0] && n.tBodies[0].rows.length > 1);
       if (n.tagName === "UL" || n.tagName === "OL") return n.children.length > 1;
-      return n.matches(".co,.concept,.plan,.sol,.grp") && n.children.length > 1;
+      return n.matches(".co,.concept,.plan,.sol,.grp,.box:not(.whole),.msq") && n.children.length > 1;
     };
     // Place `node` into `parent`; returns null when it fits fully, otherwise the part that still has to go.
     function place(parent, node) {
@@ -385,6 +385,175 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
       const blob = pdf.output("blob");
       prog.set("Done", 1);
       IB.download(opts.filename || `IB-${s.short.replace(/\s+/g, "-")}-${title.replace(/[^\w一-鿿]+/g, "-")}-notes.pdf`, blob, "application/pdf");
+      return all.length;
+    } catch (e) {
+      IB.toast(e.message || "Couldn't build the PDF.");
+      throw e;
+    } finally {
+      if (frame) frame.remove();
+      prog.done();
+    }
+  };
+  // ================= IB-style exam papers =================
+  const PAPER_CSS = (c) => `
+.page.pcov{padding:40px 64px 0}
+.ptop{position:absolute;top:14px;left:0;right:0;text-align:center;font:600 11px Figtree,sans-serif;color:#333}
+.pcover{height:${PH - 120}px;display:flex;flex-direction:column}
+.pc-brand{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #111;padding-bottom:14px}
+.pc-brand .code{font:700 11px "JetBrains Mono",monospace;color:#555;text-align:right;line-height:1.6}
+.pc-title{margin:34px 0 4px;font:800 30px/1.15 "Bricolage Grotesque",sans-serif;color:#111}
+.pc-sub{font-size:17px;font-weight:700;color:#111;margin:0 0 4px}
+.pc-meta{font-size:14px;color:#333;margin:0 0 26px}
+.cand{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end;margin:0 0 26px}
+.cand .name{border-bottom:1.4px solid #111;height:34px;font-size:11px;color:#555;padding-top:2px}
+.cand .num{display:flex;gap:4px}.cand .num i{width:24px;height:30px;border:1.4px solid #111;display:block}
+.instr{border:1.6px solid #111;padding:14px 20px;margin:0 0 18px}
+.instr h3{margin:0 0 6px;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+.instr ul{margin:0;padding-left:18px;font-size:13px;line-height:1.7}
+.pc-total{margin-top:auto;display:flex;justify-content:space-between;align-items:flex-end;border-top:1.4px solid #111;padding-top:12px;font-size:11px;color:#444}
+.pc-total .big{font:800 34px "Bricolage Grotesque",sans-serif;color:#111}
+.disc{font-size:10px;color:#666;margin-top:8px}
+.secbar{font:800 15px "Bricolage Grotesque",sans-serif;border-bottom:2px solid #111;padding:0 0 4px;margin:6px 0 12px;color:#111}
+.pq-h{display:grid;grid-template-columns:30px 1fr;gap:6px;margin:10px 0 6px;font-size:13.4px;color:#111}
+.pq-h>b{font-size:14px}
+.pq-t .mk{float:right;font-weight:800;margin-left:10px}
+.pq-t .tp{display:block;font-size:10px;color:#777;margin-top:3px}
+.popts{display:grid;grid-template-columns:30px 1fr;margin:0 0 4px 36px;gap:3px 10px;font-size:13px}
+.popts b{font-weight:800}
+.ansl{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin:2px 0 14px;font-size:11px;color:#444}
+.ansl i{width:30px;height:30px;border:1.4px solid #111;display:block}
+.box{border:1.4px solid #111;border-radius:0;margin:4px 0 16px 36px;padding:0 12px}
+.box i{display:block;height:28px;border-bottom:1px dotted #8A93A6}.box i:last-child{border-bottom:0}
+.mshead{font:800 22px "Bricolage Grotesque",sans-serif;margin:0 0 4px}
+.msq{border-left:4px solid ${c};background:#F7F8FB;padding:8px 14px;margin:0 0 9px;font-size:12.4px}
+.msq .h{font-weight:800;display:flex;justify-content:space-between}
+.msq ul{margin:4px 0 0}
+.mcqgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 14px}
+.mcqgrid div{border:1.4px solid #111;padding:5px 8px;font:700 12px "JetBrains Mono",monospace}
+`;
+  const linesFor = (q) => q.type === "mcq" ? 0 : q.type === "extended" ? Math.min(34, Math.max(14, Math.round(q.marks * 2.2))) : q.numeric ? Math.min(14, 3 + q.marks * 2) : Math.min(16, Math.max(3, Math.round(q.marks * 2.2)));
+
+  /**
+   * IB-style exam paper PDF: cover with candidate boxes and instructions, numbered questions with marks,
+   * lined answer boxes, then the markscheme.
+   * opts: { title, subtitle, subject (id or null), questions, minutes, filename, markscheme (default true) }
+   */
+  IB.paperPdf = async function (opts) {
+    const qs = (opts.questions || []).filter(Boolean);
+    if (!qs.length) throw new Error("No questions to export.");
+    const s = opts.subject && IB.subjects[opts.subject];
+    const c = (s && HEX[s.id]) || "#2D5BFF";
+    const mcq = qs.filter((q) => q.type === "mcq"), written = qs.filter((q) => q.type !== "mcq");
+    const ordered = mcq.concat(written);
+    const total = ordered.reduce((n, q) => n + (q.marks || 0), 0);
+    const minutes = opts.minutes || Math.max(10, Math.round(total * 1.3));
+    const calc = s && s.id === "math" ? (opts.paper === "P1" ? "not permitted" : "required") : ["chem", "phys", "bio", "geo", "econ"].includes(s && s.id) ? "permitted" : null;
+    const prog = progress();
+    let frame;
+    try {
+      await loadLibs();
+      frame = document.createElement("iframe");
+      frame.setAttribute("aria-hidden", "true");
+      frame.style.cssText = `position:fixed;left:-${PW * 3}px;top:0;width:${PW}px;height:${PH}px;border:0;visibility:hidden`;
+      document.body.appendChild(frame);
+      const doc = frame.contentDocument;
+      doc.open();
+      doc.write(`<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="${new URL("vendor/katex/katex.min.css", location.href)}"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"><style>${CSS(c)}${PAPER_CSS(c)}</style></head><body></body></html>`);
+      doc.close();
+      await new Promise((r) => setTimeout(r, 60));
+      await Promise.race([Promise.all(Array.from(doc.querySelectorAll("link")).map((l) => (l.sheet ? 1 : new Promise((ok) => { l.onload = l.onerror = ok; })))), new Promise((r) => setTimeout(r, 4000))]);
+      if (doc.fonts && doc.fonts.ready) await Promise.race([doc.fonts.ready, new Promise((r) => setTimeout(r, 3000))]);
+      const root = doc.body;
+      const title = opts.title || "Practice paper";
+      const date = new Date().toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" });
+      const P = paginator(doc, root, `${IB.esc(s ? s.name : "Mixed subjects")} · ${IB.esc(title)}`);
+
+      // cover
+      const cover = doc.createElement("div");
+      cover.className = "page pcov";
+      cover.innerHTML = `<div class="pcover">
+        <div class="pc-brand"><div><div style="font:800 15px 'Bricolage Grotesque',sans-serif">IB Revision Hub</div><div style="font-size:11px;color:#555">Original practice material in IB exam format</div></div><div class="code">${IB.esc((s ? s.short : "MIXED").toUpperCase())}<br>${IB.esc(date)}</div></div>
+        <div class="pc-title">${IB.esc(s ? s.name : "Mixed subjects")}</div>
+        <div class="pc-sub">${IB.esc(title)}${opts.subtitle && (!s || opts.subtitle !== s.name) ? " · " + IB.esc(opts.subtitle) : ""}</div>
+        <div class="pc-meta">${Math.floor(minutes / 60) ? Math.floor(minutes / 60) + " hour" + (Math.floor(minutes / 60) > 1 ? "s" : "") + " " : ""}${minutes % 60 ? (minutes % 60) + " minutes" : ""}</div>
+        <div class="cand"><div class="name">Candidate name</div><div><div style="font-size:11px;color:#555;margin-bottom:4px">Candidate session number</div><div class="num">${"<i></i>".repeat(10)}</div></div></div>
+        <div class="instr"><h3>Instructions to candidates</h3><ul>
+          <li>Do not open this examination paper until instructed to do so.</li>
+          <li>Answer all questions.</li>
+          ${mcq.length ? "<li>Multiple choice: write the letter of your chosen answer in the box provided for each question.</li>" : ""}
+          ${written.length ? "<li>Answers must be written within the answer boxes provided.</li>" : ""}
+          ${calc ? `<li>A calculator is ${calc} for this paper.</li>` : ""}
+          ${s && (s.id === "chem" || s.id === "phys") ? `<li>A clean copy of the ${s.baseName.toLowerCase()} data booklet is required for this paper.</li>` : ""}
+          ${s && s.id === "math" ? "<li>Unless otherwise stated, all numerical answers should be given exactly or correct to three significant figures.</li>" : ""}
+          <li>The maximum mark for this examination paper is <b>[${total} marks]</b>.</li>
+        </ul></div>
+        <div class="pc-total"><div>${ordered.length} questions${mcq.length && written.length ? ` · Section A: ${mcq.length} multiple choice · Section B: ${written.length} written` : ""}<div class="disc">Original questions written for revision in the style of IB papers. Not an official IB examination paper; not affiliated with or endorsed by the International Baccalaureate Organization.</div></div><div style="text-align:right"><div class="big">${total}</div>marks</div></div>
+      </div>`;
+      root.appendChild(cover);
+
+      const addHtml = (html) => {
+        const tmp = doc.createElement("div");
+        root.appendChild(tmp);
+        tmp.innerHTML = html;
+        IB.math(tmp);
+        const kids = Array.from(tmp.children);
+        root.removeChild(tmp);
+        kids.forEach((k) => P.add(k));
+      };
+      const topicLabel = (q) => { const t = IB.topic(q.topic); return t ? `${t.code} ${t.title}` : ""; };
+      prog.set("Laying out questions", 0.1);
+      P.newPage();
+      let n = 0;
+      if (mcq.length) {
+        addHtml(`<div class="secbar keep">${written.length ? "Section A · " : ""}Multiple choice</div>`);
+        mcq.forEach((q) => {
+          n++;
+          addHtml(`<div class="pq-h keep"><b>${n}.</b><div class="pq-t">${q.q} <span class="mk">[${q.marks}]</span>${opts.showTopics ? `<span class="tp">${IB.esc(topicLabel(q))}</span>` : ""}</div></div>
+            <div class="popts keep">${q.options.map((o, i) => `<b>${"ABCD"[i]}.</b><span>${o}</span>`).join("")}</div><div class="ansl"><span>Answer</span><i></i></div>`);
+        });
+      }
+      if (written.length) {
+        if (mcq.length) { P.breakPage(); addHtml(`<div class="secbar keep">Section B · Written answers</div>`); }
+        written.forEach((q) => {
+          n++;
+          const parts = [`<div class="pq-h keep"><b>${n}.</b><div class="pq-t">${q.q} <span class="mk">[${q.marks}]</span>${opts.showTopics ? `<span class="tp">${IB.esc(topicLabel(q))}</span>` : ""}</div></div>`];
+          parts.push(`<div class="box${linesFor(q) <= 10 ? " whole" : ""}">${"<i></i>".repeat(linesFor(q))}</div>`);
+          addHtml(parts.join(""));
+        });
+      }
+
+      // markscheme
+      if (opts.markscheme !== false) {
+        P.breakPage();
+        addHtml(`<div class="mshead keep">Markscheme</div><p class="lead">M = method mark · A = answer mark · R = reasoning · ECF = error carried forward · OWTTE = or words to that effect.</p>`);
+        if (mcq.length) addHtml(`<div class="secbar keep">Section A answers</div><div class="mcqgrid">${mcq.map((q, i) => `<div>${i + 1}. ${"ABCD"[q.answer]}</div>`).join("")}</div>`);
+        ordered.forEach((q, i) => {
+          if (q.type === "mcq" && !(q.ms || []).some((x) => x.length > 3)) return;
+          addHtml(`<div class="msq"><div class="h"><span>${i + 1}.${q.type === "mcq" ? " " + "ABCD"[q.answer] : ""}</span><span>[${q.marks} mark${q.marks > 1 ? "s" : ""}]</span></div><ul>${(q.ms || []).map((p) => `<li>${p}</li>`).join("")}</ul></div>`);
+        });
+      }
+
+      const all = [cover].concat(P.pages);
+      all.forEach((p, i) => {
+        p.classList.add("paper");
+        if (i) p.insertAdjacentHTML("afterbegin", `<div class="ptop">– ${i + 1} –</div>`);
+        const pn = p.querySelector(".pn");
+        if (pn) pn.innerHTML = i < all.length - 1 ? "<b>Turn over</b>" : `${i + 1} / ${all.length}`;
+      });
+      const h2c = window.html2canvas.default || window.html2canvas.html2canvas || window.html2canvas;
+      const pdf = new window.jspdf.jsPDF({ unit: "pt", format: "a4", compress: true });
+      all.forEach((p) => p.remove());
+      for (let i = 0; i < all.length; i++) {
+        prog.set(`Rendering page ${i + 1} of ${all.length}`, 0.3 + (0.7 * i) / all.length);
+        root.appendChild(all[i]);
+        const canvas = await h2c(all[i], { scale: 1.7, backgroundColor: "#ffffff", logging: false, useCORS: true, width: PW, height: PH, windowWidth: PW, windowHeight: PH });
+        root.removeChild(all[i]);
+        if (i) pdf.addPage();
+        pdf.addImage(canvas.toDataURL("image/jpeg", 0.82), "JPEG", 0, 0, 595.28, 841.89, undefined, "FAST");
+      }
+      pdf.setProperties({ title, subject: s ? s.name : "IB practice paper", creator: "IB Revision Hub" });
+      prog.set("Done", 1);
+      IB.download(opts.filename || `IB-${s ? s.short.replace(/\s+/g, "-") : "Mixed"}-${title.replace(/[^\w一-鿿]+/g, "-")}-paper.pdf`, pdf.output("blob"), "application/pdf");
       return all.length;
     } catch (e) {
       IB.toast(e.message || "Couldn't build the PDF.");

@@ -55,7 +55,7 @@ IB.page = function () {
     run.innerHTML = `<div class="exam-bar">
         <div><strong>${IB.esc(title)}</strong><div class="small muted">${questions.length} questions · ${totalMarks} marks${exam ? " · exam conditions: markschemes hidden until you submit" : ""}</div></div>
         <div class="btn-row">${minutes ? `<span class="timer" id="timer"></span>` : ""}<span class="pill" id="live">0 answered</span>
-        <button class="btn" id="dlPaper">⬇ Paper</button><button class="btn primary" id="finish">${exam ? "Submit paper" : "Finish & mark"}</button><button class="btn" id="quit">Quit</button></div>
+        <button class="btn mark" id="dlPaper">⬇ IB-style PDF</button><button class="btn primary" id="finish">${exam ? "Submit paper" : "Finish & mark"}</button><button class="btn" id="quit">Quit</button></div>
       </div><div id="qs"></div><div id="summary"></div>`;
     const list = IB.qs("#qs");
     const cards = questions.map((q, i) => {
@@ -86,7 +86,13 @@ IB.page = function () {
       timerH = setInterval(tick, 1000);
     }
 
-    IB.qs("#dlPaper").onclick = () => IB.download(`${title.replace(/[^\w]+/g, "-")}.html`, IB.standaloneDoc(title, `<h1>${IB.esc(title)}</h1><p class="meta">${questions.length} questions · ${totalMarks} marks${minutes ? ` · ${minutes} minutes` : ""}</p>` + IB.worksheetHtml(questions, "Questions")));
+    IB.qs("#dlPaper").onclick = (ev) => {
+      if (!IB.paperPdf) return dlHtml();
+      const b = ev.currentTarget;
+      b.disabled = true;
+      IB.paperPdf({ title, subtitle: IB.subjects[subject] ? IB.subjects[subject].name : "", subject, questions, minutes }).catch((e) => IB.toast(e.message)).finally(() => (b.disabled = false));
+    };
+    const dlHtml = () => IB.download(`${title.replace(/[^\w]+/g, "-")}.html`, IB.standaloneDoc(title, `<h1>${IB.esc(title)}</h1><p class="meta">${questions.length} questions · ${totalMarks} marks${minutes ? ` · ${minutes} minutes` : ""}</p>` + IB.worksheetHtml(questions, "Questions")));
     IB.qs("#quit").onclick = () => { clearInterval(timerH); run.innerHTML = ""; setup.classList.remove("hidden"); };
 
     let finished = false;
@@ -322,7 +328,16 @@ IB.page = function () {
     setups[mode]();
   };
   IB.qsa("#modes button").forEach((b) => (b.onclick = () => switchMode(b.dataset.mode)));
-  switchMode(IB.param("mode") || "quiz");
+  if (IB.param("mode") === "mistakes") {
+    // Retry quiz from the mistakes notebook.
+    let ids = [];
+    try { ids = JSON.parse(sessionStorage.getItem("ibrev:quizIds") || "[]"); } catch (e) { /* ignore */ }
+    const mk = IB.store.get().mistakes || {};
+    const qs = ids.map((id) => mk[id] && IB.mistakeQuestion(id, mk[id])).filter(Boolean);
+    switchMode("quiz");
+    if (qs.length) startRun({ title: "Mistakes retry quiz", subject: qs[0].subject, questions: IB.shuffle(qs), kind: "quiz" });
+    else IB.toast("No mistakes to retry.");
+  } else switchMode(IB.param("mode") || "quiz");
 
   // Sit one of your imported past papers as a timed mock.
   const myKey = IB.param("mypaper");

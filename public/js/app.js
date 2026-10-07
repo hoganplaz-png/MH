@@ -352,7 +352,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
 
   // ---------- storage / progress ----------
   const KEY = "ibrev:v1";
-  const blank = () => ({ attempts: [], read: {}, flags: {}, exams: [], custom: [], created: Date.now() });
+  const blank = () => ({ attempts: [], read: {}, flags: {}, exams: [], custom: [], mistakes: {}, created: Date.now() });
   IB.store = {
     get() {
       try {
@@ -377,12 +377,27 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
       return d;
     },
   };
-  IB.recordAttempt = function (q, score, max, mode = "practice") {
+  IB.recordAttempt = function (q, score, max, mode = "practice", extra = {}) {
     IB.store.update((d) => {
       d.attempts.push({ id: q.id, s: q.subject, t: q.topic, sc: score, mx: max, m: mode, at: Date.now() });
       if (d.attempts.length > 5000) d.attempts = d.attempts.slice(-5000);
+      // Mistakes notebook: any lost mark is recorded with the answer given; full marks on a retry fixes it.
+      d.mistakes = d.mistakes || {};
+      const prev = d.mistakes[q.id];
+      if (score < max) {
+        const ans = extra.ans === undefined || extra.ans === null ? "" : q.type === "mcq" && q.options ? `${"ABCD"[extra.ans] || "?"}. ${String(q.options[extra.ans] || "").replace(/<[^>]+>/g, "")}` : String(extra.ans);
+        const m = { s: q.subject, t: q.topic, n: ((prev && prev.n) || 0) + 1, sc: score, mx: max, at: Date.now(), first: (prev && prev.first) || Date.now(), ans: ans.slice(0, 3000), miss: (extra.missing || []).slice(0, 6).map((x) => String(x).replace(/<[^>]+>/g, "").slice(0, 200)), fixed: false };
+        if (q.generated || /^gen-|^ai-/.test(q.id)) m.snap = { q: q.q, ms: q.ms, marks: q.marks, type: q.type, options: q.options, answer: q.answer, numeric: q.numeric, paper: q.paper, diff: q.diff };
+        d.mistakes[q.id] = m;
+      } else if (prev && !prev.fixed) {
+        prev.fixed = true;
+        prev.fixedAt = Date.now();
+      }
     });
   };
+  // A question from the notebook: the live question, or the saved copy for generated ones.
+  IB.mistakeQuestion = (id, m) => IB.question(id) || (IB.topic(m.t) || {}).questions?.find((q) => q.id === id) || (m.snap ? Object.assign({ id, subject: m.s, topic: m.t, generated: true }, m.snap) : null);
+  IB.mistakeCount = (data = IB.store.get()) => Object.values(data.mistakes || {}).filter((m) => !m.fixed).length;
   IB.markRead = (topicId, val = true) => IB.store.update((d) => (val ? (d.read[topicId] = Date.now()) : delete d.read[topicId]));
   IB.toggleFlag = (qid) =>
     IB.store.update((d) => {
@@ -722,7 +737,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     const finish = (score, max, mode) => {
       if (scored) return;
       scored = true;
-      IB.recordAttempt(q, score, max, mode || opts.mode || "practice");
+      IB.recordAttempt(q, score, max, mode || opts.mode || "practice", { ans: card.getAnswer ? card.getAnswer() : "", missing: card._lastFb ? card._lastFb.missing : [] });
       card.dataset.score = score;
       card.classList.remove("pop", "shake");
       void card.offsetWidth;
@@ -812,6 +827,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         aiBtn.textContent = fb.offline ? "✓ Marked - mark again" : "✦ Marked by AI";
         aiBtn.disabled = false;
         IB.qsa(".feedback", result).forEach((n) => n.remove());
+        card._lastFb = fb;
         result.prepend(IB.feedbackEl(fb));
         IB.math(result);
         finish(fb.score, fb.max, fb.offline ? "offline" : "ai");

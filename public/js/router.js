@@ -14,6 +14,7 @@
     "tutor.html": ["tutor", "js/tutor.js"],
     "mypapers.html": ["mypapers", "js/mypapers.js"],
     "progress.html": ["progress", "js/progress.js"],
+    "mistakes.html": ["mistakes", "js/mistakes.js"],
   };
   const parse = () => {
     const [file, qs] = location.hash.replace(/^#\/?/, "").split("?");
