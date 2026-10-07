@@ -65,6 +65,7 @@
       const add = (q) => {
         Object.assign(q, { subject: s.id, topic: t.id, derived: true, diff: q.diff || 1 });
         q.type = q.type || "short";
+        if (t.hl) q.hl = true;
         qs.push(q);
       };
 
@@ -95,7 +96,7 @@
         if (!c.b || strip(c.b).length < 40 || /<table/i.test(c.b)) return;
         const ms = points(c.b, 4);
         const marks = Math.max(2, Math.min(4, ms.length));
-        add({ id: `${t.id}-c${i + 1}`, sec: "concepts", marks, diff: 2, q: T.explain(s.id, c.h, marks), ms });
+        add({ id: `${t.id}-c${i + 1}`, sec: "concepts", marks, diff: 2, q: T.explain(s.id, c.h, marks), ms, hl: !!c.hl || !!t.hl });
       });
 
       // spot the mistake: one trap + three pieces of good practice from the same topic

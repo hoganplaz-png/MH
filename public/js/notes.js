@@ -36,13 +36,18 @@ IB.page = function () {
         unit = t.unit;
         side += `<div class="small muted" style="font-weight:700;margin:12px 4px 4px">${IB.esc(unit)}</div><ul class="topic-list">`;
       }
-      side += `<li><a href="#" data-t="${t.id}" class="${t.id === topicId ? "active" : ""}"><span class="code">${IB.esc(t.code)}</span><span>${IB.esc(t.title)}</span>${data.read[t.id] ? '<span class="done" title="Revised">✓</span>' : ""}</a></li>`;
+      side += `<li><a href="#" data-t="${t.id}" class="${t.id === topicId ? "active" : ""}"><span class="code">${IB.esc(t.code)}</span><span>${IB.esc(t.title)}${t.hl ? ' <span class="ahl-badge">AHL</span>' : ""}</span>${data.read[t.id] ? '<span class="done" title="Revised">✓</span>' : ""}</a></li>`;
     });
     side += "</ul>";
     IB.qs("#side").innerHTML = side;
     IB.qsa("#side a").forEach((a) => (a.onclick = (e) => { e.preventDefault(); go(subjectId, a.dataset.t); }));
 
     const t = topicId ? s.topics.find((x) => x.id === topicId) : null;
+    const hidden = !t && topicId ? s.allTopics.find((x) => x.id === topicId) : null;
+    if (hidden) {
+      IB.qs("#content").innerHTML = `<div class="card" data-reveal style="text-align:center;padding:40px 24px"><span class="ahl-badge">AHL · HL only</span><h2 style="margin:.6em 0 .2em">${IB.esc(hidden.code)} ${IB.esc(hidden.title)}</h2><p class="muted">This topic is part of the higher level course. Switch ${IB.esc(s.baseName)} to HL to open it.</p>${IB.levelSwitch(s.id)}</div>`;
+      return;
+    }
     t ? renderTopic(s, t, data) : renderOverview(s, data);
   }
 
@@ -61,13 +66,14 @@ IB.page = function () {
       const m = IB.mastery(t.id, data);
       return `${head}<a href="#" data-t="${t.id}" class="topic-card" data-reveal style="--c:${s.color}">
         <span class="topic-num">${String(n).padStart(2, "0")}</span>
-        <span class="topic-card-body"><span class="mono small muted">${IB.esc(t.code)}</span><strong>${IB.esc(t.title)}</strong><span class="small muted">${t.summary}</span></span>
+        <span class="topic-card-body"><span class="mono small muted">${IB.esc(t.code)}</span><strong>${IB.esc(t.title)}${t.hl ? ' <span class="ahl-badge">AHL</span>' : ""}</strong><span class="small muted">${t.summary}</span></span>
         <span class="topic-card-meta">${data.read[t.id] ? '<span class="pill good">✓ revised</span>' : ""}${m !== null ? `<span class="pill">${m}%</span>` : ""}</span>
       </a>`;
     }).join("");
     c.innerHTML = `<div class="subject-hero" style="--c:${s.color}" data-reveal>
-      <span class="eyebrow">${IB.esc(s.guide)}</span>
+      <div class="btn-row" style="justify-content:space-between"><span class="eyebrow">${IB.esc(s.guide)}</span>${IB.levelSwitch(s.id)}</div>
       <h1>${s.name} revision notes</h1>
+      ${IB.hasHL(s.id) ? `<p class="small" style="margin:.2em 0 .6em;opacity:.85">${IB.levelOf(s.id) === "HL" ? `HL view: all ${s.allTopics.length} topics including ${s.allTopics.filter((t) => t.hl).length} AHL topics (marked AHL), HL papers and AHL questions.` : `SL view: ${s.topics.length} topics. Switch to HL to add ${s.allTopics.filter((t) => t.hl).length} AHL topics and HL papers.`}</p>` : ""}
       <div class="chip-row">${s.topics.slice(0, 12).map((t) => `<a href="#" data-t="${t.id}" class="chip">${IB.esc(t.title)}</a>`).join("")}${s.topics.length > 12 ? `<span class="chip">+${s.topics.length - 12} more</span>` : ""}</div>
       <div class="hero-progress"><div class="bar"><span style="width:${IB.pct(read, s.topics.length)}%"></span></div><span class="small">${read}/${s.topics.length} topics revised</span></div>
       <div class="btn-row no-print"><button class="btn mark" id="dlAll">⬇ PDF: all notes</button><button class="btn" id="dlAllQ">⬇ PDF: notes + practice paper</button><button class="btn" id="dlHtml">⬇ HTML version</button></div>
@@ -114,7 +120,7 @@ IB.page = function () {
     c.innerHTML = `<div class="topic-banner" style="--c:${s.color}" data-reveal>
       <span class="topic-big-num">${String(idx + 1).padStart(2, "0")}</span>
       <div class="topic-banner-body">
-        <div class="btn-row"><span class="eyebrow">${IB.esc(t.unit)}</span>${m !== null ? `<span class="pill ${m >= 70 ? "good" : m >= 40 ? "warn" : "bad"}">Mastery ${m}%</span>` : ""}</div>
+        <div class="btn-row"><span class="eyebrow">${IB.esc(t.unit)}</span>${t.hl ? '<span class="ahl-badge">AHL · HL only</span>' : ""}${IB.levelSwitch(s.id, { small: true })}${m !== null ? `<span class="pill ${m >= 70 ? "good" : m >= 40 ? "warn" : "bad"}">Mastery ${m}%</span>` : ""}</div>
         <h1><span class="code">${IB.esc(t.code)}</span>${IB.esc(t.title)}</h1>
         <p>${t.summary}</p>
       </div>

@@ -24,7 +24,7 @@ const head = notes.match(/<head>([\s\S]*?)<\/head>/)[1]
   .replace(/<meta charset[^>]*>\s*|<meta name="viewport"[^>]*>\s*|<title>[\s\S]*?<\/title>\s*/g, "")
   .replace(/<script src="js\/notes\.js"><\/script>\s*/, "")
   .replace('<script src="js/app.js"></script>', '<script>window.IB_HOSTED = true;</script>\n<script src="vendor/pdfjs/pdf.min.js"></script>\n<script src="js/app.js"></script>')
-  .replace('<script src="js/pdfnotes.js"></script>', '<script src="js/pdfnotes.js"></script>\n<script src="js/data/frameworks.js"></script>\n<script src="js/data/ia.js"></script>\n<script src="js/router.js"></script>');
+  .replace('<script src="js/pdfnotes.js"></script>', '<script src="js/pdfnotes.js"></script>\n<script src="js/data/ia.js"></script>\n<script src="js/router.js"></script>');
 fs.writeFileSync(path.join(out, "index.html"), `<title>IB Revision Hub</title>\n${head.trim()}\n<main class="container" id="app"></main>\n`);
 
 const files = {};

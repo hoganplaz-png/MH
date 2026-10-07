@@ -29,6 +29,29 @@
     try { localStorage.setItem(LEVEL_KEY, JSON.stringify(all)); } catch (e) { /* ignore */ }
     if (IB.onLevelChange) IB.onLevelChange(sid, all[sid]);
   };
+  // SL | HL segmented switch for one subject (empty for single-level subjects).
+  IB.levelSwitch = (sid, opts = {}) => {
+    if (!IB.hasHL(sid)) return opts.label ? `<span class="pill">${IB.levelOf(sid)} only</span>` : "";
+    const lv = IB.levelOf(sid);
+    return `<div class="lvl-switch${opts.small ? " small" : ""}" role="group" aria-label="${IB.esc(IB.subjects[sid].baseName)} level">${["SL", "HL"].map((x) => `<button type="button" data-lvl-sid="${sid}" data-lv="${x}" class="${x === lv ? "on" : ""}" aria-pressed="${x === lv}">${x}</button>`).join("")}</div>`;
+  };
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest && e.target.closest("[data-lvl-sid]");
+    if (!b || b.classList.contains("on")) return;
+    e.preventDefault();
+    IB.setLevel(b.dataset.lvlSid, b.dataset.lv);
+  });
+  // Default reaction to a level change: redraw the current screen and say what changed.
+  IB.onLevelChange = (sid, lv) => {
+    const s = IB.subjects[sid];
+    const n = s.allTopics.filter((t) => t.hl).length;
+    if (IB.toast) IB.toast(lv === "HL" ? `${s.baseName} HL on: +${n} AHL topics, HL papers and questions` : `${s.baseName} SL: AHL content hidden`);
+    const y = window.scrollY;
+    Promise.resolve(IB.rerender ? IB.rerender() : IB.runPage && IB.runPage()).then(() => {
+      IB.qsa(`[data-lvl-sid="${sid}"]`).forEach((b) => { b.classList.toggle("on", b.dataset.lv === lv); b.setAttribute("aria-pressed", b.dataset.lv === lv); });
+      window.scrollTo(0, y);
+    });
+  };
   IB.isHLItem = (x) => !!(x && x.hl);
   IB.showItem = (sid, x) => !IB.isHLItem(x) || IB.levelOf(sid) === "HL";
 
@@ -66,6 +89,8 @@
         return out;
       },
     });
+    subject.assessmentSL = subject.assessment || [];
+    Object.defineProperty(subject, "assessment", { configurable: true, get: () => (level() === "HL" && subject.assessmentHL ? subject.assessmentHL : subject.assessmentSL) });
     IB.subjects[subject.id] = subject;
   };
 
@@ -88,6 +113,8 @@
     const s = IB.subjects[subjectId];
     if (!s) return;
     if (extra.gameplan) s.gameplan = extra.gameplan;
+    if (extra.papers) Object.assign(s.allPapers, extra.papers);
+    if (extra.assessmentHL) s.assessmentHL = extra.assessmentHL;
     Object.entries(extra.topics || {}).forEach(([id, add]) => {
       const t = s.allTopics.find((x) => x.id === id);
       if (t) Object.assign(t, add);
@@ -856,17 +883,29 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         ${link("mypapers.html", "Past Papers", "mypapers")}
         ${link("progress.html", "Progress", "progress")}
       </nav>
+      <button class="icon-btn lvl-btn" id="lvlBtn" title="Choose SL or HL for each subject" aria-label="Choose SL or HL" aria-expanded="false">SL/HL</button>
       <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">◐</button>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">☰</button>
     </div></header>`);
     document.body.prepend(header);
     document.body.appendChild(
       IB.el(`<footer class="site-footer"><div class="container">
-      <p><strong>IB Revision Hub</strong> · Economics SL · Chemistry SL · Geography SL · Mathematics AA SL · Biology SL · English B HL · 中文A 語言與文學 SL</p>
+      <p><strong>IB Revision Hub</strong> · Economics SL/HL · Chemistry SL/HL · Physics SL/HL · Geography SL/HL · Mathematics AA SL/HL · Biology SL/HL · English B HL · 中文A 語言與文學 SL</p>
       <p>All notes and questions are original IB-style material written for revision. They are not official IB past-paper questions and this site is not affiliated with or endorsed by the International Baccalaureate Organization. Get official past papers and markschemes from your school or the IB store.</p>
     </div></footer>`)
     );
     IB.qs("#menuBtn").onclick = () => IB.qs("#navLinks").classList.toggle("open");
+    const lvlBtn = IB.qs("#lvlBtn");
+    lvlBtn.onclick = (e) => {
+      e.stopPropagation();
+      let panel = IB.qs("#lvlPanel");
+      if (panel) { panel.remove(); lvlBtn.setAttribute("aria-expanded", "false"); return; }
+      panel = IB.el(`<div class="lvl-panel card" id="lvlPanel" role="dialog" aria-label="Subject levels"><strong>My subject levels</strong><p class="small muted" style="margin:4px 0 10px">HL adds the AHL topics, HL-only papers (e.g. Paper 3) and harder questions.</p>${IB.subjectList().map((x) => `<div class="lvl-row" style="--c:${x.color}"><span class="dot" style="background:${x.color}"></span><span>${IB.esc(x.baseName)}</span>${IB.levelSwitch(x.id, { small: true, label: true })}</div>`).join("")}</div>`);
+      header.appendChild(panel);
+      lvlBtn.setAttribute("aria-expanded", "true");
+      const close = (ev) => { if (!panel.contains(ev.target) && ev.target !== lvlBtn) { panel.remove(); lvlBtn.setAttribute("aria-expanded", "false"); document.removeEventListener("click", close); } };
+      setTimeout(() => document.addEventListener("click", close), 0);
+    };
     IB.qs("#themeBtn").onclick = () => {
       const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       const next = cur === "dark" ? "light" : "dark";
@@ -927,7 +966,10 @@ IB.topicSections = function (t, opts = {}) {
   const out = [];
   const box = (kind, title, body, id) => `<section class="callout ${kind}" ${id ? `id="${id}"` : ""} data-reveal><h3 class="callout-title">${title}</h3>${body}</section>`;
   if (t.formulas && t.formulas.length) out.push(["formulas", "Formulas", box("formula", "Formulas", `<div class="formula-grid">${t.formulas.map((f) => `<div class="formula">${f}</div>`).join("")}</div>`, "sec-formulas")]);
-  out.push(["concepts", "Concepts", `<section class="card concepts" id="sec-concepts" data-reveal><h3 class="section-title">Key concepts</h3>${t.concepts.map((x) => `<div class="concept"><h3>${x.h}</h3>${x.b}</div>`).join("")}</section>`]);
+  const yue = (x) => (x.yue ? `<aside class="yue" lang="zh-HK"><strong class="yue-tag">廣東話解釋</strong> ${x.yue}</aside>` : "");
+  const ahl = (x) => (x.hl ? ' <span class="ahl-badge" title="Additional higher level">AHL</span>' : "");
+  const concepts = t.concepts.filter((x) => IB.showItem(t.subject, x));
+  out.push(["concepts", "Concepts", `<section class="card concepts" id="sec-concepts" data-reveal><h3 class="section-title">Key concepts</h3>${concepts.map((x) => `<div class="concept${x.hl ? " is-ahl" : ""}"><h3>${x.h}${ahl(x)}</h3>${x.b}${yue(x)}</div>`).join("")}</section>`]);
   if (t.table) out.push(["table", "Compare", `<section class="card" id="sec-table" data-reveal><h3 class="section-title">Compare at a glance</h3><div class="table-wrap"><table class="compare"><tr>${t.table.head.map((h) => `<th>${h}</th>`).join("")}</tr>${t.table.rows.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th scope="row">${x}</th>`)).join("")}</tr>`).join("")}</table></div></section>`]);
   if (t.diagrams && t.diagrams.length && IB.plot) out.push(["diagrams", "Diagrams", `<section class="card" id="sec-diagrams" data-reveal><h3 class="section-title">Diagrams to know</h3><div class="plot-grid">${t.diagrams.map(IB.plot).join("")}</div></section>`]);
   const methods = (t.methods || []).concat((t.skills || []).map((x) => `<strong>${x.h}:</strong> ${x.b}`));
@@ -936,6 +978,8 @@ IB.topicSections = function (t, opts = {}) {
   if (t.examples && t.examples.length) out.push(["examples", "Worked examples", box("example", "Worked examples", t.examples.map((e, i) => `<div class="worked"><strong>Example ${i + 1}.</strong> ${e.q}${opts.static ? `<div class="sol"><strong>Solution:</strong> ${e.a}</div>` : `<details class="sol"><summary>Show solution</summary><div>${e.a}</div></details>`}</div>`).join(""), "sec-examples")]);
   const plans = IB.essayPlansHtml ? IB.essayPlansHtml(t) : "";
   if (plans) out.push(["plans", "Essay plans", `<section class="card plans" id="sec-plans" data-reveal><h3 class="section-title">Practice essay plans</h3><p class="small muted" style="margin-top:0">Built from the markschemes: intro → for → against → examples → evaluate → conclusion. Use at least two evaluation lenses (scale, time, stakeholders, place, evidence).</p>${plans}</section>`]);
+  const frames = IB.topicFrames ? IB.topicFrames(t) : t.frame || [];
+  if (frames.length) out.push(["frame", "答題框架", `<section class="card frame-sec" id="sec-frame" data-reveal><h3 class="section-title">答題框架 · Answer frameworks</h3><p class="small muted" style="margin-top:0">Exam skills for each question type: follow the steps in order and you hit every markscheme point.</p><div class="frame-grid">${frames.map((f) => `<div class="frame-card"><div class="frame-type">${f.type}</div><ol class="frame-steps">${f.steps.map((x) => `<li>${x}</li>`).join("")}</ol>${f.yue ? `<aside class="yue" lang="zh-HK"><strong class="yue-tag">廣東話</strong> ${f.yue}</aside>` : ""}</div>`).join("")}</div></section>`]);
   if (t.tips && t.tips.length) out.push(["tips", "Exam tips", box("tip", "Exam tips", `<ul>${t.tips.map((m) => `<li>${m}</li>`).join("")}</ul>`, "sec-tips")]);
   if (t.terms && t.terms.length) out.push(["terms", "Key terms", box("terms", "Key definitions to learn", `<div class="table-wrap"><table class="def-table"><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody>${t.terms.map(([k, v]) => `<tr><th scope="row">${k}</th><td>${v}</td></tr>`).join("")}</tbody></table></div>`, "sec-terms")]);
   return out;

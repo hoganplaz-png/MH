@@ -184,3 +184,96 @@ IB.frameworks = {
     ],
   },
 };
+
+/* Physics frameworks (same layout as the other sciences). */
+IB.frameworks.phys = {
+  frameworks: [
+    { id: "mcq", type: "Multiple choice (Paper 1A)", marks: "1", when: "Paper 1A", time: "~1.5 min",
+      structure: [["Read the stem", "Underline NOT, MOST, LEAST; note units and powers of ten."], ["Estimate", "No calculator: round numbers (g ≈ 10) to find the order of magnitude."], ["Units check", "Eliminate options with the wrong units or dimensions."], ["Limiting cases", "Test an extreme (θ = 0, m → ∞) to rule options out."]],
+      starters: [], example: { q: "A ball is thrown horizontally at 10 m s⁻¹ from 20 m. Time to land?", a: "Vertical motion only: 20 = ½(10)t² → t = 2 s." },
+      checklist: ["Never leave blank", "Watch for 'NOT'", "Use the data booklet"] },
+    { id: "calc", type: "Calculate / Determine", marks: "2-4", when: "Calculate, determine, show that", time: "1.5 min per mark",
+      structure: [["Formula", "Write the data-booklet equation first (often M1)."], ["SI units", "Convert: km → m, g → kg, mA → A, °C → K, eV → J."], ["Substitute", "Show numbers in the formula."], ["Answer", "Unit + sensible significant figures (2-3)."]],
+      starters: ["Using v² = u² + 2as: …"], example: { q: "Calculate the KE of a 0.50 kg ball at 6.0 m s⁻¹. [2]", a: "Ek = ½mv² = ½ × 0.50 × 6.0² = 9.0 J." },
+      checklist: ["ECF protects later marks", "Don't round early", "Unit on every answer"] },
+    { id: "showthat", type: "Show that", marks: "2-3", when: "Show that … is about …", time: "1 min per mark",
+      structure: [["Every step", "Formula, substitution and the unrounded result."], ["Extra s.f.", "Give one more significant figure than the value shown."]],
+      starters: [], example: { q: "Show that the period is about 2 s for l = 1.0 m. [2]", a: "T = 2π√(1.0/9.81) = 2.006 s ≈ 2 s." },
+      checklist: ["Never just restate the given value", "Use the value given in later parts"] },
+    { id: "explain", type: "Explain / Outline", marks: "2-4", when: "Explain, outline, suggest", time: "1.5 min per mark",
+      structure: [["Principle", "Name the law or principle (Newton's 2nd law, conservation of energy, Lenz's law)."], ["Link", "Apply it to this situation step by step ('so', 'therefore')."], ["Conclusion", "State the effect asked for."]],
+      starters: ["By conservation of momentum, …", "…so the resultant force…"], example: { q: "Explain why a parachutist reaches terminal velocity. [3]", a: "Drag increases with speed [1]; eventually drag equals weight [1]; resultant force zero so acceleration zero, constant velocity [1]." },
+      checklist: ["Name the physics principle", "One linked point per mark"] },
+    { id: "draw", type: "Draw / Sketch graphs and diagrams", marks: "1-3", when: "Sketch, draw, label", time: "2-3 min",
+      structure: [["Axes", "Labelled with quantity and unit."], ["Shape", "Correct curve: straight line, inverse, exponential, sinusoidal."], ["Key points", "Intercepts, asymptotes, peaks, relative values."]],
+      starters: [], example: { q: "Sketch the x-t graph of an object in SHM starting at maximum displacement. [2]", a: "Cosine curve starting at +x₀, constant amplitude, constant period." },
+      checklist: ["Free-body arrows from the centre of mass", "Ruler for straight lines"] },
+    { id: "data", type: "Data-based (Paper 1B)", marks: "1-4", when: "Uncertainty, graphs, method evaluation", time: "~1.2 min per mark",
+      structure: [["Variables", "Independent, dependent, controlled."], ["Uncertainty", "Absolute, fractional and %; add % for products/quotients."], ["Graph", "Gradient (large triangle), intercept, linearise (e.g. T² vs l)."], ["Evaluate", "Random vs systematic error; specific improvement."]],
+      starters: ["The gradient of the graph equals …"], example: { q: "l = 50.0 ± 0.1 cm. Find the % uncertainty. [1]", a: "0.1/50.0 × 100 = 0.2%." },
+      checklist: ["Error bars both directions", "Max/min gradient lines for uncertainty in gradient"] },
+    { id: "compare", type: "Compare / Distinguish", marks: "2-3", when: "Compare, distinguish, contrast", time: "1 min per mark",
+      structure: [["Paired statements", "\"A …, whereas B …\" for each point."]],
+      starters: ["…whereas…"], example: { q: "Distinguish between transverse and longitudinal waves. [2]", a: "Transverse: oscillations perpendicular to energy transfer, whereas longitudinal: oscillations parallel to energy transfer." },
+      checklist: ["Both sides in every point"] },
+  ],
+  decoder: [{ title: "Markscheme notation", rows: [["M / A marks", "Method / answer", "Correct method with a slip still scores M.", "Always write the formula and substitution."], ["ECF", "Error carried forward", "A wrong value from (a) used correctly later still earns marks.", "Never skip a later part."], ["OWTTE", "Or words to that effect", "Different wording accepted.", ""], ["Allow / Do not allow", "Accepted and rejected answers", "Shows the boundary of acceptable answers.", "Read the 'do not allow' list - they are common mistakes."], ["Units", "Missing or wrong unit", "Often loses the final A mark.", "Unit on every final answer."], ["IA criteria", "Research design 6 · Data analysis 6 · Conclusion 6 · Evaluation 6", "Shared by all sciences (24 marks).", "See IA & EE page."]] }],
+};
+
+/* Cantonese one-line summaries for each framework type (used in the 答題框架 section of the notes). */
+IB.frameYue = {
+  def: "定義題：核心意思 + 精準修飾語，兩分就到手。",
+  dia4: "圖表題：先畫圖（軸、曲線、移動箭咀、均衡點），再解釋原因同過程。",
+  calc: "計算題：先寫公式，再代數（換 SI 單位），最後答案加單位同有效數字。",
+  p1a: "Paper 1 (a)：定義 → 畫圖 → 解釋理論 → 例子，唔使評估。",
+  p1b: "Paper 1 (b)：定義 + 圖 + 理論 + 真實例子 + 評估（CLASP）+ 有條件嘅結論。",
+  p2h: "Paper 2 最後一題：一定要引用文本同數據，用理論分析，再評估同結論。",
+  mcq: "選擇題：先估答案再睇選項，用單位同極端情況刪走錯嘅。",
+  state: "State 題：一分一個準確事實，唔使解釋。",
+  explain: "解釋題：原因 → 連接（所以／因此）→ 結果，一分一個連貫論點。",
+  draw: "畫圖題：軸要有標籤同單位，形狀正確，標出關鍵點。",
+  data: "數據題：認清變數，計不確定度，用斜率／截距，評估誤差同具體改善方法。",
+  compare: "比較題：每一點都要兩邊都講，用「而」連接。",
+  describe: "描述數據：講整體趨勢 + 引用數據 + 指出異常值。",
+  explain22: "解釋兩個原因：每個原因 1 分指出 + 1 分發展（點樣導致結果）。",
+  suggest: "Suggest 題：提出合理原因，要連返題目嘅情境。",
+  essay10: "10 分長答：引言、兩至三段有實例同數據嘅分析、評估、結論。",
+  infographic: "資訊圖題：先讀標題同圖例，引用具體數字，再解釋。",
+  writedown: "Write down：直接寫答案，唔使步驟。",
+  find: "Find／Calculate：清楚寫出步驟，最後答案準確到 3 個有效數字。",
+  showthat: "Show that：每一步都要寫，唔可以直接抄答案；答案比題目多一位有效數字。",
+  hence: "Hence：一定要用上一題嘅結果。",
+  sketch: "Sketch：標出截距、漸近線、轉折點同大概形狀。",
+  proof: "證明題：清楚列出每一步，最後要寫結論句。",
+  justify: "Justify／R 分：用數學理由支持答案，例如導數符號。",
+  gdc: "Paper 2 計數機題：寫出用咗咩功能同輸入，答案 3 個有效數字。",
+  sectionb: "Section B：分題之間有連繫，前面答錯都要繼續做（ECF）。",
+  outline: "Outline：簡單講出重點，每分一點。",
+  graph: "描述圖表：趨勢 + 數據 + 單位 + 例外情況。",
+  distinguish: "分辨題：一點一對，兩邊都要講。",
+  extended: "長答題：先列大綱，每分一個要點，用正確生物學術語。",
+};
+
+/* The 答題框架 for a topic: its own hand-written frames first, then the subject's frameworks that match
+   the question types used in this topic. */
+IB.topicFrames = function (t) {
+  const F = IB.frameworks[t.subject];
+  const own = (t.frame || []).slice();
+  if (!F) return own;
+  const qs = t.questions || [];
+  const has = (fn) => qs.some(fn);
+  const want = [];
+  const add = (...ids) => ids.forEach((id) => { if (!want.includes(id) && F.frameworks.some((f) => f.id === id)) want.push(id); });
+  if (has((q) => q.type === "mcq")) add("mcq");
+  if ((t.terms || []).length) add("def", "state", "outline", "writedown");
+  if (has((q) => q.numeric)) add("calc", "find", "showthat");
+  if ((t.diagrams || []).length) add("dia4", "draw", "sketch");
+  if (has((q) => q.type === "extended")) add("p1b", "essay10", "extended", "sectionb", "p1", "p2");
+  add("explain", "explain22", "describe", "proof", "compare", "distinguish", "data", "article", "para");
+  const pick = want.slice(0, Math.max(2, 4 - own.length)).map((id) => F.frameworks.find((f) => f.id === id));
+  return own.concat(pick.map((f) => ({
+    type: `${f.type} [${f.marks}]`,
+    steps: (f.structure || []).map(([h, b]) => `<strong>${h}</strong>: ${b}`).concat(f.example ? [`<em>Example:</em> ${f.example.q}<br><span class="muted">→ ${f.example.a}</span>`] : []),
+    yue: (IB.frameYue || {})[f.id] || "",
+  })));
+};
