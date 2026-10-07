@@ -7,14 +7,7 @@ IB.page = function () {
   const recent = data.attempts.slice(-1)[0];
   const recentTopic = recent && IB.topic(recent.t);
 
-  // revision streak (consecutive days with at least one attempt)
-  const dayKey = (ts) => new Date(ts).toISOString().slice(0, 10);
-  const days = new Set(data.attempts.map((a) => dayKey(a.at)));
-  let streak = 0;
-  for (let i = 0; ; i++) {
-    if (days.has(dayKey(Date.now() - i * 86400000))) streak++;
-    else if (i > 0) break;
-  }
+  const streak = IB.streak(data).days;
 
   app.innerHTML = `
   <section class="band">
@@ -44,7 +37,8 @@ IB.page = function () {
     </div>
   </section>
 
-  <section class="grid grid-4 stat-grid" style="margin-top:40px" aria-label="Site statistics">
+  <div style="margin-top:40px">${IB.gamePanel(data, { compact: true })}</div>
+  <section class="grid grid-4 stat-grid" style="margin-top:20px" aria-label="Site statistics">
     <div class="card stat-tile"><span class="stat-big" data-count="${totalT}">${totalT}</span><span class="muted">syllabus topics with notes</span></div>
     <div class="card stat-tile"><span class="stat-big" data-count="${totalQ}">${totalQ}</span><span class="muted">exam-style questions with markschemes</span></div>
     <div class="card stat-tile"><span class="stat-big">∞</span><span class="muted">fresh calculation questions</span></div>
@@ -79,7 +73,7 @@ IB.page = function () {
     const tried = rows.filter((m) => m !== null);
     const pct = tried.length ? Math.round(rows.reduce((n, m) => n + (m ?? 0), 0) / rows.length) : 0;
     const next = s.topics.map((t, i) => ({ t, m: rows[i] })).sort((a, b) => (a.m ?? -1) - (b.m ?? -1))[0].t;
-    const mono = { econ: "Ec", chem: "Ch", geo: "Ge", math: "Ma", bio: "Bi", engb: "En", chia: "中" }[s.id] || s.short.slice(0, 2);
+    const mono = { econ: "Ec", chem: "Ch", phys: "Ph", geo: "Ge", math: "Ma", bio: "Bi", engb: "En", chia: "中" }[s.id] || s.short.slice(0, 2);
     const C = 2 * Math.PI * 26;
     grid.appendChild(
       IB.el(`<a class="card subject-card" href="notes.html?subject=${s.id}" style="--c:${s.color}" data-reveal>

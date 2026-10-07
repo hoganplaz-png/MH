@@ -1,0 +1,42 @@
+rules_version = '2';
+// Security rules for IB Revision Hub.
+// - Your full progress (answers, mistakes, past papers) lives in users/{uid}/private and only you can read it.
+// - Your profile summary (name, level, XP, streak, badges, subject %) is readable by you and your friends only.
+// - Friendships need a request from one side and acceptance by the other.
+service cloud.firestore {
+  match /databases/{db}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function isFriendOf(uid) { return exists(/databases/$(db)/documents/friends/$(uid)/list/$(me())); }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (me() == uid || isFriendOf(uid));
+      allow write: if signedIn() && me() == uid;
+      match /private/{doc} {
+        allow read, write: if signedIn() && me() == uid;
+      }
+    }
+
+    match /codes/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == me() && request.resource.data.keys().hasOnly(["uid"]);
+      allow update, delete: if false;
+    }
+
+    match /requests/{to}/from/{from} {
+      allow read: if signedIn() && (me() == to || me() == from);
+      allow create: if signedIn() && me() == from && from != to;
+      allow delete: if signedIn() && (me() == to || me() == from);
+    }
+
+    match /friends/{uid}/list/{fid} {
+      allow read: if signedIn() && me() == uid;
+      // accepting a request: the receiver writes both sides while the request exists
+      allow create: if signedIn() && (
+        (me() == uid && exists(/databases/$(db)/documents/requests/$(uid)/from/$(fid))) ||
+        (me() == fid && exists(/databases/$(db)/documents/requests/$(fid)/from/$(uid)))
+      );
+      allow delete: if signedIn() && (me() == uid || me() == fid);
+    }
+  }
+}

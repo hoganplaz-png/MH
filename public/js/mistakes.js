@@ -44,7 +44,7 @@ IB.page = function () {
       <div class="stat-tile card"><span class="stat-big">${fixed.length}</span><span class="muted">fixed</span></div>
       <div class="stat-tile card"><span class="stat-big">${lost}</span><span class="muted">marks to win back</span></div>
       <div class="stat-tile card"><span class="stat-big small-big">${weakTopic ? IB.esc(weakTopic.title) : "-"}</span><span class="muted">most mistakes</span></div>`;
-    IB.qs("#mkSubs").innerHTML = [`<button data-s="all" class="${sid === "all" ? "active" : ""}">All subjects</button>`]
+    IB.qs("#mkSubs").innerHTML = [`<button data-s="all" class="${sid === "all" ? "active" : ""}" style="--c:#0F1B2D">All subjects</button>`]
       .concat(subjects().map((x) => {
         const n = Object.values(IB.store.get().mistakes || {}).filter((m) => m.s === x.id && !m.fixed).length;
         return `<button data-s="${x.id}" class="${sid === x.id ? "active" : ""}" style="--c:${x.color}">${IB.esc(x.name)}${n ? ` <span class="count">${n}</span>` : ""}</button>`;

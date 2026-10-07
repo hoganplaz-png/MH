@@ -9,12 +9,7 @@ IB.page = function () {
     const dayKey = (ts) => new Date(ts).toISOString().slice(0, 10);
     const perDay = {};
     A.forEach((a) => (perDay[dayKey(a.at)] = (perDay[dayKey(a.at)] || 0) + 1));
-    let streak = 0;
-    for (let i = 0; ; i++) {
-      const k = dayKey(Date.now() - i * 86400000);
-      if (perDay[k]) streak++;
-      else if (i > 0) break;
-    }
+    const streak = IB.streak(d).days;
     const readCount = Object.keys(d.read).length;
     const totalTopics = IB.subjectList().reduce((n, s) => n + s.topics.length, 0);
 
@@ -33,7 +28,8 @@ IB.page = function () {
     }
 
     app.innerHTML = `<h1 style="margin-bottom:.2em">My progress</h1>
-      <p class="muted" style="margin-top:0">Saved privately in this browser. Export a backup to keep it safe or move it to another device.</p>
+      <p class="muted" style="margin-top:0">${IB.cloud && IB.cloud.user ? "Synced to your Google account - available on any device you sign in on." : "Saved privately in this browser. Sign in with Google to sync it, or export a backup."}</p>
+      ${IB.gamePanel(d)}
       <section class="grid grid-4">
         <div class="card"><div class="stat-big">${unique}</div><div class="small muted">different questions attempted (${A.length} attempts)</div></div>
         <div class="card"><div class="stat-big">${A.length ? avg + "%" : "-"}</div><div class="small muted">average score</div></div>

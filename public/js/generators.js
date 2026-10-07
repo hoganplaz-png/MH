@@ -16,6 +16,125 @@
 
   const G = {
 
+
+    // ===================== HL TOPICS =====================
+    "econ-h3": [
+      () => {
+        const mpc = P([0.5, 0.6, 0.75, 0.8, 0.9]), dG = R(2, 30), k = dp(1 / (1 - mpc), 2), dy = dp(k * dG, 1);
+        return { paper: "P3", marks: 2, diff: 2, q: `The marginal propensity to consume is ${mpc}. Government spending increases by $${dG}bn. Calculate the final change in real GDP (in $bn).`, numeric: { value: dy, tol: 0.15 }, ms: [`k = 1 ÷ (1 − ${mpc}) = ${k} [M1]`, `ΔY = ${k} × ${dG} = $${dy}bn [A1]`] };
+      },
+      () => {
+        const mps = P([0.1, 0.15, 0.2]), mpt = P([0.1, 0.15, 0.2, 0.25]), mpm = P([0.05, 0.1, 0.15, 0.2]), k = dp(1 / (mps + mpt + mpm), 2);
+        return { paper: "P3", marks: 2, diff: 2, q: `In an economy MPS = ${mps}, MPT = ${mpt} and MPM = ${mpm}. Calculate the value of the multiplier.`, numeric: { value: k, tol: 0.02 }, ms: [`k = 1 ÷ (${mps} + ${mpt} + ${mpm}) [M1]`, `= ${k} [A1]`] };
+      },
+      () => {
+        const rr = P([5, 8, 10, 12.5, 20, 25]), mm = dp(100 / rr, 2);
+        return { paper: "P3", marks: 1, diff: 1, q: `The reserve requirement is ${rr}%. Calculate the money multiplier.`, numeric: { value: mm, tol: 0.02 }, ms: [`1 ÷ ${rr / 100} = ${mm} [A1]`] };
+      },
+    ],
+    "econ-h4": [
+      () => {
+        const px = R(85, 130), pm = R(85, 130), tot = dp((px / pm) * 100, 1);
+        return { paper: "P3", marks: 2, diff: 1, q: `A country's index of average export prices is ${px} and its index of average import prices is ${pm}. Calculate its terms of trade.`, numeric: { value: tot, tol: 0.15 }, ms: [`${px} ÷ ${pm} × 100 [M1]`, `= ${tot} [A1]`] };
+      },
+      () => {
+        const t = R(1, 8), m = R(5, 60) * 10, rev = t * m;
+        return { paper: "P3", marks: 2, diff: 1, q: `A tariff of $${t} per unit is imposed. After the tariff, ${m} units are imported. Calculate the government's tariff revenue (in $).`, numeric: { value: rev, tol: 0.5 }, ms: [`${t} × ${m} [M1]`, `= $${rev} [A1]`] };
+      },
+    ],
+    "econ-h1": [
+      () => {
+        const q1 = R(10, 40), dq = R(2, 10), tc1 = R(200, 900), mc = R(4, 30), tc2 = tc1 + mc * dq;
+        return { paper: "P3", marks: 2, diff: 1, q: `When output rises from ${q1} to ${q1 + dq} units, total cost rises from $${tc1} to $${tc2}. Calculate the marginal cost per unit (in $).`, numeric: { value: mc, tol: 0.01 }, ms: [`MC = (${tc2} − ${tc1}) ÷ ${dq} [M1]`, `= $${mc} [A1]`] };
+      },
+      () => {
+        const q = R(5, 60) * 10, p = R(10, 60), atc = p - R(-8, 12), prof = (p - atc) * q;
+        return { paper: "P3", marks: 2, diff: 2, q: `A firm sells ${q} units at a price of $${p}. Its average total cost at this output is $${atc}. Calculate its economic profit (in $; use a negative sign for a loss).`, numeric: { value: prof, tol: 0.5 }, ms: [`(AR − ATC) × Q = (${p} − ${atc}) × ${q} [M1]`, `= $${prof} [A1]`] };
+      },
+    ],
+    "chem-h3": [
+      () => {
+        const dH = -R(20, 200), dS = -R(40, 250), T = P([298, 350, 400, 500]), dG = dp(dH - (T * dS) / 1000, 1);
+        return { paper: "P2", marks: 2, diff: 2, q: `For a reaction ΔH° = ${dH} kJ mol⁻¹ and ΔS° = ${dS} J K⁻¹ mol⁻¹. Calculate ΔG° at ${T} K in kJ mol⁻¹.`, numeric: { value: dG, tol: 0.2 }, ms: [`ΔG = ${dH} − ${T} × (${dS / 1000}) [M1]`, `= ${dG} kJ mol⁻¹ [A1]`] };
+      },
+      () => {
+        const dH = R(30, 250), dS = R(80, 300), T = Math.round((dH * 1000) / dS);
+        return { paper: "P2", marks: 2, diff: 2, q: `ΔH° = +${dH} kJ mol⁻¹ and ΔS° = +${dS} J K⁻¹ mol⁻¹. Calculate the minimum temperature, in K, at which the reaction becomes spontaneous.`, numeric: { value: T, tol: 2 }, ms: [`T = ${dH} ÷ ${dS / 1000} [M1]`, `= ${T} K [A1]`] };
+      },
+    ],
+    "chem-h4": [
+      () => {
+        const g = R(2000, 12000), ea = dp((g * 8.31) / 1000, 1);
+        return { paper: "P2", marks: 2, diff: 3, q: `A graph of ln k against 1/T has a gradient of −${g} K. Calculate the activation energy in kJ mol⁻¹. (R = 8.31 J K⁻¹ mol⁻¹)`, numeric: { value: ea, tol: 0.2 }, ms: [`Ea = ${g} × 8.31 [M1]`, `= ${ea} kJ mol⁻¹ [A1]`] };
+      },
+      () => {
+        const n = P([1, 2]), f = P([2, 3, 4]), r = Math.pow(f, n);
+        return { paper: "P2", marks: 1, diff: 1, q: `A reaction is order ${n} with respect to X. By what factor does the rate change when [X] is multiplied by ${f}?`, numeric: { value: r, tol: 0 }, ms: [`${f}^${n} = ${r} [A1]`] };
+      },
+    ],
+    "chem-h5": [
+      () => {
+        const ka = P([1.8e-5, 6.3e-5, 1.4e-4, 4.0e-4, 1.3e-5]), c = P([0.05, 0.1, 0.2, 0.25, 0.5]), pH = dp(-Math.log10(Math.sqrt(ka * c)), 2);
+        return { paper: "P2", marks: 2, diff: 2, q: `Calculate the pH of a ${c} mol dm⁻³ solution of a weak acid with Ka = ${ka.toExponential(1)}.`, numeric: { value: pH, tol: 0.02 }, ms: [`[H⁺] = √(${ka.toExponential(1)} × ${c}) [M1]`, `pH = ${pH} [A1]`] };
+      },
+      () => {
+        const pairs = [["Cu²⁺/Cu", 0.34], ["Ag⁺/Ag", 0.8], ["Fe²⁺/Fe", -0.45], ["Zn²⁺/Zn", -0.76], ["Ni²⁺/Ni", -0.26], ["Pb²⁺/Pb", -0.13], ["Mg²⁺/Mg", -2.37]];
+        const [a, b] = IB.shuffle(pairs.slice()).slice(0, 2).sort((x, y) => y[1] - x[1]);
+        const e = dp(a[1] - b[1], 2);
+        return { paper: "P2", marks: 2, diff: 2, q: `E°(${a[0]}) = ${a[1] > 0 ? "+" : ""}${a[1]} V and E°(${b[0]}) = ${b[1] > 0 ? "+" : ""}${b[1]} V. Calculate the standard cell potential E°cell in V.`, numeric: { value: e, tol: 0.01 }, ms: [`E°cell = ${a[1]} − (${b[1]}) [M1]`, `= +${e} V [A1]`] };
+      },
+    ],
+    "math-h1": [
+      () => {
+        const n = R(5, 12), r = R(2, Math.min(5, n - 1));
+        const f = (x) => (x <= 1 ? 1 : x * f(x - 1));
+        const c = Math.round(f(n) / (f(r) * f(n - r)));
+        return { paper: "P1", marks: 2, diff: 1, q: `A team of ${r} is chosen from ${n} students. Find the number of possible teams.`, numeric: { value: c, tol: 0 }, ms: [`⁽${n}⁾C₍${r}₎ = ${n}! ÷ (${r}! × ${n - r}!) [M1]`, `= ${c} [A1]`] };
+      },
+      () => {
+        const a = R(-6, 6) || 1, b = R(-6, 6) || 2, n = R(2, 6), mod = dp(Math.pow(Math.sqrt(a * a + b * b), n), 2);
+        return { paper: "P1", marks: 2, diff: 2, q: `Given z = ${a} ${b < 0 ? "−" : "+"} ${Math.abs(b)}i, find |z^${n}|${Number.isInteger(mod) ? "" : " (to 2 d.p.)"}.`, numeric: { value: mod, tol: Math.max(0.01, mod * 0.001) }, ms: [`|z| = √(${a * a} + ${b * b}) [M1]`, `|z^${n}| = |z|^${n} = ${mod} [A1]`] };
+      },
+    ],
+    "math-h2": [
+      () => {
+        const a = R(-4, 4), b = R(-9, 9), c = R(-9, 9), x = R(-3, 3), rem = x * x * x + a * x * x + b * x + c;
+        return { paper: "P1", marks: 2, diff: 1, q: `Find the remainder when x³ ${a < 0 ? "−" : "+"} ${Math.abs(a)}x² ${b < 0 ? "−" : "+"} ${Math.abs(b)}x ${c < 0 ? "−" : "+"} ${Math.abs(c)} is divided by (x ${x < 0 ? "+" : "−"} ${Math.abs(x)}).`, numeric: { value: rem, tol: 0 }, ms: [`P(${x}) [M1]`, `= ${rem} [A1]`] };
+      },
+    ],
+    "math-h3": [
+      () => {
+        const a = [R(-5, 5), R(-5, 5), R(-5, 5)], b = [R(-5, 5), R(-5, 5), R(-5, 5)], d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+        return { paper: "P1", marks: 1, diff: 1, q: `Find a · b where a = (${a.join(", ")}) and b = (${b.join(", ")}).`, numeric: { value: d, tol: 0 }, ms: [`${a[0]}×${b[0]} + ${a[1]}×${b[1]} + ${a[2]}×${b[2]} = ${d} [A1]`] };
+      },
+    ],
+    "math-h4": [
+      () => {
+        const k = R(2, 9), m = R(1, 5);
+        return { paper: "P1", marks: 2, diff: 2, q: `Find lim (x → 0) of sin(${k}x) / (${m}x)${k % m ? " (give your answer as a decimal to 2 d.p.)" : ""}.`, numeric: { value: dp(k / m, 2), tol: 0.01 }, ms: [`L'Hôpital: ${k}cos(${k}x) ÷ ${m} [M1]`, `= ${dp(k / m, 2)} [A1]`] };
+      },
+      () => {
+        const r = R(1, 9), dr = dp(R(1, 9) / 10, 1), dA = dp(2 * Math.PI * r * dr, 2);
+        return { paper: "P2", marks: 3, diff: 2, q: `The radius of a circle increases at ${dr} cm s⁻¹. Find the rate of increase of its area, in cm² s⁻¹, when r = ${r} cm.`, numeric: { value: dA, tol: 0.02 }, ms: [`dA/dt = 2πr × dr/dt [M1]`, `= 2π × ${r} × ${dr} [M1]`, `= ${dA} cm² s⁻¹ [A1]`] };
+      },
+    ],
+    "math-h5": [
+      () => {
+        const v = R(1, 9), a = P([2, 3, 4, 5, -2, -3]), b = R(-5, 5);
+        return { paper: "P1", marks: 2, diff: 1, q: `Var(X) = ${v}. Find Var(${a}X ${b < 0 ? "−" : "+"} ${Math.abs(b)}).`, numeric: { value: a * a * v, tol: 0 }, ms: [`${a}² × ${v} [M1]`, `= ${a * a * v} [A1]`] };
+      },
+      () => {
+        const p = P([0.005, 0.01, 0.02, 0.05]), sens = P([0.9, 0.95, 0.98, 0.99]), fp = P([0.02, 0.05, 0.1]);
+        const v = dp((p * sens) / (p * sens + (1 - p) * fp), 3);
+        return { paper: "P2", marks: 4, diff: 3, q: `${p * 100}% of a population has a condition. A test detects it with probability ${sens} and gives a false positive with probability ${fp}. Find the probability that a person who tests positive has the condition (3 d.p.).`, numeric: { value: v, tol: 0.002 }, ms: [`P(+) = ${p} × ${sens} + ${dp(1 - p, 3)} × ${fp} [M1]`, `= ${dp(p * sens + (1 - p) * fp, 5)} [A1]`, `${dp(p * sens, 5)} ÷ P(+) [M1]`, `= ${v} [A1]`] };
+      },
+    ],
+    "bio-h4": [
+      () => {
+        const n = R(8, 40) * 10, o1 = Math.round(n / 2 + R(-25, 25)), o2 = n - o1, e = n / 2, chi = dp(((o1 - e) ** 2) / e + ((o2 - e) ** 2) / e, 2);
+        return { paper: "P2", marks: 2, diff: 2, q: `In a cross expected to give a 1:1 ratio, ${n} offspring were counted: ${o1} and ${o2}. Calculate χ² (2 d.p.).`, numeric: { value: chi, tol: 0.02 }, ms: [`E = ${e} for each class; Σ(O − E)²/E [M1]`, `χ² = ${chi} [A1]`] };
+      },
+    ],
     // ===================== PHYSICS =====================
     "phys-1": [
       () => {

@@ -353,10 +353,15 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
   // ---------- storage / progress ----------
   const KEY = "ibrev:v1";
   const blank = () => ({ attempts: [], read: {}, flags: {}, exams: [], custom: [], mistakes: {}, created: Date.now() });
+  // Guests use one key; a signed-in account gets its own key so people sharing a browser stay separate.
+  let storeKey = KEY;
+  IB.setStoreKey = (k) => { storeKey = k || KEY; myCache = null; };
+  IB.guestKey = KEY;
+  let afterPending = false;
   IB.store = {
     get() {
       try {
-        const d = JSON.parse(localStorage.getItem(KEY));
+        const d = JSON.parse(localStorage.getItem(storeKey));
         return d && d.attempts ? Object.assign(blank(), d) : blank();
       } catch (e) {
         return blank();
@@ -365,9 +370,14 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
     save(d) {
       myCache = null;
       try {
-        localStorage.setItem(KEY, JSON.stringify(d));
+        localStorage.setItem(storeKey, JSON.stringify(d));
       } catch (e) {
         IB.toast("Could not save progress in this browser (storage blocked or full).");
+      }
+      // XP, quests and cloud sync react after the current change has finished.
+      if (IB.afterSave && !afterPending) {
+        afterPending = true;
+        setTimeout(() => { afterPending = false; IB.afterSave(); }, 0);
       }
     },
     update(fn) {
@@ -903,13 +913,17 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       <nav class="nav-links" id="navLinks">
         ${link("notes.html", "Notes", "notes")}
         ${link("questionbank.html", "Questions", "bank")}
-        ${link("practice.html", "Quizzes &amp; Mocks", "practice")}
-        ${link("skills.html", "Exam Skills", "skills")}
+        ${link("practice.html", "Quizzes", "practice")}
+        ${link("mistakes.html", "Mistakes", "mistakes")}
+        ${link("skills.html", "Skills", "skills")}
         ${link("ia.html", "IA &amp; EE", "ia")}
-        ${IB.config.ai ? link("tutor.html", "AI Tutor", "tutor") : link("mistakes.html", "Mistakes", "mistakes")}
-        ${link("mypapers.html", "Past Papers", "mypapers")}
+        ${link("mypapers.html", "Papers", "mypapers")}
+        ${link("friends.html", "Friends", "friends")}
         ${link("progress.html", "Progress", "progress")}
+        ${IB.config.ai ? link("tutor.html", "AI Tutor", "tutor") : ""}
       </nav>
+      ${IB.gameChip ? IB.gameChip() : ""}
+      <span id="acctSlot"></span>
       <button class="icon-btn lvl-btn" id="lvlBtn" title="Choose SL or HL for each subject" aria-label="Choose SL or HL" aria-expanded="false">SL/HL</button>
       <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">◐</button>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">☰</button>
