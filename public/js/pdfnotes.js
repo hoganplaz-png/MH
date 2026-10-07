@@ -69,7 +69,9 @@ h3.h{font-size:15px;color:#1B4F72;margin:12px 0 6px}
 .co{border-radius:12px;padding:10px 16px 8px;margin:0 0 10px;border-left:5px solid var(--k);background:var(--b)}
 .co>.ct{font:800 11px Figtree,sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--k);margin:2px 0 6px}
 .k-formula{--k:#2D5BFF;--b:#EEF2FF}.k-method{--k:#1F8A4C;--b:#EAF8EF}.k-trap{--k:#D0312D;--b:#FDEEEE}
-.k-example{--k:#6741D9;--b:#F3EEFF}.k-tip{--k:#C27803;--b:#FFF6DF}.k-terms{--k:#8A6A00;--b:#FFF9E5}.k-zh{--k:#9C36B5;--b:#FBEFFF}
+.k-example{--k:#6741D9;--b:#F3EEFF}.k-tip{--k:#C27803;--b:#FFF6DF}.k-terms{--k:#8A6A00;--b:#FFF9E5}.k-zh{--k:#7048E8;--b:#F3EFFF}.k-frame{--k:#7048E8;--b:#F7F4FF}
+.yue{background:#F3EFFF;border-radius:8px;padding:5px 10px;margin:6px 0 0;font-size:12.6px}.yue b{color:#7048E8}
+.ahl{display:inline-block;font:800 9.5px Figtree,sans-serif;background:#7048E8;color:#fff;border-radius:4px;padding:2px 5px;vertical-align:middle}
 .fgrid{display:flex;flex-wrap:wrap;gap:6px}.fgrid div{background:#fff;border-radius:8px;padding:5px 10px}
 .concept{border-left:3px solid ${c};padding:2px 0 2px 14px;margin:0 0 10px}
 .concept>h3{font-size:14.5px;margin:0 0 4px;color:#0F1B2D}
@@ -105,7 +107,8 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
     if (t.summary) b.push(`<p class="lead">${t.summary}</p>`);
     if (t.formulas && t.formulas.length) b.push(head(L(s, "Formulas", "公式")) + box("formula", L(s, "Formula", "公式"), `<div class="fgrid">${t.formulas.map((f) => `<div>${f}</div>`).join("")}</div>`));
     b.push(head(L(s, "Key concepts", "核心概念")));
-    t.concepts.forEach((x) => b.push(`<div class="concept"><h3>${x.h}</h3>${x.b}</div>`));
+    if (t.yue && !ZH(s)) b.push(box("zh", "廣東話重點", `<p>${t.yue}</p>`));
+    t.concepts.filter((x) => IB.showItem(s.id, x)).forEach((x) => b.push(`<div class="concept"><h3>${x.h}${x.hl ? ' <span class="ahl">AHL</span>' : ""}</h3>${x.b}${x.yue ? `<p class="yue"><b>廣東話：</b>${x.yue}</p>` : ""}</div>`));
     if (t.table) b.push(head(L(s, "Compare at a glance", "比較")) + `<table><thead><tr>${t.table.head.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${t.table.rows.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th>${x}</th>`)).join("")}</tr>`).join("")}</tbody></table>`);
     if (t.diagrams && t.diagrams.length && IB.plot) b.push(head(L(s, "Diagrams to know", "圖表")) + `<div class="plots">${t.diagrams.map(IB.plot).join("")}</div>`);
     const methods = (t.methods || []).concat((t.skills || []).map((x) => `<strong>${x.h}:</strong> ${x.b}`));
@@ -116,6 +119,11 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
       t.examples.forEach((e, i) => b.push(box("example", `${L(s, "Worked example", "例題")} ${i + 1}`, `<p><strong>${e.q}</strong></p><div class="sol">${e.a}</div>`)));
     }
     if (t.tips && t.tips.length) b.push(head(L(s, "Exam tips", "考試貼士")) + box("tip", L(s, "Exam tip", "考試貼士"), `<ul>${t.tips.map((m) => `<li>${m}</li>`).join("")}</ul>`));
+    const frames = IB.topicFrames ? IB.topicFrames(t) : [];
+    if (frames.length) {
+      b.push(head("答題框架 · " + L(s, "Answer frameworks", "答題步驟")));
+      frames.forEach((f) => b.push(box("frame", f.type, `<ol>${f.steps.map((x) => `<li>${x}</li>`).join("")}</ol>${f.yue ? `<p class="yue"><b>廣東話：</b>${f.yue}</p>` : ""}`)));
+    }
     if (t.terms && t.terms.length) b.push(head(L(s, "Key definitions to learn", "關鍵詞")) + `<table class="defs"><thead><tr><th>${ZH(s) ? "術語" : "Term"}</th><th>${ZH(s) ? "定義" : "Definition"}</th></tr></thead><tbody>${t.terms.map(([k, v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join("")}</tbody></table>`);
     const plans = IB.essayPlansHtml(t);
     if (plans) b.push(head("Practice essay plans") + plans);
@@ -254,7 +262,7 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
       // questions for the practice paper
       const qset = [];
       if (opts.questions) opts.topics.forEach((t) => {
-        const exam = (t.questions || []).filter((q) => !q.derived);
+        const exam = (t.questions || []).filter((q) => !q.derived && IB.showItem(s.id, q));
         const pick = exam.filter((q) => q.type !== "extended" || s.id === "chia" || s.id === "engb").slice(0, opts.questions);
         const ext = exam.filter((q) => q.type === "extended").slice(0, single ? 2 : 1);
         pick.concat(ext.filter((q) => !pick.includes(q))).slice(0, opts.questions + 1).forEach((q) => qset.push(q));
@@ -264,7 +272,7 @@ tbody tr:nth-child(even) td{background:#FAFBFD}
       const cover = doc.createElement("div");
       cover.className = "page cover";
       const chips = single
-        ? ["Key concepts", "Fastest methods", "Traps", "Worked examples", "Exam tips", "Definitions"].concat(IB.essayPlansHtml(opts.topics[0]) ? ["Essay plans"] : []).concat(qset.length ? ["Practice paper"] : [])
+        ? ["Key concepts", "Fastest methods", "Traps", "Worked examples", "Exam tips", "答題框架", "Definitions"].concat(IB.essayPlansHtml(opts.topics[0]) ? ["Essay plans"] : []).concat(qset.length ? ["Practice paper"] : [])
         : opts.topics.map((t) => t.title);
       cover.innerHTML = `<div class="cover-card"><div class="cover-big">${IB.esc(single ? opts.topics[0].code : s.short.replace(/\s.*/, ""))}</div>
         <div class="eyebrow">IB ${IB.esc(s.name)}${single ? " · " + IB.esc(opts.topics[0].unit) : ""}</div>
