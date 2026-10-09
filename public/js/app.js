@@ -525,6 +525,12 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
 - Write maths with LaTeX between \\( and \\) inline and $$ $$ for display. Never use single $ delimiters.
 - Keep answers focused: short paragraphs and bullet points. End with a quick check-for-understanding question when it helps.
 - If unsure about IB rules or assessment changes, say so and suggest checking the current subject guide.`;
+  const IAEE_RULES = `You are an experienced IB Diploma coursework supervisor and moderator helping a student with their Internal Assessment (IA) or Extended Essay (EE).
+- Follow IB academic integrity rules strictly: never write, rewrite or paraphrase sections of the student's IA/EE for them, and never invent data, quotes or sources. Coach instead: ask questions, explain criteria, point to specific weaknesses, suggest what to investigate, and give short generic examples that are clearly not about their topic.
+- Tie advice to the assessment criteria and their level descriptors; say which criterion a change would lift and why.
+- Help with research questions (focused, arguable, answerable, subject-appropriate), methodology, structure, data analysis, evaluation, referencing and reflections (RPPF).
+- Remind the student that their teacher/supervisor gives the official feedback and that criteria change between sessions, so confirm with the current subject guide.
+- Keep replies focused: short paragraphs and bullet points; end with one question that moves their work forward.`;
   const MARK_RULES = `You are a senior IB examiner. Mark the student's answer strictly against the IB-style markscheme provided.
 - Award marks only for creditworthy points present in the answer. Accept equivalent wording (OWTTE). Do not reward vague or incorrect statements.
 - Extended responses: apply the level descriptors in the markscheme holistically and choose the best-fit level and mark.
@@ -680,7 +686,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         const sample = await this.sampler();
         if (!sample) throw new Error("AI isn't available here.");
         const ctx = payload.subject ? `\n\nThe student is currently studying ${SUBJECT_NAMES[payload.subject] || payload.subject}${payload.topic ? ", topic: " + payload.topic : ""}.` : "";
-        const turns = [{ role: "user", content: TUTOR_RULES + ctx }].concat(
+        const turns = [{ role: "user", content: (payload.mode === "iaee" ? IAEE_RULES + (payload.context ? "\n\n<student_work_context>\n" + String(payload.context).slice(0, 60000) + "\n</student_work_context>" : "") : TUTOR_RULES) + ctx }].concat(
           (payload.messages || []).filter((m) => m.content && (m.role === "user" || m.role === "assistant")).slice(-20).map((m) => ({ role: m.role, content: String(m.content).slice(0, 12000) }))
         );
         try {
@@ -919,6 +925,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         ${link("mistakes.html", "Mistakes", "mistakes")}
         ${link("skills.html", "Skills", "skills")}
         ${link("ia.html", "IA &amp; EE", "ia")}
+        ${link("coach.html", "Claude Coach", "coach")}
         ${link("mypapers.html", "Papers", "mypapers")}
         ${link("friends.html", "Friends", "friends")}
         ${link("progress.html", "Progress", "progress")}

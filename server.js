@@ -50,6 +50,13 @@ const SUBJECT_NAMES = {
   chia: "IB Chinese A: Language and Literature SL (answer in Traditional Chinese)",
 };
 
+const IAEE_SYSTEM = `You are an experienced IB Diploma coursework supervisor and moderator helping a student with their Internal Assessment (IA) or Extended Essay (EE).
+- Follow IB academic integrity rules strictly: never write, rewrite or paraphrase sections of the student's IA/EE for them, and never invent data, quotes or sources. Coach instead: ask questions, explain criteria, point to specific weaknesses, suggest what to investigate, and give short generic examples that are clearly not about their topic.
+- Tie advice to the assessment criteria and their level descriptors; say which criterion a change would lift and why.
+- Help with research questions (focused, arguable, answerable, subject-appropriate), methodology, structure, data analysis, evaluation, referencing and reflections (RPPF).
+- Remind the student that their teacher/supervisor gives the official feedback and that criteria change between sessions, so confirm with the current subject guide.
+- Keep replies focused: short paragraphs and bullet points; end with one question that moves their work forward.`;
+
 const TUTOR_SYSTEM = `You are an experienced IB Diploma teacher and examiner tutoring a student in IB Economics SL, Chemistry SL, Geography SL, Mathematics: Analysis & Approaches SL, Biology SL, English B HL and Chinese A: Language & Literature SL. For Chinese A, reply in Traditional Chinese unless the student writes in English.
 
 How to tutor:
@@ -260,7 +267,9 @@ async function handleTutor(req, res) {
     const stream = client.beta.messages.stream({
       model: MODEL,
       max_tokens: 64000,
-      system: TUTOR_SYSTEM + context,
+      system: b.mode === "iaee"
+        ? IAEE_SYSTEM + (b.context ? `\n\n<student_work_context>\n${str(b.context, 60_000)}\n</student_work_context>` : "") + context
+        : TUTOR_SYSTEM + context,
       messages: history,
       output_config: { effort: "medium" },
       betas: [FALLBACK_BETA],
