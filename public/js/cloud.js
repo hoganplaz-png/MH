@@ -15,7 +15,18 @@
   const load = (src) => new Promise((ok, bad) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => bad(new Error("Couldn't reach Firebase - check your connection.")); document.head.appendChild(s); });
 
   const cloud = (IB.cloud = { configured: !!window.IB_FIREBASE && !window.IB_HOSTED, user: null, profile: null, ready: false });
-  let fb = null, db = null, auth = null, saveTimer = null, starting = null;
+  let fb = null, db = null, auth = null, saveTimer = null, starting = null, signingIn = false;
+
+  // ---------- staying signed in ----------
+  // Firebase keeps the login in this browser until "Sign out" is pressed. We also remember who was signed in,
+  // so every page opens straight into that account (avatar, progress) instead of flashing "Sign in"
+  // while Firebase loads, and so an offline visit keeps the account's progress.
+  const SESSION = "ibrev:session";
+  const readLocal = (k) => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } };
+  const remember = (u) => { try { localStorage.setItem(SESSION, JSON.stringify({ uid: u.uid, name: u.displayName || "", email: u.email || "", photo: u.photoURL || "" })); } catch (e) { /* storage full or blocked */ } };
+  const forget = () => { try { localStorage.removeItem(SESSION); } catch (e) { /* ignore */ } };
+  cloud.remembered = cloud.configured ? readLocal(SESSION) : null;
+  if (cloud.remembered && cloud.remembered.uid) IB.setStoreKey("ibrev:u:" + cloud.remembered.uid);
 
   // ---------- merging two copies of the progress store ----------
   function merge(a, b) {
@@ -47,17 +58,19 @@
   IB.mergeStores = merge;
 
   const code = () => "IB-" + Array.from({ length: 5 }, () => "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random() * 32)]).join("");
-  const readLocal = (k) => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } };
 
   async function start() {
     if (!cloud.configured) return null;
     if (starting) return starting;
     starting = (async () => {
-      for (const s of SDK) await load(s);
+      await load(SDK[0]);
+      await Promise.all(SDK.slice(1).map(load));
       fb = window.firebase;
       fb.initializeApp(window.IB_FIREBASE);
       auth = fb.auth();
       db = fb.firestore();
+      // LOCAL = stay signed in after the tab or browser is closed (falls back to the session if storage is blocked).
+      try { await auth.setPersistence(fb.auth.Auth.Persistence.LOCAL); } catch (e) { /* private mode: Firebase picks the best it can */ }
       // Local testing against the Firebase emulators: { ..., emulator: { auth: "http://127.0.0.1:9099", firestore: ["127.0.0.1", 8085] } }
       const em = window.IB_FIREBASE.emulator;
       if (em) { auth.useEmulator(em.auth); db.useEmulator(em.firestore[0], em.firestore[1]); }
@@ -70,6 +83,8 @@
   async function onUser(u) {
     cloud.user = u;
     if (!u) {
+      forget();
+      cloud.remembered = null;
       IB.setStoreKey(null);
       cloud.profile = null;
       cloud.ready = true;
@@ -77,6 +92,10 @@
       rerender();
       return;
     }
+    const restored = !signingIn && cloud.remembered && cloud.remembered.uid === u.uid;
+    signingIn = false;
+    remember(u);
+    cloud.remembered = readLocal(SESSION);
     const key = "ibrev:u:" + u.uid;
     let local = readLocal(key);
     // First sign-in on this browser: bring the guest progress into the account.
@@ -108,7 +127,7 @@
     await saveNow();
     renderSlot();
     rerender();
-    IB.toast(`Signed in as ${u.displayName || u.email}. Progress is synced.`);
+    if (!restored) IB.toast(`Signed in as ${u.displayName || u.email}. You'll stay signed in on this device until you sign out.`);
   }
 
   function rerender() {
@@ -143,13 +162,15 @@
     }
     await start();
     const provider = new fb.auth.GoogleAuthProvider();
+    signingIn = true;
     try { await auth.signInWithPopup(provider); } catch (e) {
       if (/popup/i.test(e.code || "")) await auth.signInWithRedirect(provider);
-      else IB.toast(e.message);
+      else { signingIn = false; IB.toast(e.message); }
     }
   };
   cloud.signOut = async () => {
     await saveNow();
+    forget();
     await auth.signOut();
     IB.toast("Signed out. You're now using the site as a guest.");
   };
@@ -200,6 +221,13 @@
     const slot = document.getElementById("acctSlot");
     if (!slot) return;
     const u = cloud.user;
+    const r = cloud.remembered;
+    if (!u && r && !cloud.ready) {
+      // Firebase is still restoring the saved login: show the account, not a "Sign in" button.
+      const ini = ((r.name || r.email || "?").trim()[0] || "?").toUpperCase();
+      slot.innerHTML = `<button class="icon-btn acct-btn" title="${IB.esc(r.name || r.email || "")} (reconnecting...)" disabled>${r.photo ? `<img src="${IB.esc(r.photo)}" alt="" referrerpolicy="no-referrer">` : `<span class="av">${IB.esc(ini)}</span>`}</button>`;
+      return;
+    }
     if (!u) {
       slot.innerHTML = `<button class="icon-btn acct-btn" id="signInBtn" title="Sign in with Google to save progress and add friends"><svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span class="acct-label">Sign in</span></button>`;
       document.getElementById("signInBtn").onclick = cloud.signIn;
