@@ -558,6 +558,20 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccc;padding:5p
   // AI is off by default: answers are marked by the built-in markscheme marker (js/marker.js).
   // A self-hosted copy with an API key can switch it back on with window.IB_CONFIG = { ai: true }.
   IB.config = Object.assign({ ai: false }, window.IB_CONFIG || {});
+  // Calls the AI server, sending the class access code (asked for once, kept in this browser) when the server requires one.
+  IB.apiFetch = async function (url, init = {}) {
+    const get = () => { try { return localStorage.getItem("ib-access-code") || ""; } catch (e) { return ""; } };
+    const go = () => fetch(url, Object.assign({}, init, { headers: Object.assign({}, init.headers, { "x-access-code": get() }) }));
+    let r = await go();
+    if (r.status === 401) {
+      const code = prompt("This site's Claude features need an access code (ask your teacher):");
+      if (code) {
+        try { localStorage.setItem("ib-access-code", code.trim()); } catch (e) {}
+        r = await go();
+      }
+    }
+    return r;
+  };
   IB.ai = {
     _health: null,
     _sample: null,
@@ -626,7 +640,7 @@ Mark the student answer out of ${q.marks}. Reply with only a JSON object of this
           model_answer: String((r && r.model_answer) || ""),
         };
       }
-      const r = await fetch("/api/mark", {
+      const r = await IB.apiFetch("/api/mark", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ subject: q.subject, topic: t ? t.title : "", question, ms: q.ms, marks: q.marks, answer }),
@@ -649,7 +663,7 @@ Mark the student answer out of ${q.marks}. Reply with only a JSON object of this
           throw sampleError(e);
         }
       }
-      const r = await fetch("/api/json", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt }) });
+      const r = await IB.apiFetch("/api/json", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt }) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || "AI request failed");
       return j;
@@ -676,7 +690,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
           throw sampleError(e);
         }
       }
-      const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(opts) });
+      const r = await IB.apiFetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(opts) });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j.error || "Generation failed");
       return j.questions || [];
@@ -696,7 +710,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         }
         return;
       }
-      const r = await fetch("/api/tutor", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      const r = await IB.apiFetch("/api/tutor", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!r.ok || !r.body) {
         const j = await r.json().catch(() => ({}));
         throw new Error(j.error || "Tutor unavailable");

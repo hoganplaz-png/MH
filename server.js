@@ -29,6 +29,21 @@ if (hasCredentials) {
   }
 }
 
+// Protects the API key on a public deployment: ACCESS_CODE makes every AI request carry that code,
+// and RATE_LIMIT caps AI requests per visitor (IP) per hour.
+const ACCESS_CODE = process.env.ACCESS_CODE || "";
+const RATE_LIMIT = Number(process.env.RATE_LIMIT) || 40;
+const hits = new Map();
+function rateLimited(req) {
+  const ip = String(req.headers["x-forwarded-for"] || req.socket.remoteAddress || "").split(",")[0].trim();
+  const now = Date.now();
+  const list = (hits.get(ip) || []).filter((t) => now - t < 3_600_000);
+  list.push(now);
+  hits.set(ip, list);
+  if (hits.size > 10_000) hits.clear();
+  return list.length > RATE_LIMIT;
+}
+
 const MIME = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -312,6 +327,8 @@ const server = http.createServer(async (req, res) => {
     if (req.url.startsWith("/api/")) {
       if (req.url === "/api/health") return sendJson(res, 200, { ai: !!client, model: client ? MODEL : null });
       if (req.method !== "POST") return sendJson(res, 405, { error: "POST only" });
+      if (ACCESS_CODE && req.headers["x-access-code"] !== ACCESS_CODE) return sendJson(res, 401, { error: "Enter the class access code to use Claude.", code: "access_code" });
+      if (rateLimited(req)) return sendJson(res, 429, { error: "Hourly AI limit reached - try again later." });
       if (!client) return sendJson(res, 503, { error: "AI is not configured on this server. Set ANTHROPIC_API_KEY and restart." });
       if (req.url === "/api/mark") return await handleMark(req, res);
       if (req.url === "/api/generate") return await handleGenerate(req, res);

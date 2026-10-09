@@ -1,0 +1,16 @@
+# One-click deploy on Render (https://render.com): New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: ib-revision-hub
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false   # paste your key in the Render dashboard
+      - key: ACCESS_CODE
+        sync: false   # a code you give your students; leave empty for no code
+      - key: RATE_LIMIT
+        value: "40"   # AI requests per visitor per hour
