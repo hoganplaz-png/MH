@@ -191,6 +191,7 @@ IB.register({
         ["Price ceiling", "A legal maximum price set below the equilibrium price."],
         ["Price floor", "A legal minimum price set above the equilibrium price."],
         ["Welfare (deadweight) loss", "Loss of community surplus when output is not at the allocatively efficient level."],
+        ["Command and control regulation", "Laws or rules that directly ban, limit or require certain behaviour (e.g. emission limits, smoking bans), backed by penalties."],
       ],
       skills: [
         { h: "Tax diagram checklist", b: "S₁ and S₁+tax; Pc (consumer price), Pp (price received by producers), Pe original; Q₁ and Qt; shade government revenue (Pc−Pp)×Qt; mark welfare loss triangle." },
@@ -223,6 +224,7 @@ IB.register({
         ["Merit good", "A good that is underprovided by the market and has benefits that consumers undervalue."],
         ["Common pool resource", "A resource that is rivalrous but non-excludable."],
         ["Cap and trade", "A scheme where a limit on total pollution is set and permits to pollute can be bought and sold."],
+        ["Demerit good", "A good that is overconsumed in a free market because consumers underestimate its harm to themselves (e.g. cigarettes); often has negative consumption externalities."],
       ],
       skills: [
         { h: "Externality diagram checklist", b: "Axes: Price/costs/benefits and Quantity. Curves: MPC, MSC, MPB, MSB. Mark Qm and Qopt; shade welfare loss between MSC and MSB from Qopt to Qm." },
@@ -279,6 +281,7 @@ IB.register({
         ["Real GDP", "GDP adjusted for inflation."],
         ["PPP", "Purchasing power parity - an exchange rate that equalises the purchasing power of currencies."],
         ["Recession", "Two consecutive quarters of negative real GDP growth."],
+        ["Green GDP", "GDP minus the cost of environmental degradation and resource depletion caused by production."],
       ],
       skills: [
         { h: "Real GDP calculation", b: "\\(\\text{Real GDP} = \\frac{\\text{Nominal GDP}}{\\text{GDP deflator}} \\times 100\\). Growth rate = (new − old)/old × 100." },
@@ -336,6 +339,8 @@ IB.register({
         ["Structural unemployment", "Unemployment due to a mismatch between workers' skills/location and the jobs available."],
         ["Inflation", "A sustained increase in the general/average price level."],
         ["Deflation", "A sustained decrease in the average price level."],
+        ["Natural rate of unemployment", "The rate of unemployment when the economy is at potential output: structural + frictional + seasonal unemployment (no cyclical unemployment)."],
+        ["Underemployment", "Workers who are employed part-time but want full-time work, or work in jobs below their skill level."],
         ["CPI", "An index measuring changes over time in the price of a weighted basket of goods and services bought by a typical household."],
       ],
       skills: [
@@ -359,7 +364,7 @@ IB.register({
       summary: "Measuring inequality (Lorenz curve, Gini), poverty, causes and policies including taxation and transfers.",
       concepts: [
         { h: "Equity vs equality; measuring inequality", b: "<p><strong>Equality</strong> = everyone has the same; <strong>equity</strong> = fairness. The <strong>Lorenz curve</strong> plots cumulative % of income against cumulative % of population; the further from the line of perfect equality, the greater the inequality. <strong>Gini coefficient</strong> = A/(A+B), from 0 (perfect equality) to 1. Also: income share ratios (e.g. top 10% / bottom 40% - Palma ratio).</p>" },
-        { h: "Poverty", b: "<p><strong>Absolute poverty</strong>: income below that needed for basic needs (World Bank: $2.15/day 2017 PPP). <strong>Relative poverty</strong>: income below a % (e.g. 50% or 60%) of median income. Multidimensional Poverty Index (MPI): health, education, living standards.</p><p>Causes: inequality of opportunity, different levels of human capital, discrimination, unequal wealth ownership, tax policies, globalisation and technological change, market-based supply-side policies.</p>" },
+        { h: "Poverty", b: "<p><strong>Absolute poverty</strong>: income below that needed for basic needs (World Bank international poverty line: US$3.00/day at 2021 PPP, updated June 2025 from $2.15 at 2017 PPP). <strong>Relative poverty</strong>: income below a % (e.g. 50% or 60%) of median income. Multidimensional Poverty Index (MPI): health, education, living standards.</p><p>Causes: inequality of opportunity, different levels of human capital, discrimination, unequal wealth ownership, tax policies, globalisation and technological change, market-based supply-side policies.</p>" },
         { h: "Policies", b: "<ul><li><strong>Progressive taxation</strong> (marginal rate rises with income) vs <strong>regressive</strong> (indirect taxes) vs <strong>proportional</strong>.</li><li>Transfer payments, universal basic income, minimum wage, investment in education/healthcare, policies against discrimination, wealth taxes.</li></ul><p>Evaluation: disincentive effects, tax avoidance/evasion, fiscal cost, administrative complexity.</p>" },
       ],
       terms: [
@@ -540,7 +545,7 @@ IB.register({
         { type: "short", paper: "P2", marks: 2, diff: 1, q: "Define <em>sustainable development</em>.", ms: ["Development that meets the needs of the present generation", "without compromising the ability of future generations to meet their own needs."] },
         { type: "short", paper: "P2", marks: 4, diff: 2, q: "Explain how dependence on primary commodity exports can be a barrier to economic development.", ms: ["Low PED/PES → volatile prices and export revenues", "Volatile foreign exchange earnings/government revenue make planning and investment difficult", "Low YED means demand grows slowly as world incomes rise; declining terms of trade", "Little value added / few linkages; Dutch disease; resource curse"] },
         { type: "extended", paper: "P1", marks: 15, diff: 3, q: "Evaluate the effectiveness of foreign direct investment (FDI) as a strategy for achieving economic development. [15]", ms: ["Level 5 (13-15): precise definitions, balanced evaluation with real examples, justified conclusion.", "Define FDI, MNC and economic development.", "Benefits: capital inflow fills savings gap, technology transfer, employment, human capital, tax revenue, exports/foreign exchange, infrastructure.", "Costs: profit repatriation, transfer pricing/tax avoidance, environmental damage, weak labour standards, crowding out of local firms, enclave economies, political influence.", "Examples: Vietnam (Samsung), Ireland, extractive FDI in DRC.", "Depends on government regulation, type of FDI, linkages with local economy.", "Judgement."] },
-        { type: "extended", paper: "P2", marks: 15, diff: 3, q: "<em>Data response (part h).</em> A low-income country has HDI 0.48, 70% of exports are cocoa, 35% of adults have no access to formal banking, and women own 12% of small businesses. Using the information and your knowledge of economics, evaluate the use of microfinance to promote economic development in this country. [15]", ms: ["Levels 5 (13-15): uses data explicitly, relevant theory and diagram, balanced evaluation and conclusion.", "Define microfinance and development.", "Use data: 35% unbanked - microfinance increases access to credit; women own 12% of businesses - empowerment potential.", "Diagram e.g. PPC/LRAS shift from entrepreneurship or poverty cycle.", "Benefits: entrepreneurship, diversification away from cocoa, women's empowerment, human capital spending.", "Limitations: high interest rates, small loans, over-indebtedness, doesn't address infrastructure/institutions, commodity dependence remains.", "Compare with other strategies e.g. diversification, education, infrastructure.", "Conclusion relating to the specific country data."] },
+        { type: "extended", paper: "P2", marks: 15, diff: 3, q: "<em>Data response (final 15-mark question).</em> A low-income country has HDI 0.48, 70% of exports are cocoa, 35% of adults have no access to formal banking, and women own 12% of small businesses. Using the information and your knowledge of economics, evaluate the use of microfinance to promote economic development in this country. [15]", ms: ["Levels 5 (13-15): uses data explicitly, relevant theory and diagram, balanced evaluation and conclusion.", "Define microfinance and development.", "Use data: 35% unbanked - microfinance increases access to credit; women own 12% of businesses - empowerment potential.", "Diagram e.g. PPC/LRAS shift from entrepreneurship or poverty cycle.", "Benefits: entrepreneurship, diversification away from cocoa, women's empowerment, human capital spending.", "Limitations: high interest rates, small loans, over-indebtedness, doesn't address infrastructure/institutions, commodity dependence remains.", "Compare with other strategies e.g. diversification, education, infrastructure.", "Conclusion relating to the specific country data."] },
       ],
     },
   ],

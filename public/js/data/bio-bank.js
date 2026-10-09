@@ -17,6 +17,7 @@ IB.addQuestions("bio", {
     { paper: "P2", marks: 3, diff: 3, q: "Explain why cells are limited in size.", ms: ["As size increases, surface area : volume ratio decreases [1]", "Rate of exchange depends on surface area, needs depend on volume [1]", "Diffusion distances become too long to supply the cell / remove waste [1]"] },
   ],
   "bio-3": [
+    { paper: "P2", marks: 2, diff: 1, q: "State two uses of a karyotype.", ms: ["Determine the chromosome number of a species [1]", "Determine sex / detect abnormalities such as trisomy 21 [1]"] },
     { paper: "P1A", marks: 1, diff: 1, q: "Which is the correct order of classification from broadest to narrowest?", options: ["Kingdom, phylum, class, order, family, genus, species", "Kingdom, class, phylum, order, genus, family, species", "Domain, kingdom, order, class, family, genus, species", "Species, genus, family, order, class, phylum, kingdom"], answer: 0, ms: ["A."] },
     { paper: "P1A", marks: 1, diff: 2, q: "Analogous structures:", options: ["show common ancestry", "have similar function but different evolutionary origin", "are vestigial", "are found only in plants"], answer: 1, ms: ["B - convergent evolution."] },
     { paper: "P2", marks: 2, diff: 1, q: "Outline the biological species concept and one limitation.", ms: ["Group of organisms that can interbreed to produce fertile offspring [1]", "Limitation: asexual organisms / fossils / hybrids [1]"] },
@@ -47,6 +48,7 @@ IB.addQuestions("bio", {
     { paper: "P2", marks: 3, diff: 2, q: "Outline how stem cells differentiate into specialised cells.", ms: ["Stem cells are unspecialised and can divide [1]", "Particular genes are expressed / switched on [1]", "Producing proteins that give a specialised structure and function [1]"] },
   ],
   "bio-7": [
+    { paper: "P2", marks: 2, diff: 2, numeric: { value: 191, tol: 2 }, q: "24 stomata were counted in a circular field of view of diameter 0.4 mm. Calculate the stomatal density in stomata mm⁻².", ms: ["Area = π × 0.2² = 0.126 mm² [M1]", "24 ÷ 0.126 ≈ 191 mm⁻² [A1]"] },
     { paper: "P1A", marks: 1, diff: 1, q: "Which blood vessel carries blood at the highest pressure?", options: ["Vein", "Capillary", "Artery", "Venule"], answer: 2, ms: ["C."] },
     { paper: "P1A", marks: 1, diff: 2, q: "What maintains a steep concentration gradient in the alveoli?", options: ["Surfactant", "Ventilation and blood flow", "Cartilage", "Cilia"], answer: 1, ms: ["B."] },
     { paper: "P2", marks: 3, diff: 2, q: "Explain how alveoli are adapted for gas exchange.", ms: ["Large surface area (many alveoli) [1]", "Thin walls - one cell thick, short diffusion distance [1]", "Dense capillary network / moist lining [1]"] },
@@ -75,6 +77,7 @@ IB.addQuestions("bio", {
     { paper: "P2", marks: 3, diff: 2, q: "Explain how light intensity can be a limiting factor of photosynthesis.", ms: ["At low light intensity, rate increases as light increases [1]", "Light provides energy for the light-dependent reactions / photolysis [1]", "At high light, rate plateaus as another factor (CO₂ / temperature) becomes limiting [1]"] },
   ],
   "bio-11": [
+    { paper: "P1A", marks: 1, diff: 1, q: "Which hormone regulates circadian rhythms?", options: ["Epinephrine", "Melatonin", "Insulin", "Glucagon"], answer: 1, ms: ["B - secreted by the pineal gland."] },
     { paper: "P1A", marks: 1, diff: 1, q: "The resting potential of a neuron is approximately:", options: ["+40 mV", "0 mV", "−70 mV", "−150 mV"], answer: 2, ms: ["C."] },
     { paper: "P1A", marks: 1, diff: 2, q: "Depolarisation is caused by:", options: ["K⁺ leaving the axon", "Na⁺ entering the axon", "Cl⁻ entering the axon", "the sodium-potassium pump"], answer: 1, ms: ["B."] },
     { paper: "P2", marks: 3, diff: 2, q: "Explain how myelination increases the speed of nerve impulses.", ms: ["Myelin insulates the axon [1]", "Action potentials only occur at nodes of Ranvier [1]", "Impulse jumps from node to node (saltatory conduction) [1]"] },
@@ -82,9 +85,9 @@ IB.addQuestions("bio", {
     { paper: "P2", marks: 2, diff: 2, q: "Outline the role of the sodium-potassium pump.", ms: ["Actively pumps 3 Na⁺ out and 2 K⁺ in using ATP [1]", "Maintains the resting potential [1]"] },
   ],
   "bio-12": [
-    { paper: "P1A", marks: 1, diff: 1, q: "Which cells produce antibodies?", options: ["Phagocytes", "Plasma cells (B lymphocytes)", "Red blood cells", "Platelets"], answer: 1, ms: ["B."] },
+    { paper: "P1A", marks: 1, diff: 1, q: "Which cells produce antibodies?", options: ["Phagocytes", "Plasma cells (derived from B lymphocytes)", "Red blood cells", "Platelets"], answer: 1, ms: ["B."] },
     { paper: "P1A", marks: 1, diff: 2, q: "Antibiotics are ineffective against viruses because viruses:", options: ["are too small", "lack the metabolic processes and structures antibiotics target", "are always resistant", "live outside cells"], answer: 1, ms: ["B."] },
-    { paper: "P2", marks: 3, diff: 2, q: "Explain how vaccination provides immunity.", ms: ["Vaccine contains antigens (weakened/inactivated pathogen or mRNA) [1]", "Triggers a primary immune response; B cells make antibodies [1]", "Memory cells produced, giving a faster, larger secondary response [1]"] },
+    { paper: "P2", marks: 3, diff: 2, q: "Explain how vaccination provides immunity.", ms: ["Vaccine contains antigens (weakened/inactivated pathogen) or mRNA coding for an antigen [1]", "Triggers a primary immune response; B cells make antibodies [1]", "Memory cells produced, giving a faster, larger secondary response [1]"] },
     { paper: "P2", marks: 3, diff: 2, q: "Explain how antibiotic resistance develops in bacteria.", ms: ["Variation: some bacteria have a mutation for resistance [1]", "Antibiotic kills non-resistant bacteria - selection pressure [1]", "Resistant bacteria survive and reproduce, passing on the allele [1]"] },
     { paper: "P2", marks: 2, diff: 2, q: "Outline the role of skin as a primary defence.", ms: ["Physical barrier - tough keratinised outer layer [1]", "Sebum / acidic pH inhibits microbial growth [1]"] },
   ],

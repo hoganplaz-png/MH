@@ -106,7 +106,7 @@
             reject: "\"price level\" or \"quantity\" on the axes; drawing the trend as horizontal; calling any slowdown in growth a recession",
             tip: "趨勢線 = 潛在產出（長期）；波動 = 實際產出（短期）。四個階段要寫齊：擴張、高峰、收縮、低谷。" },
 
-          { title: "Evaluate GDP growth as a measure of well-being (Paper 2 part h)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
+          { title: "Evaluate GDP growth as a measure of well-being (Paper 2 final 15-mark question)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
             q: "<em>Data response.</em> Country Z's real GDP grew by an average of 6% a year over the last decade. Over the same period its Gini coefficient rose from 0.36 to 0.44, air-pollution-related deaths increased by 30%, and average weekly working hours rose from 44 to 49. Its score on the OECD Better Life Index improved only slightly. Using information from the text/data and your knowledge of economics, evaluate the view that Country Z's economic growth has improved the well-being of its population.",
             marks: [
               ["Definitions", "precise definitions of __real GDP / economic growth__ and __well-being__ (or composite indicator)", 2],
@@ -633,7 +633,7 @@
             reject: "limitations of fiscal policy (crowding out, political pressures)",
             tip: "「推繩子」(pushing on a string)：利率再低，冇信心都唔會借錢。" },
 
-          { title: "Evaluate monetary policy to reduce inflation (Paper 2 part h)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
+          { title: "Evaluate monetary policy to reduce inflation (Paper 2 final 15-mark question)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
             q: "<em>Data response.</em> In Country M inflation is 7.5% against a central bank target of 2%. Unemployment is 4.2%, household debt is 140% of disposable income, most mortgages have variable interest rates, and the rise in inflation was largely caused by higher imported energy prices. Using information from the text/data and your knowledge of economics, evaluate the decision of Country M's central bank to raise its policy interest rate.",
             marks: [
               ["Definitions", "define __monetary policy__ / inflation / inflation targeting", 2],
@@ -953,7 +953,7 @@
             reject: "two arguments that repeat the same idea",
             tip: "反對保護主義：報復、資源錯配、價格上升、輸入成本上升、缺乏競爭。" },
 
-          { title: "Evaluate a tariff on steel imports (Paper 2 part h)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
+          { title: "Evaluate a tariff on steel imports (Paper 2 final 15-mark question)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
             q: "<em>Data response.</em> Country S imposes a 25% tariff on imported steel. Domestic steel employs 80 000 workers, but car and construction firms that use steel employ 1.2 million. After the tariff, domestic steel prices rose by 18%, steel imports fell by 30%, and the country's two largest trading partners announced tariffs on its agricultural exports. Using information from the text/data and your knowledge of economics, evaluate the decision to impose the tariff.",
             marks: [
               ["Definitions", "define __tariff__ / protectionism", 2],
@@ -1388,7 +1388,7 @@
             reject: "\"humanitarian aid is from governments, development aid is from NGOs\"",
             tip: "人道援助 = 短期緊急；發展援助 = 長期建設。" },
 
-          { title: "Evaluate trade liberalisation as a development strategy (Paper 2 part h)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
+          { title: "Evaluate trade liberalisation as a development strategy (Paper 2 final 15-mark question)", star: true, paper: "P2", where: "Paper 2 · 15 marks · use the text/data",
             q: "<em>Data response.</em> Country D's exports are 75% unprocessed coffee. Its average tariff is 18%, tariffs provide 25% of government revenue, 60% of workers are in agriculture, and a neighbouring country that liberalised trade attracted textile FDI and doubled manufacturing exports in ten years. Using information from the text/data and your knowledge of economics, evaluate the use of trade liberalisation to promote economic development in Country D.",
             marks: [
               ["Definitions", "define __trade liberalisation__ and __economic development__", 2],

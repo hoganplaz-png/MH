@@ -138,6 +138,7 @@ IB.addTopics("phys", [
     concepts: [
       { h: "Coulomb's law and electric fields", b: "<p>\\(F = k\\frac{q_1q_2}{r^2}\\), \\(k = \\frac{1}{4\\pi\\varepsilon_0}\\). Field strength \\(E = \\frac{F}{q}\\); between parallel plates \\(E = \\frac{V}{d}\\) (uniform).</p>", yue: "電場強度係單位正電荷受到嘅力；平行板之間電場均勻。" },
       { h: "Magnetic fields", b: "<p>Field lines around a straight wire are concentric circles (right-hand grip rule); a solenoid's field is uniform inside, like a bar magnet outside.</p>" },
+      { h: "Charge and charging", b: "<p>Charge is conserved and quantised in units of e = 1.60 × 10⁻¹⁹ C (Millikan's oil-drop experiment). Objects are charged by friction, contact (conduction) or induction - always by transferring electrons. Field lines: radial for a point charge, uniform between parallel plates.</p>", yue: "電荷守恆，而且一定係 e 嘅整數倍；起電其實係電子轉移。" },
       { h: "Electric potential (AHL)", hl: true, b: "<p>\\(V_e = \\frac{kQ}{r}\\); \\(E_p = \\frac{kQq}{r}\\); field strength = −potential gradient, \\(E = -\\frac{\\Delta V}{\\Delta r}\\). Equipotentials are perpendicular to field lines.</p>" },
     ],
     terms: [["Electric field strength", "Force per unit positive charge (N C⁻¹ or V m⁻¹)."], ["Equipotential surface", "A surface on which every point has the same potential."], ["Magnetic field", "A region in which a moving charge or current experiences a force."]],
@@ -150,7 +151,7 @@ IB.addTopics("phys", [
     questions: [
       { type: "mcq", paper: "P1A", marks: 1, diff: 1, q: "The unit V m⁻¹ is equivalent to:", options: ["N C⁻¹", "J C⁻¹", "N m", "C V"], answer: 0, ms: ["A."] },
       { paper: "P2", marks: 2, diff: 1, numeric: { value: 40000, tol: 100 }, q: "Calculate the electric field strength, in V m⁻¹, between parallel plates 5.0 mm apart with a p.d. of 200 V.", ms: ["E = 200 ÷ 5.0 × 10⁻³ [M1]", "4.0 × 10⁴ V m⁻¹ (40 000) [A1]"] },
-      { paper: "P2", marks: 2, diff: 2, numeric: { value: 0.0225, tol: 0.0005 }, q: "Two charges of +5.0 μC are 3.0 m apart. Calculate the force between them in N. (k = 8.99 × 10⁹ N m² C⁻²)", ms: ["F = 8.99 × 10⁹ × (5.0 × 10⁻⁶)² ÷ 3.0² [M1]", "0.0225 N [A1]"] },
+      { paper: "P2", marks: 2, diff: 2, numeric: { value: 0.0250, tol: 0.0005 }, q: "Two charges of +5.0 μC are 3.0 m apart. Calculate the force between them in N. (k = 8.99 × 10⁹ N m² C⁻²)", ms: ["F = 8.99 × 10⁹ × (5.0 × 10⁻⁶)² ÷ 3.0² [M1]", "0.0250 N (2.50 × 10⁻² N) [A1]"] },
     ],
   },
   {
@@ -243,6 +244,7 @@ IB.addTopics("phys", [
     concepts: [
       { h: "Types of radiation", b: "<p>Alpha (helium nucleus, highly ionising, stopped by paper), beta-minus (electron + antineutrino), beta-plus (positron + neutrino), gamma (photon). Background radiation must be subtracted from count rates.</p>", yue: "α 電離能力最強但穿透力最弱，一張紙擋到；γ 穿透力最強。" },
       { h: "Half-life and binding energy", b: "<p>Half-life = time for half the nuclei (or activity) to decay. Mass defect → binding energy \\(E = \\Delta mc^2\\); binding energy per nucleon peaks near iron-56.</p>" },
+      { h: "Nuclear stability", b: "<p>The <strong>strong nuclear force</strong> is attractive, very short range (~10⁻¹⁵ m) and acts between nucleons, overcoming electrostatic repulsion between protons. Heavy stable nuclei need more neutrons than protons. Beta-decay energy spectra are continuous, which was evidence for the (anti)neutrino.</p>" },
       { h: "Decay law (AHL)", hl: true, b: "<p>\\(N = N_0e^{-\\lambda t}\\), \\(A = \\lambda N\\), \\(T_{1/2} = \\frac{\\ln 2}{\\lambda}\\).</p>" },
     ],
     terms: [["Half-life", "The time taken for half the radioactive nuclei in a sample to decay."], ["Binding energy", "The energy needed to separate a nucleus into its individual nucleons."], ["Activity", "The number of decays per second (Bq)."]],

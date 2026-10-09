@@ -8,6 +8,9 @@ IB.addQuestions("phys", {
     { paper: "P2", marks: 3, diff: 3, q: "Describe how air resistance affects the trajectory of a projectile compared with the motion in a vacuum.", ms: ["Lower maximum height [1]", "Shorter horizontal range [1]", "Trajectory no longer symmetrical / steeper descent [1]"] },
   ],
   "phys-2": [
+    { paper: "P2", marks: 2, diff: 2, numeric: { value: 1.96, tol: 0.02 }, q: "A block of volume 2.0 × 10⁻⁴ m³ is held fully submerged in water of density 1000 kg m⁻³. Calculate the buoyancy force on it in N.", ms: ["F_b = ρVg = 1000 × 2.0 × 10⁻⁴ × 9.81 [M1]", "1.96 N [A1]"] },
+    { paper: "P2", marks: 2, diff: 2, q: "A small sphere falls through oil at terminal speed. Using Stokes' law, state and explain how the terminal speed changes if the oil is replaced by one of higher viscosity.", ms: ["Terminal speed decreases [1]", "At terminal speed drag 6πηrv balances (weight − buoyancy), which is unchanged, so larger η needs smaller v [1]"] },
+
     { type: "mcq", paper: "P1A", marks: 1, diff: 1, q: "The unit of momentum is:", options: ["N s", "N m", "kg m s⁻²", "J s"], answer: 0, ms: ["A."] },
     { type: "mcq", paper: "P1A", marks: 1, diff: 2, q: "A person stands in a lift accelerating upwards. The normal reaction on the person is:", options: ["less than their weight", "equal to their weight", "greater than their weight", "zero"], answer: 2, ms: ["C."] },
     { paper: "P2", marks: 2, diff: 2, numeric: { value: 360, tol: 1 }, q: "A 0.15 kg ball moving at 20 m s⁻¹ is stopped by a bat in 0.010 s, rebounding at 4.0 m s⁻¹. Calculate the average force on the ball in N.", ms: ["Δp = 0.15 × (20 + 4.0) = 3.6 N s [M1]", "F = 3.6 / 0.010 = 360 N [A1]"] },
@@ -51,6 +54,9 @@ IB.addQuestions("phys", {
     { paper: "P2", marks: 2, diff: 3, q: "State the second law of thermodynamics in terms of entropy and explain why no heat engine can be 100% efficient.", ms: ["The entropy of an isolated system never decreases [1]", "Some energy must be transferred to a cold reservoir, so not all heat can become work [1]"] },
   ],
   "phys-10": [
+    { paper: "P2", marks: 2, diff: 1, q: "State Kirchhoff's junction rule and loop rule, and the conservation law each is based on.", ms: ["Junction: sum of currents into a junction = sum out; conservation of charge [1]", "Loop: sum of emfs = sum of p.d.s round any closed loop; conservation of energy [1]"] },
+    { paper: "P2", marks: 2, diff: 2, numeric: { value: 2, tol: 0.05 }, q: "A 12 V cell of negligible internal resistance is connected in series with a 4.0 Ω resistor and a resistor R. The p.d. across the 4.0 Ω resistor is 8.0 V. Calculate R in Ω.", ms: ["I = 8.0/4.0 = 2.0 A; p.d. across R = 12 − 8.0 = 4.0 V (loop rule) [M1]", "R = 4.0/2.0 = 2.0 Ω [A1]"] },
+
     { type: "mcq", paper: "P1A", marks: 1, diff: 1, q: "Two 4.0 Ω resistors are connected in parallel. The total resistance is:", options: ["0.5 Ω", "2.0 Ω", "4.0 Ω", "8.0 Ω"], answer: 1, ms: ["B."] },
     { paper: "P2", marks: 3, diff: 2, numeric: { value: 1.5, tol: 0.02 }, q: "A cell of emf 6.0 V and internal resistance 1.0 Ω is connected to a 3.0 Ω resistor. Calculate the current in A.", ms: ["I = ε/(R + r) [M1]", "= 6.0/4.0 [M1]", "1.5 A [A1]"] },
     { paper: "P2", marks: 2, diff: 2, numeric: { value: 4.5, tol: 0.05 }, q: "A 6.0 V cell (internal resistance 1.0 Ω) drives 1.5 A through a resistor. Calculate the terminal potential difference in V.", ms: ["V = ε − Ir = 6.0 − 1.5 × 1.0 [M1]", "4.5 V [A1]"] },
@@ -85,6 +91,8 @@ IB.addQuestions("phys", {
     { paper: "P2", marks: 2, diff: 2, q: "Explain why an astronaut in an orbiting space station feels weightless.", ms: ["The astronaut and the station are both in free fall / have the same acceleration towards Earth [1]", "So there is no normal (contact) force between them [1]"] },
   ],
   "phys-17": [
+    { paper: "P2", marks: 2, diff: 1, numeric: { value: 2.0e10, tol: 0.05e10 }, q: "A plastic rod acquires a charge of +3.2 nC when rubbed. Calculate the number of electrons removed from the rod.", ms: ["N = 3.2 × 10⁻⁹ ÷ 1.60 × 10⁻¹⁹ [M1]", "2.0 × 10¹⁰ (20 000 000 000) [A1]"] },
+
     { type: "mcq", paper: "P1A", marks: 1, diff: 1, q: "Electric field lines point:", options: ["from negative to positive", "from positive to negative", "around a current", "towards the north pole"], answer: 1, ms: ["B."] },
     { paper: "P2", marks: 2, diff: 2, q: "Outline one similarity and one difference between gravitational and electric fields.", ms: ["Similarity: both inverse-square laws for point sources / both field = force per unit (mass or charge) [1]", "Difference: gravity is only attractive; electric force can attract or repel [1]"] },
   ],
@@ -105,6 +113,8 @@ IB.addQuestions("phys", {
     { paper: "P2", marks: 2, diff: 3, q: "Outline what is meant by wave-particle duality, with one piece of evidence for each nature of electrons.", ms: ["Particle: electrons have mass/charge, deflected by fields / photoelectric emission [1]", "Wave: electron diffraction through a crystal / de Broglie wavelength [1]"] },
   ],
   "phys-22": [
+    { paper: "P2", marks: 3, diff: 2, q: "Explain why a stable nucleus containing several protons does not fly apart.", ms: ["Protons repel by the electrostatic force [1]", "The strong nuclear force acts attractively between all nucleons [1]", "It is stronger than the electrostatic force at nuclear separations (~10⁻¹⁵ m) but very short range [1]"] },
+
     { type: "mcq", paper: "P1A", marks: 1, diff: 2, q: "In β⁻ decay the nucleon number:", options: ["increases by 1", "decreases by 1", "stays the same", "decreases by 4"], answer: 2, ms: ["C."] },
     { paper: "P2", marks: 2, diff: 2, numeric: { value: 25, tol: 0.1 }, q: "A sample has an activity of 400 Bq. Calculate its activity, in Bq, after four half-lives.", ms: ["400 ÷ 2⁴ [M1]", "25 Bq [A1]"] },
     { paper: "P2", marks: 3, diff: 3, q: "Explain why the binding energy per nucleon curve shows that both fission and fusion release energy.", ms: ["Binding energy per nucleon peaks near iron-56 [1]", "Fission of heavy nuclei and fusion of light nuclei both form products with higher binding energy per nucleon [1]", "The increase in total binding energy is released (mass defect converted to energy) [1]"] },
