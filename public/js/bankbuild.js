@@ -34,7 +34,8 @@
     }
     return a;
   };
-  const strip = (h) => String(h).replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  // only real tags: "x < −2 and x > 3" must survive
+  const strip = (h) => String(h).replace(/<\/?[a-zA-Z][^>]*>/g, "").replace(/\s+/g, " ").trim();
   // Split prose into markscheme-sized points (keeps maths and HTML intact inside each sentence).
   const points = (html, max) => {
     const parts = String(html)
@@ -73,7 +74,8 @@
 
       // key-term drills: define it, term-from-definition, definition-from-term
       (t.terms || []).forEach(([k, v], i) => {
-        add({ id: `${t.id}-k${i + 1}d`, sec: "terms", marks: 2, q: T.define(s.id, k), ms: [v, T.defMs(s.id)] });
+        if (s.id === "math") add({ id: `${t.id}-k${i + 1}d`, sec: "terms", marks: 1, q: `State what is meant by <strong>${k}</strong>.`, ms: [`${v} [A1]`] });
+        else add({ id: `${t.id}-k${i + 1}d`, sec: "terms", marks: 2, q: T.define(s.id, k), ms: [v, T.defMs(s.id)] });
         const others = shuffle(allTerms.filter((x) => x.k !== k && x.v !== v), r);
         // prefer distractors from the same topic (harder), then the rest of the subject
         const near = others.filter((x) => x.topic === t.id).concat(others.filter((x) => x.topic !== t.id));
@@ -96,9 +98,11 @@
       // explain the concept (markscheme = the notes' own points)
       (t.concepts || []).forEach((c, i) => {
         if (!c.b || strip(c.b).length < 40 || /<table/i.test(c.b)) return;
-        const ms = points(c.b, 4);
+        let ms = points(c.b, 4);
         const marks = Math.max(2, Math.min(4, ms.length));
-        add({ id: `${t.id}-c${i + 1}`, sec: "concepts", marks, diff: 2, q: T.explain(s.id, c.h, marks), ms, hl: !!c.hl || !!t.hl });
+        // maths: a recall drill ("write down" the results), one A1 per result, without the notes' paragraph tags
+        if (s.id === "math") ms = ms.map((p) => `${p.replace(/<\/?p>/g, "").trim()} [A1]`);
+        add({ id: `${t.id}-c${i + 1}`, sec: "concepts", marks, diff: 2, q: s.id === "math" ? `Write down the key results for: ${c.h}. [${marks}]` : T.explain(s.id, c.h, marks), ms, hl: !!c.hl || !!t.hl });
       });
 
       // spot the mistake: one trap + three pieces of good practice from the same topic
@@ -108,8 +112,11 @@
         const rr = rng(seedOf(t.id + "x" + i));
         const right = Array.from(new Set(shuffle(good, rr).concat(shuffle(facts, rr)))).filter((y) => y !== strip(x)).slice(0, 3);
         if (right.length < 3) return;
-        const opts = shuffle([strip(x)].concat(right), r);
-        add({ id: `${t.id}-x${i + 1}`, sec: "traps", type: "mcq", marks: 1, diff: 2, q: T.trap(s.id), options: opts, answer: opts.indexOf(strip(x)), ms: [T.trapMs(s.id, x)] });
+        // a trap written as advice ("keep both roots") is not itself a mistake: use the topic's worked-wrong version when given
+        const wrong = t.mistakes && t.mistakes[i] ? strip(t.mistakes[i]) : strip(x);
+        const opts = shuffle([wrong].concat(right.filter((y) => y !== wrong)), r);
+        const ms = t.mistakes && t.mistakes[i] ? [`This is the mistake: ${t.mistakes[i]}`, `Correct: ${x}`] : [T.trapMs(s.id, x)];
+        add({ id: `${t.id}-x${i + 1}`, sec: "traps", type: "mcq", marks: 1, diff: 2, q: T.trap(s.id), options: opts, answer: opts.indexOf(wrong), ms });
       });
 
       // worked-example replays: the model answer becomes the markscheme
