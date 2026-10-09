@@ -853,6 +853,10 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       const rows = q.type === "extended" ? 14 : Math.min(10, 3 + q.marks);
       ansBox.innerHTML = `<textarea rows="${rows}" placeholder="${q.numeric ? "Show your working, then give your final answer…" : "Write your answer here…"}"></textarea>`;
       const ta = IB.qs("textarea", ansBox);
+      // Economics: upload a diagram and check it against the diagram markscheme (js/diagramcheck.js).
+      const dgp = IB.diagramPanel ? IB.diagramPanel(q) : null;
+      if (dgp) ansBox.appendChild(dgp.el);
+      card.diagram = dgp;
       const aiBtn = IB.el(`<button class="btn primary small">✓ Mark my answer</button>`);
       const msBtn = IB.el(`<button class="btn small">Show markscheme & self-mark</button>`);
       if (!opts.hideActions && opts.mode !== "exam") {
@@ -872,16 +876,17 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       msBtn.onclick = selfMark;
       const runMark = async () => {
         const answer = ta.value;
-        if (!answer.trim()) return IB.toast("Write an answer first.");
+        const dg = dgp ? dgp.state() : null;
+        if (!answer.trim() && !dg) return IB.toast("Write an answer first.");
         aiBtn.disabled = true;
         aiBtn.textContent = "Marking…";
         let fb;
         try {
-          if (await IB.ai.available()) fb = await IB.ai.mark(q, answer);
-          else fb = IB.offlineMark(q, answer);
+          if (await IB.ai.available()) fb = await IB.ai.mark(q, answer + (dgp ? dgp.describe() : ""));
+          else fb = IB.offlineMark(q, answer, { diagram: dg });
         } catch (e) {
           IB.toast(e.message + " - using offline marker.");
-          fb = IB.offlineMark(q, answer);
+          fb = IB.offlineMark(q, answer, { diagram: dg });
         }
         aiBtn.textContent = fb.offline ? "✓ Marked - mark again" : "✦ Marked by AI";
         aiBtn.disabled = false;

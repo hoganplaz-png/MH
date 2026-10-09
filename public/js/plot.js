@@ -3,7 +3,7 @@
             curves:[{ f: x => ..., color, dash, label, domain:[a,b] }],
             lines:[{ from:[x,y], to:[x,y], color, dash, label, labelAt:"end"|"start" }],
             points:[{ at:[x,y], label, color }], vlines:[{x, label, dash}], hlines:[{y, label, dash}],
-            shade:{ from:a, to:b, color } }  Colours are names: "a" (accent) "b" "c" "muted". */
+            shade:{ from:a, to:b, color }, areas:[{ pts:[[x,y],…], color, label, at:[x,y] }] }  Colours are names: "a" (accent) "b" "c" "muted". */
 (function () {
   const IB = window.IB;
   const COL = { a: "var(--plot-a)", b: "var(--plot-b)", c: "var(--plot-c)", muted: "var(--muted)" };
@@ -25,6 +25,11 @@
     }
     // shading between x values (e.g. inequality solution)
     if (spec.shade) g += `<rect x="${sx(spec.shade.from)}" y="${P}" width="${sx(spec.shade.to) - sx(spec.shade.from)}" height="${H - 2 * P}" fill="${COL[spec.shade.color] || COL.c}" opacity=".14"/>`;
+    // shaded polygons (welfare loss, tax revenue, surplus areas)
+    (spec.areas || []).forEach((r) => {
+      g += `<polygon points="${r.pts.map(([x, y]) => sx(x).toFixed(1) + "," + sy(y).toFixed(1)).join(" ")}" fill="${COL[r.color] || COL.b}" opacity=".2" class="pl-area"/>`;
+      if (r.label) g += `<text x="${sx(r.at[0])}" y="${sy(r.at[1])}" class="pl-lab">${esc(r.label)}</text>`;
+    });
     // axes
     const ax = spec.origin === false ? x0 : Math.min(Math.max(0, x0), x1), ay = spec.origin === false ? y0 : Math.min(Math.max(0, y0), y1);
     g += `<line x1="${P}" y1="${sy(ay)}" x2="${W - PR + 10}" y2="${sy(ay)}" class="pl-axis" marker-end="url(#pl-arr)"/>`;
