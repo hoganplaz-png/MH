@@ -1,7 +1,7 @@
 /* Chemistry SL - exam-focused extras: game plan, fastest methods, traps, tips, diagrams. */
 IB.extend("chem", {
   gameplan: {
-    intro: "Paper 1 (1h 30m): 1A multiple choice + 1B data-based questions on practical work. Paper 2 (1h 30m). <strong>Calculators are allowed in both papers</strong> in the current syllabus (first exams 2025), but estimate first to catch slips: short-answer and extended questions. Data booklet allowed in both - <strong>know what's in it so you don't waste time memorising it</strong>.",
+    intro: "Paper 1 (1h 30m): 1A multiple choice + 1B data-based questions on practical work. Paper 2 (1h 30m). Paper 2 has short-answer and extended-response questions. <strong>Calculators are allowed in both papers</strong> in the current syllabus (first exams 2025), but estimate first to catch slips. Data booklet allowed in both - <strong>know what's in it so you don't waste time memorising it</strong>.",
     rows: [
       ["Paper 1A", "Multiple choice, ~1.5 min each", "Eliminate wrong options first. ~1 min each: estimate before calculating (a calculator is allowed, but estimates are faster and catch slips)."],
       ["Paper 1B", "Data-based questions from experiments", "Read the method carefully; questions on uncertainty, graphs, improvements and errors."],

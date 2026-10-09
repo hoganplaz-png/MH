@@ -25,9 +25,10 @@ IB.register({
   topics: [
     // ---------------- TOPIC 1 ----------------
     {
-      id: "math-1", code: "1.2-1.4, 1.8", unit: "Topic 1: Number and algebra", title: "Sequences, series and financial maths",
-      summary: "Arithmetic and geometric sequences and series, sigma notation, infinite geometric series and compound interest.",
+      id: "math-1", code: "1.1-1.4, 1.8", unit: "Topic 1: Number and algebra", title: "Sequences, series and financial maths",
+      summary: "Standard form, arithmetic and geometric sequences and series, sigma notation, infinite geometric series, compound interest and depreciation.",
       concepts: [
+        { h: "Standard form (1.1)", b: "<p>Scientific notation \\(a \\times 10^k\\) with \\(1 \\le a < 10\\), k ∈ ℤ, e.g. 0.000 452 = \\(4.52 \\times 10^{-4}\\). In Paper 1 multiply/divide by combining the a-parts and adding/subtracting the powers, then re-normalise: \\((6 \\times 10^5)(4 \\times 10^{3}) = 24 \\times 10^8 = 2.4 \\times 10^9\\).</p>" },
         { h: "Arithmetic sequences", b: "<p>Common difference d: $$u_n = u_1 + (n-1)d \\qquad S_n = \\frac{n}{2}\\left(2u_1 + (n-1)d\\right) = \\frac{n}{2}(u_1 + u_n)$$ Applications: simple interest, linear growth, seating rows.</p>" },
         { h: "Geometric sequences", b: "<p>Common ratio r: $$u_n = u_1 r^{n-1} \\qquad S_n = \\frac{u_1(r^n - 1)}{r - 1} = \\frac{u_1(1 - r^n)}{1 - r},\\ r \\neq 1$$ Infinite sum converges only when \\(|r| < 1\\): $$S_\\infty = \\frac{u_1}{1 - r}$$</p>" },
         { h: "Sigma notation", b: "<p>\\(\\sum_{k=1}^{n} u_k\\) means add terms from k = 1 to n. The number of terms is (upper − lower + 1).</p>" },
@@ -167,6 +168,7 @@ IB.register({
       concepts: [
         { h: "3D shapes and coordinates", b: "<p>Distance \\(d = \\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2 + (z_2 - z_1)^2}\\). Volumes: cone \\(\\frac{1}{3}\\pi r^2h\\), sphere \\(\\frac{4}{3}\\pi r^3\\), pyramid \\(\\frac{1}{3}Ah\\). Surface area: sphere \\(4\\pi r^2\\), cone curved \\(\\pi r l\\). Angle between a line and a plane using right-angled triangles.</p>" },
         { h: "Non-right-angled triangles", b: "<p>Sine rule: \\(\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C}\\) (ambiguous case when given two sides and a non-included angle). Cosine rule: \\(c^2 = a^2 + b^2 - 2ab\\cos C\\), \\(\\cos C = \\frac{a^2 + b^2 - c^2}{2ab}\\). Area \\(= \\frac{1}{2}ab\\sin C\\).</p>" },
+        { h: "Applications: bearings, elevation and depression (3.3)", b: "<p>A <strong>true bearing</strong> is measured clockwise from north, written with three figures (e.g. 065°). The <strong>angle of elevation</strong> is measured up from the horizontal, the <strong>angle of depression</strong> down from the horizontal; they are equal by alternate angles. Draw a diagram with a north line at every point, then use right-angled trig or the sine/cosine rule.</p>" },
         { h: "Radians", b: "<p>\\(\\pi\\) rad = 180°. Arc length \\(l = r\\theta\\); sector area \\(A = \\frac{1}{2}r^2\\theta\\) (θ in radians). Segment area = sector − triangle = \\(\\frac{1}{2}r^2(\\theta - \\sin\\theta)\\).</p>" },
       ],
       terms: [["Radian", "The angle subtended at the centre of a circle by an arc equal in length to the radius."], ["Ambiguous case", "When the sine rule gives two possible triangles (acute and obtuse angle)."]],
@@ -207,6 +209,7 @@ IB.register({
       summary: "Sampling, measures of central tendency and spread, box plots and outliers, correlation and regression lines.",
       concepts: [
         { h: "Sampling and data", b: "<p>Population vs sample; discrete vs continuous data. Sampling methods: simple random, convenience, systematic, quota, stratified. Reliability and bias.</p>" },
+        { h: "Presenting data (4.2)", b: "<p>Histograms (continuous data, no gaps, equal class widths), cumulative frequency graphs (plot at <em>upper class boundaries</em>; read median at n/2, Q₁ at n/4, Q₃ at 3n/4, percentiles), and box-and-whisker diagrams (five-number summary, outliers marked separately). Grouped data: estimate the mean using mid-interval values. Compare distributions using a measure of centre <em>and</em> a measure of spread.</p>" },
         { h: "Central tendency and dispersion", b: "<p>Mean \\(\\bar{x} = \\frac{\\sum fx}{n}\\), median, mode, modal class. Range, interquartile range IQR = Q₃ − Q₁, standard deviation σ (GDC), variance σ². <strong>Outlier</strong>: more than 1.5 × IQR below Q₁ or above Q₃. Effects of constant changes: adding k shifts mean by k but not σ; multiplying by k multiplies both by k.</p>" },
         { h: "Correlation and regression", b: "<p>Pearson's product-moment correlation coefficient r (−1 ≤ r ≤ 1) measures linear correlation. Regression line of y on x (y = ax + b) from GDC; use it to predict y from x only within the data range (interpolation). Regression of x on y is used to predict x from y. Correlation does not imply causation.</p>" },
       ],
@@ -218,7 +221,7 @@ IB.register({
         { type: "mcq", paper: "P1", marks: 1, diff: 2, q: "Each value in a data set is multiplied by 3 and then 2 is added. The standard deviation was 4. What is the new standard deviation?", options: ["4", "12", "14", "36"], answer: 1, ms: ["Adding does not change spread; multiplying by 3 multiplies σ by 3."] },
         { type: "short", paper: "P1", marks: 2, diff: 1, numeric: { value: 8, tol: 0.001 }, q: "The numbers 3, 5, 6, 8, x have a mean of 6. Find x.", ms: ["\\(\\frac{22 + x}{5} = 6\\) [M1]", "x = 8 [A1]"] },
         { type: "short", paper: "P2", marks: 4, diff: 2, q: "The regression line of y on x for a data set is y = 2.4x + 7.1 with r = 0.93. The x-values range from 5 to 20. (a) Interpret r. (b) Estimate y when x = 12. (c) Explain why it would not be appropriate to estimate y when x = 40.", ms: ["Strong positive linear correlation [A1]", "y = 2.4(12) + 7.1 = 35.9 [M1][A1]", "x = 40 is outside the data range - extrapolation is unreliable [R1]"] },
-        { type: "short", paper: "P2", marks: 3, diff: 2, q: "Explain the difference between a stratified sample and a quota sample.", ms: ["Both divide population into groups/strata proportionally", "Stratified: random sampling within each stratum", "Quota: non-random selection within each group until quota filled"] },
+        { type: "short", paper: "P2", marks: 3, diff: 2, q: "Explain the difference between a stratified sample and a quota sample.", ms: ["Both divide the population into groups and sample each in proportion to its size [R1]", "Stratified: members of each stratum are chosen at random [R1]", "Quota: members are chosen non-randomly (e.g. conveniently) until each quota is filled [R1]"] },
       ],
     },
     {
@@ -262,7 +265,7 @@ IB.register({
 
     // ---------------- TOPIC 5 ----------------
     {
-      id: "math-12", code: "5.1-5.3, 5.6-5.8", unit: "Topic 5: Calculus", title: "Differentiation",
+      id: "math-12", code: "5.1-5.4, 5.6-5.8", unit: "Topic 5: Calculus", title: "Differentiation",
       summary: "Limits and the derivative, power/chain/product/quotient rules, derivatives of standard functions, tangents and normals, stationary points.",
       concepts: [
         { h: "The derivative", b: "<p>The derivative \\(f'(x)\\) is the gradient function: $$f'(x) = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$$ It gives the rate of change. f is increasing where \\(f'(x) > 0\\), decreasing where \\(f'(x) < 0\\).</p>" },
@@ -282,7 +285,7 @@ IB.register({
       ],
     },
     {
-      id: "math-13", code: "5.4-5.5, 5.10-5.11", unit: "Topic 5: Calculus", title: "Integration and area",
+      id: "math-13", code: "5.5, 5.10-5.11", unit: "Topic 5: Calculus", title: "Integration and area",
       summary: "Anti-differentiation, standard integrals, integration by substitution (inspection), definite integrals and areas between curves.",
       concepts: [
         { h: "Indefinite integrals", b: "<p>$$\\int x^n dx = \\frac{x^{n+1}}{n + 1} + C\\ (n \\neq -1) \\qquad \\int \\frac{1}{x} dx = \\ln|x| + C$$ $$\\int \\sin x\\,dx = -\\cos x + C \\quad \\int \\cos x\\,dx = \\sin x + C \\quad \\int e^x dx = e^x + C$$ Linear composite: \\(\\int f(ax + b)dx = \\frac{1}{a}F(ax + b) + C\\). Use a boundary condition to find C.</p>" },

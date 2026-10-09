@@ -1103,7 +1103,7 @@ IB.HIGHLIGHTS = [
   const DATE = String.raw`\b(?:1[6-9]\d\d|20\d\d)(?:s\b|\s?[-–]\s?(?:1[6-9]\d\d|20\d\d)\b)?(?!\s?(?:%|km|kg|kJ|mm|ppm|m\b|people|units|tonnes))`;
   const STAT = String.raw`(?:[$£€¥]\s?)?\b\d[\d,]*(?:\.\d+)?\s?(?:%|per cent|percent|million|billion|trillion|bn\b|km²|km|kg|tonnes|°C|ppm|years?\b|per\s1,?000|per 100\b|times\b|mm\b|kJ\b|mol\b)|[$£€¥]\s?\d[\d,]*(?:\.\d+)?|\b\d+\.\d+\b`;
   const PLACE = PLACES.sort((a, b) => b.length - a.length).map(esc).join("|");
-  const SKIP = "script,style,code,pre,svg,.banner,.bar,.toc,.qh,.foot,.katex,.plot,button,a,h1,h2,h3,h4,.callout-title,.hl,mark,input,textarea,select,.q-card,.no-hl";
+  const SKIP = "script,style,code,pre,svg,.fn-bar,.fn-head,.banner,.bar,.toc,.qh,.foot,.katex,.plot,button,a,h1,h2,h3,h4,.callout-title,.hl,mark,input,textarea,select,.q-card,.no-hl";
   const classify = (txt) =>
     new RegExp("^\\s*" + DATE + "\\s*$").test(txt) ? "d" : new RegExp(STAT).test(txt) && /\d/.test(txt) && txt.length < 40 ? "s" : new RegExp("^(?:" + PLACE + ")$").test(txt.trim()) ? "p" : "k";
 

@@ -99,3 +99,17 @@ IB.addQuestions("math", {
     { paper: "P1", marks: 3, diff: 2, numeric: { value: 14, tol: 0.001 }, q: "A particle has displacement \\(s = t^3 - 2t\\). Find its acceleration at \\(t = \\frac{7}{3}\\).", ms: ["\\(v = 3t^2 - 2\\) [A1]", "\\(a = 6t\\) [A1]", "\\(a = 14\\) m s⁻² [A1]"] },
   ],
 });
+
+/* Syllabus gap fill (review 2026): 1.1 standard form, 3.3 bearings/elevation, 4.2 data presentation. */
+IB.addQuestions("math", {
+  "math-1": [
+    { type: "short", paper: "P1", marks: 3, diff: 1, q: "Let \\(a = 6 \\times 10^5\\) and \\(b = 4 \\times 10^{-2}\\). Find \\(ab\\) and \\(\\frac{a}{b}\\), giving your answers in the form \\(k \\times 10^n\\), where \\(1 \\le k < 10\\) and \\(n \\in \\mathbb{Z}\\).", ms: ["\\(ab = 24 \\times 10^3\\) [M1]", "\\(= 2.4 \\times 10^4\\) [A1]", "\\(\\frac{a}{b} = 1.5 \\times 10^7\\) [A1]"] },
+  ],
+  "math-7": [
+    { type: "short", paper: "P2", marks: 5, diff: 2, numeric: { value: 13.6, tol: 0.05 }, q: "A ship leaves port P and sails 8 km on a bearing of 040° to point A, then 11 km on a bearing of 130° to point B. (a) Show that angle PAB = 90°. (b) Find the distance PB.", ms: ["(a) Back bearing of P from A is 220°; 220° − 130° = 90° [M1][A1] AG", "(b) \\(PB^2 = 8^2 + 11^2\\) [M1]", "\\(PB = \\sqrt{185}\\) [A1]", "= 13.6 km [A1]"] },
+    { type: "short", paper: "P2", marks: 3, diff: 2, numeric: { value: 23.1, tol: 0.05 }, q: "From the top of a cliff 40 m high, the angle of depression of a boat is 60°. Find the horizontal distance from the foot of the cliff to the boat.", ms: ["Angle of elevation from boat = 60° (alternate angles) [R1]", "\\(\\tan 60° = \\frac{40}{d}\\) [M1]", "d = 23.1 m [A1]"] },
+  ],
+  "math-9": [
+    { type: "short", paper: "P2", marks: 4, diff: 2, numeric: { value: 24.5, tol: 0.05 }, q: "The heights, h cm, of 40 plants are grouped: 0 < h ≤ 10: 4; 10 < h ≤ 20: 10; 20 < h ≤ 30: 14; 30 < h ≤ 40: 8; 40 < h ≤ 50: 4. (a) Write down the modal class. (b) Use mid-interval values to estimate the mean height.", ms: ["(a) 20 < h ≤ 30 [A1]", "(b) mid-points 5, 15, 25, 35, 45 used [M1]", "\\(\\frac{20 + 150 + 350 + 280 + 180}{40} = \\frac{980}{40}\\) [A1]", "= 24.5 cm [A1]"] },
+  ],
+});
