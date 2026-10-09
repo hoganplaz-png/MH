@@ -349,7 +349,7 @@
             tip: "Gini = A ÷ (A + B)，唔係 A ÷ B。" },
         ],
         concepts: [
-          { h: "Measures of poverty (exam detail)", b: "<p><strong>Absolute poverty</strong>: income below what is needed for basic needs; the World Bank international poverty line is a fixed real amount per person per day at PPP (currently US$2.15, 2017 PPP; being updated to US$3.00, 2021 PPP). <strong>Relative poverty</strong>: income below a share of median income (often 50% or 60%), so it rises with inequality. <strong>Multidimensional Poverty Index (MPI)</strong>: health, education and living standards (10 indicators); a person is poor if deprived in at least one third of weighted indicators. Use the line or index named in the text.</p>" },
+          { h: "Measures of poverty (exam detail)", b: "<p><strong>Absolute poverty</strong>: income below what is needed for basic needs; the World Bank international poverty line is a fixed real amount per person per day at PPP (US$3.00 at 2021 PPP since June 2025; previously US$2.15 at 2017 PPP). <strong>Relative poverty</strong>: income below a share of median income (often 50% or 60%), so it rises with inequality. <strong>Multidimensional Poverty Index (MPI)</strong>: health, education and living standards (10 indicators); a person is poor if deprived in at least one third of weighted indicators. Use the line or index named in the text.</p>" },
         ],
       },
 

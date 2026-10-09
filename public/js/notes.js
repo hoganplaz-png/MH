@@ -49,6 +49,8 @@ IB.page = function () {
       return;
     }
     t ? renderTopic(s, t, data) : renderOverview(s, data);
+    // the 10-minute notes load on demand; redraw the topic once they arrive
+    if (t && IB.loadFast && !IB.fast[t.id]) IB.loadFast(s.id).then(() => { if (topicId === t.id && IB.fast[t.id] && !IB.qs("#sec-fast")) renderTopic(s, t, IB.store.get()); });
   }
 
   function legend() {
@@ -76,7 +78,7 @@ IB.page = function () {
       ${IB.hasHL(s.id) ? `<p class="small" style="margin:.2em 0 .6em;opacity:.85">${IB.levelOf(s.id) === "HL" ? `HL view: all ${s.allTopics.length} topics including ${s.allTopics.filter((t) => t.hl).length} AHL topics (marked AHL), HL papers and AHL questions.` : `SL view: ${s.topics.length} topics. Switch to HL to add ${s.allTopics.filter((t) => t.hl).length} AHL topics and HL papers.`}</p>` : ""}
       <div class="chip-row">${s.topics.slice(0, 12).map((t) => `<a href="#" data-t="${t.id}" class="chip">${IB.esc(t.title)}</a>`).join("")}${s.topics.length > 12 ? `<span class="chip">+${s.topics.length - 12} more</span>` : ""}</div>
       <div class="hero-progress"><div class="bar"><span style="width:${IB.pct(read, s.topics.length)}%"></span></div><span class="small">${read}/${s.topics.length} topics revised</span></div>
-      <div class="btn-row no-print"><button class="btn mark" id="dlAll">⬇ PDF: all notes</button><button class="btn" id="dlAllQ">⬇ PDF: notes + practice paper</button><button class="btn" id="dlHtml">⬇ HTML version</button></div>
+      <div class="btn-row no-print"><button class="btn mark" id="dlAll">⬇ PDF: all notes</button><button class="btn" id="dlFastAll">⏱ PDF: 10-min notes</button><button class="btn" id="dlAllQ">⬇ PDF: notes + practice paper</button><button class="btn" id="dlHtml">⬇ HTML version</button></div>
     </div>
     <h2>How to read these notes</h2>
     ${legend()}
@@ -105,6 +107,18 @@ IB.page = function () {
       IB.pdfNotes({ subject: s.id, topics: s.topics, questions: n }).catch(() => {}).finally(() => (btn.disabled = false));
     };
     IB.qs("#dlAll").onclick = (e) => pdfAll(e.currentTarget, 0);
+    IB.qs("#dlFastAll").onclick = (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      IB.loadFast(s.id)
+        .then(() => {
+          const topics = s.topics.filter((t) => IB.fast[t.id]);
+          if (!topics.length) return IB.toast("10-minute notes for this subject are coming soon.");
+          return IB.pdfNotes({ subject: s.id, topics, fast: true, title: `${s.name} 10-minute notes` });
+        })
+        .catch(() => {})
+        .finally(() => (btn.disabled = false));
+    };
     IB.qs("#dlAllQ").onclick = (e) => pdfAll(e.currentTarget, 3);
     IB.qs("#dlHtml").onclick = () => dl(true);
     IB.math(c);
@@ -116,7 +130,8 @@ IB.page = function () {
     const idx = s.topics.indexOf(t);
     const prev = s.topics[idx - 1], next = s.topics[idx + 1];
     const m = IB.mastery(t.id, data);
-    const sections = IB.topicSections(t);
+    const fastSec = IB.fastSection && IB.fastSection(t);
+    const sections = (fastSec ? [fastSec] : []).concat(IB.topicSections(t));
     const nQ = IB.topicQuestions(t.id).length;
     c.innerHTML = `<div class="topic-banner" style="--c:${s.color}" data-reveal>
       <span class="topic-big-num">${String(idx + 1).padStart(2, "0")}</span>
@@ -131,6 +146,7 @@ IB.page = function () {
       <a class="btn" href="practice.html?subject=${s.id}&topic=${t.id}">Quiz this topic</a>
       ${IB.config.ai ? `<a class="btn" href="tutor.html?subject=${s.id}&topic=${t.id}">Ask the AI tutor</a>` : ""}
       <button class="btn mark" id="dlTopic">⬇ PDF notes</button>
+      ${fastSec ? '<button class="btn" id="dlFast">⏱ 10-min notes PDF</button>' : ""}
       <button class="btn" id="dlTopicQ">⬇ PDF + practice paper</button>
       <button class="btn" id="dlSheet">⬇ Worksheet</button>
       <button class="btn ${hlOn() ? "on" : ""}" id="hlBtn" aria-pressed="${hlOn()}">🖍 Highlights</button>
@@ -214,6 +230,11 @@ IB.page = function () {
     };
     IB.qs("#dlTopic").onclick = (e) => pdf(e.currentTarget, 0);
     IB.qs("#dlTopicQ").onclick = (e) => pdf(e.currentTarget, 12);
+    if (fastSec) IB.qs("#dlFast").onclick = (e) => {
+      const btn = e.currentTarget;
+      btn.disabled = true;
+      IB.pdfNotes({ subject: s.id, topics: [t], fast: true, title: t.title }).catch(() => {}).finally(() => (btn.disabled = false));
+    };
     IB.qs("#dlSheet").onclick = () => IB.download(`IB-${s.short.replace(/\s+/g, "-")}-${t.title.replace(/[^\w]+/g, "-")}-worksheet.html`, IB.standaloneDoc(`${t.title} worksheet`, `<h1>${IB.esc(s.name)}: ${IB.esc(t.title)}</h1>` + IB.worksheetHtml(t.questions.filter((q) => !q.derived), "Worksheet")));
     IB.qs("#hlBtn").onclick = (e) => {
       const on = !hlOn();

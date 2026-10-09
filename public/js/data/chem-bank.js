@@ -19,6 +19,7 @@ IB.addQuestions("chem", {
     { paper: "P2", marks: 2, diff: 1, q: "State the full electron configuration of \\(\\mathrm{Fe^{3+}}\\).", ms: ["1s² 2s² 2p⁶ 3s² 3p⁶ 3d⁵ [2] - 4s electrons removed first [1 if 4s shown]"] },
   ],
   "chem-3": [
+    { paper: "P1B", marks: 3, diff: 2, q: "A student measures the volume of a fixed mass of gas at constant pressure at several temperatures in °C and plots V against T(°C). Describe the expected graph and explain how it can be used to estimate absolute zero.", ms: ["Straight line with positive gradient (V ∝ T in kelvin) [1]", "Extrapolate the line back to V = 0 [1]", "The intercept on the temperature axis is ≈ −273 °C (absolute zero) [1]"] },
     { paper: "P1A", marks: 1, diff: 1, q: "What is the amount, in mol, of \\(\\mathrm{CO_2}\\) in 11.0 g? (\\(M_r = 44.0\\))", options: ["0.250", "0.500", "4.00", "484"], answer: 0, ms: ["A - 11.0 ÷ 44.0 = 0.250 mol."] },
     { paper: "P1A", marks: 1, diff: 2, q: "Which sample contains the greatest number of atoms?", options: ["1 mol of He", "1 mol of H₂O", "0.5 mol of CH₄", "0.5 mol of CO₂"], answer: 1, ms: ["B - 3 mol of atoms (C: 2.5 mol; D: 1.5 mol)."] },
     { paper: "P1A", marks: 1, diff: 2, q: "At constant temperature, the volume of a fixed mass of gas is halved. The pressure:", options: ["halves", "stays the same", "doubles", "quadruples"], answer: 2, ms: ["C - Boyle's law, pV = constant."] },
@@ -55,6 +56,7 @@ IB.addQuestions("chem", {
     { paper: "P2", marks: 3, diff: 3, q: "Describe how you could distinguish between hexane and hex-1-ene using a chemical test.", ms: ["Add bromine water [1]", "Hex-1-ene: orange/brown colour decolourises [1]", "Hexane: stays orange (no reaction in the dark) [1]"] },
   ],
   "chem-7": [
+    { paper: "P1B", marks: 3, diff: 2, q: "In a neutralisation experiment the thermometer reads to ±0.5 °C. The initial temperature was 21.0 °C and the maximum 27.5 °C. Calculate the percentage uncertainty in ΔT and suggest why the maximum is found by extrapolating a temperature-time graph.", ms: ["ΔT = 6.5 °C with absolute uncertainty ±1.0 °C (two readings) [1]", "% uncertainty = 1.0/6.5 × 100 ≈ 15% [1]", "Extrapolation back to the time of mixing compensates for heat lost to the surroundings while the temperature was rising [1]"] },
     { paper: "P1A", marks: 1, diff: 1, q: "For an exothermic reaction:", options: ["ΔH is positive and the surroundings cool", "ΔH is negative and the surroundings warm up", "ΔH is negative and the surroundings cool", "ΔH is positive and the surroundings warm up"], answer: 1, ms: ["B."] },
     { paper: "P1A", marks: 1, diff: 2, q: "Bond enthalpies are average values. Calculated values of ΔH using them are therefore:", options: ["always exact", "only approximate", "only valid for solids", "always more negative than experimental values"], answer: 1, ms: ["B - and they apply to gaseous species."] },
     { paper: "P1A", marks: 1, diff: 2, q: "Which fuel releases the greatest energy per gram when burnt?", options: ["Hydrogen", "Methane", "Ethanol", "Coal"], answer: 0, ms: ["A - highest specific energy (~142 kJ g⁻¹)."] },
@@ -64,6 +66,7 @@ IB.addQuestions("chem", {
     { paper: "P2", marks: 2, diff: 2, q: "Distinguish between complete and incomplete combustion of a hydrocarbon.", ms: ["Complete: excess oxygen, products CO₂ and H₂O [1]", "Incomplete: limited oxygen, products include CO and/or C (soot) and H₂O [1]"] },
   ],
   "chem-8": [
+    { paper: "P1B", marks: 3, diff: 2, q: "Titres of 24.10, 23.65, 23.70 and 23.60 cm³ were recorded. Identify which titres should be used and calculate the mean titre. State the uncertainty of a single titre if the burette reads to ±0.05 cm³.", ms: ["Use 23.65, 23.70 and 23.60 (concordant, within 0.10 cm³); 24.10 is the rough titre [1]", "Mean = 23.65 cm³ [1]", "±0.10 cm³ (two readings) [1]"] },
     { paper: "P1A", marks: 1, diff: 1, q: "What is the coefficient of \\(\\mathrm{O_2}\\) when \\(\\mathrm{C_3H_8 + \\_O_2 \\rightarrow 3CO_2 + 4H_2O}\\) is balanced?", options: ["3", "4", "5", "10"], answer: 2, ms: ["C - 6 + 4 = 10 O atoms."] },
     { paper: "P1A", marks: 1, diff: 2, q: "2.0 mol of Al reacts with 2.0 mol of Cl₂: \\(\\mathrm{2Al + 3Cl_2 \\rightarrow 2AlCl_3}\\). The limiting reactant is:", options: ["Al", "Cl₂", "neither", "AlCl₃"], answer: 1, ms: ["B - 2.0 mol Al needs 3.0 mol Cl₂."] },
     { paper: "P1A", marks: 1, diff: 2, q: "The atom economy of a reaction is 100% when:", options: ["the yield is 100%", "there is only one product", "all reactants are gases", "the reaction is exothermic"], answer: 1, ms: ["B - all reactant atoms end up in the desired product."] },
@@ -73,6 +76,7 @@ IB.addQuestions("chem", {
     { paper: "P2", marks: 2, diff: 2, q: "Explain why the percentage yield of a reaction is often less than 100%.", ms: ["Reaction incomplete / reversible / side reactions [1]", "Product lost during transfer or purification [1]"] },
   ],
   "chem-9": [
+    { paper: "P1B", marks: 3, diff: 2, q: "In the reaction of sodium thiosulfate with acid, the time for a cross to disappear is measured at different temperatures. State the independent variable, two controlled variables, and explain why 1/time can be used as a measure of rate.", ms: ["Independent: temperature [1]", "Controlled: concentration/volume of thiosulfate and acid, total volume, same cross/observer [1]", "Rate ∝ 1/time because the same amount of precipitate (sulfur) forms each time the cross disappears [1]"] },
     { paper: "P1A", marks: 1, diff: 1, q: "Which change increases the rate of reaction between marble chips and acid?", options: ["Using larger chips", "Using more dilute acid", "Using powdered marble", "Lowering the temperature"], answer: 2, ms: ["C - greater surface area."] },
     { paper: "P1A", marks: 1, diff: 2, q: "A catalyst increases the rate of a reaction by:", options: ["increasing the energy of particles", "providing an alternative pathway with lower activation energy", "increasing the collision frequency", "shifting the equilibrium"], answer: 1, ms: ["B."] },
     { paper: "P1A", marks: 1, diff: 2, q: "On a Maxwell-Boltzmann distribution, increasing temperature:", options: ["increases the peak height", "shifts the peak to the right and lowers it", "changes the total area under the curve", "moves Eₐ to the left"], answer: 1, ms: ["B - area stays constant."] },
@@ -91,6 +95,7 @@ IB.addQuestions("chem", {
     { paper: "P2", marks: 2, diff: 2, q: "State and explain the effect of adding a catalyst on the position of equilibrium.", ms: ["No effect on position / Kc [1]", "Increases rates of forward and reverse reactions equally - equilibrium reached faster [1]"] },
   ],
   "chem-11": [
+    { paper: "P1B", marks: 2, diff: 2, q: "Suggest why a pH meter is preferred to universal indicator when comparing 0.10 mol dm⁻³ solutions of a strong and a weak acid, and state one step to ensure accurate readings.", ms: ["pH meter gives a precise numerical value (to 0.01) rather than a subjective colour match to ±1 pH unit [1]", "Calibrate with buffer solutions / rinse the probe with distilled water between readings / same temperature [1]"] },
     { paper: "P1A", marks: 1, diff: 1, q: "What is the conjugate base of \\(\\mathrm{H_2SO_4}\\)?", options: ["SO₄²⁻", "HSO₄⁻", "H₃SO₄⁺", "H₂O"], answer: 1, ms: ["B - lose one H⁺."] },
     { paper: "P1A", marks: 1, diff: 2, q: "A solution has pH 3. Its [H⁺] is:", options: ["3 mol dm⁻³", "1 × 10⁻³ mol dm⁻³", "1 × 10³ mol dm⁻³", "1 × 10⁻¹¹ mol dm⁻³"], answer: 1, ms: ["B."] },
     { paper: "P1A", marks: 1, diff: 2, q: "Which is a strong acid?", options: ["CH₃COOH", "H₂CO₃", "HNO₃", "NH₄⁺"], answer: 2, ms: ["C - fully dissociates."] },
