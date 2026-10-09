@@ -140,6 +140,35 @@
     });
   };
 
+  // ⏱ 10-minute fast notes, one sheet per topic (js/data/fast/<subject>.js, loaded on demand by the notes page).
+  IB.fast = IB.fast || {};
+  IB.addFast = function (byTopic) {
+    Object.assign(IB.fast, byTopic);
+  };
+
+  // Data-response case studies: one shared text + data extract with lettered parts (js/data/cases/<subject>.js).
+  // Every part joins its topic's question bank (section "case"), so filters, marking and the mistakes notebook all work.
+  IB.cases = IB.cases || {};
+  IB.addCases = function (subjectId, list) {
+    const byTopic = {};
+    list.forEach((c) => {
+      c.subject = subjectId;
+      IB.cases[c.id] = c;
+      c.parts.forEach((p, i) => {
+        const q = Object.assign({}, p, { id: `${c.id}-${i + 1}`, paper: p.paper || c.paper, sec: "case", caseId: c.id, part: p.n, stem: p.q });
+        q.q = IB.caseHead(c, i === 0) + `<div class="case-part"><b>${p.n}</b> ${p.q}</div>`;
+        delete q.n;
+        const tid = p.topic || c.topic;
+        (byTopic[tid] = byTopic[tid] || []).push(q);
+      });
+    });
+    IB.addQuestions(subjectId, byTopic);
+  };
+  IB.caseSource = (c) =>
+    `${c.text ? `<div class="case-text">${c.text}</div>` : ""}${(c.data || []).map((d) => `<div class="case-data">${d.caption ? `<div class="case-cap">${d.caption}</div>` : ""}<div class="table-wrap"><table class="compare"><tr>${d.head.map((h) => `<th>${h}</th>`).join("")}</tr>${d.rows.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th scope="row">${x}</th>`)).join("")}</tr>`).join("")}</table></div></div>`).join("")}`;
+  IB.caseHead = (c, open) =>
+    `<details class="case-src"${open ? " open" : ""}><summary>📄 ${c.title} <span class="case-meta">${c.paper} · ${c.parts.reduce((n, p) => n + p.marks, 0)} marks · ${open ? "text & data" : "show text & data"}</span></summary>${IB.caseSource(c)}</details>`;
+
   IB.subjectList = () => IB.order.map((id) => IB.subjects[id]).filter(Boolean);
   IB.topic = (topicId) => {
     for (const s of IB.subjectList()) {

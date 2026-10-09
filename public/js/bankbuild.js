@@ -7,6 +7,7 @@
 
   IB.SECTIONS = [
     ["exam", "Exam-style", "Hand-written questions in the style of the real papers"],
+    ["case", "Data response / case studies", "Full exam-style questions built on one text and data extract, part by part, like the real paper"],
     ["frames", "Markscheme frames", "One question for every recurring IB question type in this topic, marked against its frame"],
     ["calc", "Calculations", "Fixed calculation sets - plus endless fresh numbers from the generator"],
     ["worked", "Worked-example replays", "Answer the notes' worked examples yourself, then compare"],

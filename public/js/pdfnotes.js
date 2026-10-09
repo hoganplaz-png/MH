@@ -114,6 +114,24 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
 .mf-diagram{margin:0 0 8px}.mf-diagram>b{display:block;font-size:10.5px;color:#55607A;text-transform:uppercase}.mf-diagram svg{width:300px;height:auto;--plot-a:${c};--plot-b:#2D5BFF;--plot-c:#1F8A4C;--muted:#6B7487;--text:#1B2436}
 .fig{margin:0;width:330px;--fig-a:${c};--fig-b:#2D5BFF;--fig-c:#1F8A4C;--fig-d:#D0312D;--fig-muted:#6B7487;--fig-fill:#F3F5F9;color:#1B2436}.fig svg{width:100%;height:auto}.fig figcaption{font-size:10.5px;color:#55607A;text-align:center}
 .mf-legend{font-size:11px;color:#55607A}
+/* 10-minute fast notes */
+.fn-head{background:linear-gradient(110deg,#4C1D95,#6D28D9);color:#fff;border-radius:12px;padding:14px 20px;margin:0 0 10px}
+.fn-eyebrow{font:800 11px Figtree,sans-serif;letter-spacing:.12em;text-transform:uppercase;opacity:.9}
+.fn-title{font-size:24px;line-height:1.2;margin:4px 0 2px;color:#fff}
+.fn-sub{font-size:11.5px;opacity:.92}
+.fn-part{margin:0 0 4px}
+.fn-bar{display:flex;justify-content:space-between;align-items:center;background:var(--fc);color:#fff;border-radius:9px;padding:8px 14px;margin:10px 0 8px;font:800 15px Figtree,sans-serif}
+.fn-min{background:#0F172A;color:#fff;border-radius:999px;padding:2px 10px;font-size:11px}
+.fn-key{background:#EEF2F7;border-left:4px solid #64748B;border-radius:6px;padding:8px 12px;margin:0 0 8px}
+.fn-rhyme{border:1.6px dashed #D97706;background:#FEF3C7;border-radius:8px;padding:8px 12px;margin:0 0 8px;font-weight:700}
+.fn-rhyme-h span{color:#C2410C}.fn-rhyme-b{font-weight:600;margin-top:2px}
+.fn-sum ol{margin:0;padding-left:20px}.fn-sum li{margin:3px 0}
+table.fn-table{margin:0 0 8px}table.fn-table thead th{background:#E2E8F0;color:#0F172A;border-color:#CBD5E1}table.fn-table td{border-color:#CBD5E1}
+.fn-eg{background:#EEF2F7;border-left:4px solid #64748B;border-radius:6px;padding:8px 12px;margin:0 0 8px}.fn-step{margin:2px 0}
+.fn-trap{background:#FDE2E2;border-left:4px solid #DC2626;border-radius:6px;padding:8px 12px;margin:0 0 8px}.fn-trap-h{font-weight:800;margin-bottom:2px}.fn-trap ul{margin:0}
+.fn-q{border:1.4px solid #334155;border-radius:8px;padding:8px 12px;margin:0 0 8px}.fn-m{color:#55607A}
+.fn-lines i{display:block;height:24px;border-bottom:1px dashed #94A3B8}
+.fn-ms{background:#EEF2F7;border-left:4px solid #64748B;border-radius:6px;padding:8px 12px;margin:0 0 8px}.fn-ms ol{margin:4px 0 0}
 `;
 
   // ---------- content builders ----------
@@ -175,12 +193,12 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
       return page;
     };
     const over = () => body.scrollHeight > body.clientHeight + 1;
-    const isHead = (el) => el && el.nodeType === 1 && (/^H[1-4]$/.test(el.tagName) || el.classList.contains("bar") || el.classList.contains("banner") || el.classList.contains("keep"));
+    const isHead = (el) => el && el.nodeType === 1 && (/^H[1-4]$/.test(el.tagName) || el.classList.contains("bar") || el.classList.contains("banner") || el.classList.contains("keep") || el.classList.contains("fn-bar") || el.classList.contains("fn-head"));
     const splittable = (n) => {
       if (n.nodeType !== 1) return false;
       if (n.tagName === "TABLE") return !!(n.tBodies[0] && n.tBodies[0].rows.length > 1);
       if (n.tagName === "UL" || n.tagName === "OL") return n.children.length > 1;
-      return n.matches(".co,.concept,.plan,.sol,.grp,.box:not(.whole),.msq") && n.children.length > 1;
+      return n.matches(".co,.concept,.plan,.sol,.grp,.box:not(.whole),.msq,.fn-part,.fn-eg,.fn-sum,.fn-ms,.pcase,.case-text") && n.children.length > 1;
     };
     // Place `node` into `parent`; returns null when it fits fully, otherwise the part that still has to go.
     function place(parent, node) {
@@ -257,6 +275,39 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
    * Build and download a designed PDF.
    * opts: { subject, topics (array of topic objects), title, questions: number per topic (0 = none), filename }
    */
+  // 10-minute notes: no cover or contents, just the sheets, each topic starting on a new page.
+  async function fastPdf(doc, root, s, opts, prog, footLeft, title) {
+    const P = paginator(doc, root, footLeft.replace("Revision Notes", "10-minute notes"));
+    opts.topics.forEach((t, i) => {
+      prog.set(`Laying out ${t.title}`, 0.05 + (0.35 * i) / opts.topics.length);
+      P.breakPage();
+      const tmp = doc.createElement("div");
+      root.appendChild(tmp);
+      tmp.innerHTML = IB.fastHtml(t, { static: true });
+      IB.math(tmp);
+      const kids = Array.from(tmp.children);
+      root.removeChild(tmp);
+      kids.forEach((k) => P.add(k));
+    });
+    const all = P.pages;
+    all.forEach((p, i) => { const pn = p.querySelector(".pn"); if (pn) pn.textContent = `${i + 1} / ${all.length}`; });
+    const h2c = window.html2canvas.default || window.html2canvas.html2canvas || window.html2canvas;
+    const pdf = new window.jspdf.jsPDF({ unit: "pt", format: "a4", compress: true });
+    all.forEach((p) => p.remove());
+    for (let i = 0; i < all.length; i++) {
+      prog.set(`Rendering page ${i + 1} of ${all.length}`, 0.4 + (0.6 * i) / all.length);
+      root.appendChild(all[i]);
+      const canvas = await h2c(all[i], { scale: 2, backgroundColor: "#ffffff", logging: false, useCORS: true, width: PW, height: PH, windowWidth: PW, windowHeight: PH });
+      root.removeChild(all[i]);
+      if (i) pdf.addPage();
+      pdf.addImage(canvas.toDataURL("image/jpeg", 0.86), "JPEG", 0, 0, 595.28, 841.89, undefined, "FAST");
+    }
+    pdf.setProperties({ title: `${title} - 10-minute notes`, subject: s.name, creator: "IB Revision Hub" });
+    prog.set("Done", 1);
+    IB.download(opts.filename || `IB-${s.short.replace(/\s+/g, "-")}-${title.replace(/[^\w一-鿿]+/g, "-")}-10min-notes.pdf`, pdf.output("blob"), "application/pdf");
+    return all.length;
+  }
+
   IB.pdfNotes = async function (opts) {
     const s = IB.subjects[opts.subject];
     const c = HEX[s.id] || "#2D5BFF";
@@ -293,6 +344,7 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
         pick.concat(ext.filter((q) => !pick.includes(q))).slice(0, opts.questions + 1).forEach((q) => qset.push(q));
       });
 
+      if (opts.fast) return await fastPdf(doc, root, s, opts, prog, footLeft, title);
       // cover
       const cover = doc.createElement("div");
       cover.className = "page cover";
@@ -455,6 +507,7 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
 .msq ul{margin:4px 0 0}
 .mcqgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:0 0 14px}
 .mcqgrid div{border:1.4px solid #111;padding:5px 8px;font:700 12px "JetBrains Mono",monospace}
+.pcase{font-size:12.6px;margin:0 0 10px}.pcase .case-text p{margin:0 0 7px}.pcase .case-cap{font-weight:800;margin:8px 0 4px}
 `;
   const linesFor = (q) => q.type === "mcq" ? 0 : q.type === "extended" ? Math.min(34, Math.max(14, Math.round(q.marks * 2.2))) : q.numeric ? Math.min(14, 3 + q.marks * 2) : Math.min(16, Math.max(3, Math.round(q.marks * 2.2)));
 
@@ -468,7 +521,14 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
     if (!qs.length) throw new Error("No questions to export.");
     const s = opts.subject && IB.subjects[opts.subject];
     const c = (s && HEX[s.id]) || "#2D5BFF";
-    const mcq = qs.filter((q) => q.type === "mcq"), written = qs.filter((q) => q.type !== "mcq");
+    const mcq = qs.filter((q) => q.type === "mcq");
+    // parts of the same data-response case stay together, in part order, where the case first appears
+    const written = [];
+    qs.filter((q) => q.type !== "mcq").forEach((q) => {
+      if (!q.caseId) return written.push(q);
+      if (written.some((x) => x.caseId === q.caseId)) return;
+      qs.filter((x) => x.caseId === q.caseId).sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true })).forEach((x) => written.push(x));
+    });
     const ordered = mcq.concat(written);
     const total = ordered.reduce((n, q) => n + (q.marks || 0), 0);
     const minutes = opts.minutes || Math.max(10, Math.round(total * 1.3));
@@ -539,9 +599,15 @@ u.kw{text-decoration:underline;text-decoration-color:#D0312D;text-decoration-thi
       }
       if (written.length) {
         if (mcq.length) { P.breakPage(); addHtml(`<div class="secbar keep">Section B · Written answers</div>`); }
+        const shownCase = {};
         written.forEach((q) => {
           n++;
-          const parts = [`<div class="pq-h keep"><b>${n}.</b><div class="pq-t">${q.q} <span class="mk">[${q.marks}]</span>${opts.showTopics ? `<span class="tp">${IB.esc(topicLabel(q))}</span>` : ""}</div></div>`];
+          const c = q.caseId && IB.cases[q.caseId];
+          if (c && !shownCase[c.id]) {
+            shownCase[c.id] = 1;
+            addHtml(`<div class="secbar keep">${IB.esc(c.title.replace(/<[^>]+>/g, ""))}</div><div class="pcase">${IB.caseSource(c)}</div>`);
+          }
+          const parts = [`<div class="pq-h keep"><b>${n}.</b><div class="pq-t">${c ? `<b>${q.part}</b> ${q.stem}` : q.q} <span class="mk">[${q.marks}]</span>${opts.showTopics ? `<span class="tp">${IB.esc(topicLabel(q))}</span>` : ""}</div></div>`];
           parts.push(`<div class="box${linesFor(q) <= 10 ? " whole" : ""}">${"<i></i>".repeat(linesFor(q))}</div>`);
           addHtml(parts.join(""));
         });
