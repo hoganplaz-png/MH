@@ -80,7 +80,7 @@ IB.page = async function () {
       ${league.length > 1 ? league.map((f, i) => `<a class="league-row ${f.isMe ? "me" : ""} ${i === 0 ? "first" : ""}" href="${f.isMe ? "progress.html#game" : "friends.html?friend=" + f.uid}">
         <span class="rk">${i + 1}</span>${av(f.name, f.photo, colorOf(f.uid))}
         <span class="nm"><strong>${IB.esc(f.isMe ? "You" : f.name)}</strong><span class="small muted">Lv ${(f.public || {}).level || 1} · 🔥${(f.public || {}).streak || 0}</span></span>
-        <span class="lbar"><span style="width:${Math.round((wkXp(f) / top) * 100)}%"></span></span><span class="mono">${wkXp(f).toLocaleString()}</span></a>`).join("") : `<div class="empty"><div class="empty-icon">🏆</div><p class="muted">Add a friend to start a league. Share your code or invite link →</p></div>`}
+        <span class="lbar"><span style="width:${Math.round((wkXp(f) / top) * 100)}%"></span></span><span class="mono">${wkXp(f).toLocaleString()}</span></a>`).join("") : `<div class="empty"><div class="empty-icon">🏆</div><p class="muted">Add a friend to start a league. Share your code or invite link</p></div>`}
     </section>
     <aside class="stack">
       <section class="card" data-reveal><h3 style="margin-top:0">Add a friend</h3>

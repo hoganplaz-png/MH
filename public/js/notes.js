@@ -152,7 +152,7 @@ IB.page = function () {
     </div>
     <div class="btn-row no-print" style="justify-content:space-between;margin-top:16px">
       ${prev ? `<a class="btn" href="#" data-t="${prev.id}">← ${IB.esc(prev.title)}</a>` : "<span></span>"}
-      ${next ? `<a class="btn primary" href="#" data-t="${next.id}">${IB.esc(next.title)} →</a>` : ""}
+      ${next ? `<a class="btn primary" href="#" data-t="${next.id}">Next: ${IB.esc(next.title)}</a>` : ""}
     </div>`;
 
     IB.qsa(".jumpbar a", c).forEach((a) => (a.onclick = (e) => {
