@@ -10,7 +10,7 @@ ctx.window = ctx;
 ctx.document = { addEventListener() {}, documentElement: { dataset: {} } };
 ctx.localStorage = { getItem: () => null, setItem() {} };
 vm.createContext(ctx);
-for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "data/econ-bank.js", "data/chem-bank.js", "data/geo-bank.js", "data/math-bank.js", "data/bio-bank.js", "data/engb-bank.js", "data/chia-bank.js", "data/phys.js", "data/phys2.js", "data/phys-bank.js", "data/econ-hl.js", "data/chem-hl.js", "data/math-hl.js", "data/bio-hl.js", "data/geo-hl.js", "data/hl-bank.js", "data/frameworks.js", "examframes.js", ...fs.readdirSync(path.join(root, "data/frames")).filter((f) => f.endsWith(".js")).sort().map((f) => "data/frames/" + f), "data/yue.js", "fastnotes.js", "data/cases/econ.js", "data/cases/econ-micro.js", "data/cases/econ-macro.js", "data/cases/chia.js", ...fs.readdirSync(path.join(root, "data/fast")).filter((f) => f.endsWith(".js")).sort().map((f) => "data/fast/" + f), "data/markdb.js", "marker.js", "game.js", "generators.js", "bankbuild.js", "plot.js"]) {
+for (const f of ["app.js", "data/econ.js", "data/chem.js", "data/geo.js", "data/math.js", "data/bio.js", "data/engb.js", "data/chia.js", "data/econ-plus.js", "data/chem-plus.js", "data/geo-plus.js", "data/math-plus.js", "data/bio-plus.js", "data/engb-plus.js", "data/chia-plus.js", "data/econ-bank.js", "data/chem-bank.js", "data/geo-bank.js", "data/math-bank.js", "data/bio-bank.js", "data/engb-bank.js", "data/chia-bank.js", "data/phys.js", "data/phys2.js", "data/phys-bank.js", "data/econ-hl.js", "data/chem-hl.js", "data/math-hl.js", "data/bio-hl.js", "data/geo-hl.js", "data/hl-bank.js", "data/frameworks.js", "examframes.js", ...fs.readdirSync(path.join(root, "data/frames")).filter((f) => f.endsWith(".js")).sort().map((f) => "data/frames/" + f), "data/yue.js", "fastnotes.js", "data/cases/econ.js", "data/cases/econ-micro.js", "data/cases/econ-macro.js", "data/cases/chia.js", ...fs.readdirSync(path.join(root, "data/fast")).filter((f) => f.endsWith(".js")).sort().map((f) => "data/fast/" + f), "data/markdb.js", "data/econ-diagrams.js", "marker.js", "game.js", "generators.js", "bankbuild.js", "plot.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, f), "utf8"), ctx, { filename: f });
 }
 const IB = ctx.IB;
@@ -163,6 +163,47 @@ for (const tid of IB.generatorTopics()) {
   const q = { id: "t", subject: "econ", topic: "econ-2", marks: 2, ms: ["Goods consumed together [1]", "A rise in the price of one leads to a fall in demand for the other [1]"] };
   if (IB.offlineMark(q, "Goods used together, so a fall in the price of one leads to a fall in demand for the other").score !== 1) errors.push("marker: reversed direction was not penalised");
   if (IB.offlineMark(q, "They are consumed together; when the price of one rises, demand for the other falls.").score !== 2) errors.push("marker: equivalent wording (OWTTE) was not accepted");
+}
+
+// Economics diagrams: every diagram question maps to a diagram markscheme, every model diagram renders,
+// a full diagram checklist earns the diagram points, and realistic student answers are marked fairly.
+{
+  const E = IB.econDiagrams;
+  for (const [id, d] of Object.entries(E.types)) {
+    if (d.items.length < 4 || !d.items.some((it) => it.key) || !d.errors.length) errors.push(`diagram ${id}: needs 4+ checklist points, a key point and common errors`);
+    if (d.model && /NaN|undefined/.test(IB.plot(d.model))) errors.push(`diagram ${id}: model diagram has NaN/undefined`);
+  }
+  const econ = IB.subjects.econ.allTopics.flatMap((t) => t.questions);
+  const byId = Object.fromEntries(econ.map((q) => [q.id, q]));
+  let asked = 0, lost = 0, back = 0;
+  for (const q of econ) {
+    if (!E.asks(q)) continue;
+    asked++;
+    const type = E.best(q);
+    if (!E.types[type]) { errors.push(`${q.id}: no diagram markscheme`); continue; }
+    if (q.type === "extended") continue;
+    const explain = q.ms.filter((p, i) => !E.isPoint(p, i)).map((p) => p.replace(/\[[^\]]*\]/g, "")).join(". ");
+    const full = { type, ticks: E.types[type].items.map(() => true), uploaded: true };
+    const a = IB.offlineMark(q, explain).score, b = IB.offlineMark(q, explain, { diagram: full }).score;
+    lost += q.marks - a; back += b - a;
+  }
+  if (asked < 200) errors.push(`only ${asked} Economics diagram questions found`);
+  if (back < lost * 0.9) errors.push(`diagram checklist restores only ${back} of ${lost} diagram marks`);
+  const fair = [
+    ["econ-7-q14", 3, "Steel production creates air pollution which is a cost to third parties such as people living nearby who get breathing problems. So the social cost is higher than the private cost, the MSC curve is above the MPC curve. Firms only look at their own private costs so they produce at Qm where MPB = MPC, which is more than the socially optimal Qopt where MSB = MSC. Too much steel is made, there is overallocation of resources and a welfare loss."],
+    ["econ-13-q10", 3, "Contractionary monetary policy means the central bank raises the interest rate. Borrowing becomes more expensive so households spend less on consumption and firms invest less. Aggregate demand falls from AD1 to AD2, so the average price level falls and demand-pull inflation is reduced, although real GDP also falls."],
+    ["econ-15-q4", 3, "A tariff is a tax on imports. It raises the domestic price from Pw to Pw + t. Domestic producers can now supply more because the price is higher, so domestic production rises. Consumers pay a higher price and buy less, so consumer surplus falls. Imports fall."],
+    ["econ-6-q16", 2, "A maximum price below the equilibrium means landlords supply fewer flats, while more people want to rent at the lower rent. This creates a shortage (excess demand). Some people cannot find a flat, so there may be waiting lists and black markets, and the quality of flats may fall."],
+    ["econ-10-q5", 3, "When consumers are less confident they spend less and save more. Consumption is a component of AD so AD shifts left. Real GDP falls below the full employment level, creating a recessionary gap with higher unemployment, and the price level falls."],
+    ["econ-c11a-7", 2, "Paragraph 3 says wages rose and oil import costs rose. Firms' costs of production increase so SRAS shifts to the left. The average price level rises - this is cost-push inflation - and real output falls."],
+  ];
+  for (const [id, min, ans] of fair) if (byId[id] && IB.offlineMark(byId[id], ans).score < min) errors.push(`marker: fair student answer to ${id} scored below ${min}`);
+  const wrong = [
+    ["econ-7-q14", "Steel production is a negative production externality so the MSC is below the MPC. The free market underproduces steel compared with the social optimum, so there is underproduction."],
+    ["econ-13-q10", "Contractionary monetary policy increases aggregate demand, AD shifts right, so the price level rises."],
+    ["econ-c11a-7", "Higher oil costs mean aggregate demand shifts left, price level falls."],
+  ];
+  for (const [id, ans] of wrong) if (byId[id] && IB.offlineMark(byId[id], ans).score > 1) errors.push(`marker: wrong diagram answer to ${id} scored more than 1`);
 }
 
 console.log(`${IB.subjectList().length} subjects, ${IB.subjectList().reduce((n, s) => n + s.allTopics.length, 0)} topics, ${total} bank questions, ${IB.generatorTopics().length} generator topics (${gens} samples checked)`);

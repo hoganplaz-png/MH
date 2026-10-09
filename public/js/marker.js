@@ -28,7 +28,7 @@
     groups.forEach(([gid, g]) => {
       g.forEach((entry) => {
         const e = entry.toLowerCase().trim();
-        if (/\s|-/.test(e) && e.split(/[\s-]+/).length > 1) phrases.push([new RegExp("(^|[^a-z0-9])" + e.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/[\s-]+/g, "[\\s-]+") + "(?=$|[^a-z0-9])", "g"), gid, e.length]);
+        if (/\s|-/.test(e) && e.split(/[\s-]+/).length > 1) phrases.push([new RegExp("(^|[^a-z0-9])" + e.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/[\s-]+/g, "[\\s-]+") + (/[a-z]$/.test(e) ? "(?:s|es)?" : "") + "(?=$|[^a-z0-9])", "g"), gid, e.length]);
         else if (e.length >= 2) {
           const k = stem(e);
           if (!word.has(k)) word.set(k, new Set());
@@ -89,13 +89,22 @@
   function polarClash(toks, ans, sid) {
     const { opposite } = lex(sid);
     const pol = (k) => [...k.keys].find((x) => opposite.has(x));
+    const usable = (t) => t && !t.neg && !pol(t) && (t.phrase || (t.s && !DESCRIPTOR.has(t.w) && !VERB.has(t.s)));
     for (let i = 0; i < toks.length; i++) {
       const g = pol(toks[i]);
       if (!g) continue;
-      let j = -1;
-      for (let d = 1; d <= 3 && j < 0; d++) for (const c of [i + d, i - d]) if (c >= 0 && c < toks.length && !toks[c].neg && !pol(toks[c]) && toks[c].s && !DESCRIPTOR.has(toks[c].w)) { j = c; break; }
-      if (j < 0) continue;
-      const target = toks[j], bad = opposite.get(g);
+      // "price level rises and real GDP falls": the direction belongs to the word before it or the word after it,
+      // so it is only a clash when every reading clashes.
+      const cands = [];
+      for (const dir of [1, -1]) for (let d = 1; d <= 3; d++) { const c = i + d * dir; if (c < 0 || c >= toks.length || pol(toks[c])) break; if (usable(toks[c])) { cands.push(c); break; } }
+      if (!cands.length) continue;
+      const verdicts = cands.map((j) => clashAt(toks[j], g));
+      if (verdicts.every((v) => v === "opp")) return `direction: "${toks[i].w} … ${toks[cands[0]].w}"`;
+    }
+    return null;
+
+    function clashAt(target, g) {
+      const bad = opposite.get(g);
       let same = false, opp = false;
       ans.forEach((a, ai) => {
         if (![...target.keys].some((x) => a.keys.has(x))) return;
@@ -108,13 +117,18 @@
           if (s1 && o1) { same = true; break; } // "price rises, demand falls": both readings possible
         }
       });
-      if (opp && !same) return `direction: "${toks[i].w} … ${target.w}"`;
+      return opp && !same ? "opp" : same ? "same" : "none";
     }
-    return null;
   }
+  // Linking verbs never carry the thing a direction word describes.
+  const VERB = new Set("creat caus lead result make mak becom mean bring giv tak get"
+    .split(" "));
 
   // Everyday words that appear in many definitions; never essential on their own.
-  const WEAK = new Set("good goods product products item items thing things person people way ways process type types kind form forms part parts some many much".split(" ").map((w) => stem(w)));
+  const WEAK = new Set(("good goods product products item items thing things person people way ways process type types kind form forms part parts some many much " +
+    "individual individuals consider considers considered previously relatively consequence consequences possible possibly likely particular particularly especially generally usually " +
+    "additional situation significant significantly instead compared including together whether approximately different otherwise respectively available actually typically eventually " +
+    "therefore however although following whole certain various overall").split(" ").map((w) => stem(w)));
   const isKey = (k, sid, terms) => !(k.s && WEAK.has(k.s)) && (k.num !== undefined || [...k.keys].some((x) => x.startsWith("§s")) || terms.has(k.s) || !!(k.s && k.s.length >= 8));
 
   // Split a markscheme point into the alternatives that each earn it.
@@ -246,13 +260,15 @@
   const BAND = /\[(\d+)\s*[-–]\s*(\d+)\]/;
   const FEATURE_OF = [[/diagram/i, "diagram"], [/example|case stud|real-world|data|named/i, "example"], [/evaluat|balanced|counter|limitation|strengths? and/i, "evaluation"], [/judgement|conclusion|supported/i, "judgement"], [/defin/i, "definition"], [/mechanism|explain|analys|chain|links?/i, "analysis"]];
 
-  function markExtended(q, answer, sid, terms) {
+  function markExtended(q, answer, sid, terms, dg) {
     const max = q.marks || 1;
     const ans = tokens(answer, sid);
     const text = plain(answer);
     const nWords = text.split(/\s+/).filter(Boolean).length + (text.match(/[\u3400-\u9fff]/g) || []).length / 2;
     const feats = {};
     Object.entries(DB.essay || {}).forEach(([k, f]) => (feats[k] = f.re.test(text)));
+    // An uploaded diagram that meets most of its checklist counts as "diagram used"; a weak one does not.
+    if (dg && dg.uploaded) feats.diagram = dg.got / dg.n >= 0.6;
     let total = 0;
     const awarded = [], missing = [];
     const bands = (q.ms || []).filter((p) => BAND.test(p));
@@ -288,24 +304,54 @@
   }
 
   // ---------- main ----------
-  IB.offlineMark = function (q, answer) {
+  // Diagram from the "Your diagram" panel: { type, ticks, uploaded }. Returns the checklist result and how many
+  // diagram markscheme points it earns.
+  function diagramResult(q, d) {
+    const E = IB.econDiagrams;
+    if (!E || !d || !d.uploaded || !E.types[d.type]) return null;
+    const items = E.types[d.type].items;
+    const ticks = items.map((_, i) => !!(d.ticks || [])[i]);
+    const pts = E.points(q);
+    return { type: d.type, name: E.types[d.type].name, uploaded: true, n: items.filter((it, i) => !E.optional(it) || ticks[i]).length, got: ticks.filter(Boolean).length, pts, earned: E.score(d.type, ticks, pts.length), missingKey: items.filter((it, i) => it.key && !ticks[i]).map((it) => it.t), ai: !!d.ai };
+  }
+
+  IB.offlineMark = function (q, answer, opts = {}) {
     const max = q.marks || 1;
     const sid = q.subject || (q.topic || "").split("-")[0];
-    if (!String(answer || "").trim()) return { score: 0, max, awarded: [], missing: (q.ms || []).slice(), summary: "No answer given.", offline: true };
+    const dg = diagramResult(q, opts.diagram);
+    if (!String(answer || "").trim() && !dg) return { score: 0, max, awarded: [], missing: (q.ms || []).slice(), summary: "No answer given.", offline: true };
     const t = IB.topic && IB.topic(q.topic);
     const terms = new Set(((t && t.terms) || []).flatMap(([k]) => tokens(k, sid).map((x) => x.s).filter(Boolean)));
     let fb;
     if (q.numeric) fb = markNumeric(q, answer, sid);
     else if (sid === "chia" || /[\u3400-\u9fff]{6,}/.test(plain(q.ms.join("")))) fb = markChinese(q, answer);
-    else if (q.type === "extended" || (q.ms || []).some((p) => BAND.test(p))) fb = markExtended(q, answer, sid, terms);
+    else if (q.type === "extended" || (q.ms || []).some((p) => BAND.test(p))) fb = markExtended(q, answer, sid, terms, dg);
     else {
       const r = markPoints(q, answer, sid, terms);
+      // Diagram points are earned by the drawn diagram (checklist), however the written answer describes it.
+      if (dg && dg.pts.length) {
+        const credited = dg.pts.filter((p) => r.awarded.includes(p)).length;
+        let extra = Math.max(0, dg.earned - credited);
+        r.missing = r.missing.filter((p) => {
+          if (extra > 0 && dg.pts.includes(p)) { extra--; r.awarded.push(p); return false; }
+          return true;
+        });
+        r.awarded.sort((x, y) => q.ms.indexOf(x) - q.ms.indexOf(y));
+      }
       const counted = r.awarded.length + r.missing.length || 1;
       let score = Math.min(max, Math.round((r.awarded.length / counted) * max));
       if (counted === max) score = Math.min(max, r.awarded.length);
       fb = { score, max, awarded: r.awarded, missing: r.missing, hints: r.hints, summary: r.awarded.length === counted ? "Every markscheme point found." : `${r.awarded.length} of ${counted} markscheme points found.` };
       const words = plain(answer).split(/\s+/).filter(Boolean).length;
-      if (words < 4 && max > 1) { fb.score = Math.min(fb.score, 1); fb.summary += " Answer too brief for more than 1 mark."; }
+      if (words < 4 && max > 1) {
+        const cap = dg ? Math.min(max, 1 + dg.earned) : 1;
+        if (fb.score > cap) { fb.score = cap; fb.summary += dg ? " Add a written explanation of your diagram to earn the explanation marks." : " Answer too brief for more than 1 mark."; }
+      }
+    }
+    if (dg) {
+      fb.diagram = dg;
+      fb.summary += ` Diagram (${dg.name}): ${dg.got}/${dg.n} checklist points${dg.pts.length ? ` → ${dg.earned}/${dg.pts.length} diagram mark${dg.pts.length > 1 ? "s" : ""}` : ""}${dg.ai ? " (checked by AI)" : " (self-checked)"}.`;
+      if (dg.missingKey.length) fb.hints = (fb.hints || []).concat(dg.missingKey.map((t) => "Diagram must show: " + t));
     }
     const errs = wrongAnswers(sid, answer, q);
     if (errs.length && fb.score > 0) { fb.score = Math.max(0, fb.score - 1); }

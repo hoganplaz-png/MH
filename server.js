@@ -130,6 +130,31 @@ const GEN_SCHEMA = {
   additionalProperties: false,
 };
 
+const DIAGRAM_SYSTEM = `You are a senior IB Economics examiner checking a student's hand-drawn diagram (a photo or screenshot).
+Judge only what is visible in the image against each checklist point, the way an examiner awards diagram marks:
+- A point is met only if it is clearly drawn and labelled; do not give credit for things you have to guess.
+- Accept equivalent IB labels (e.g. "APL" for average price level, "Real GDP" or "Y" for real output, "D" or "AR").
+- If the image is not an economics diagram, or is unreadable, mark every point as not met and say why in the summary.
+- Notes are short (under 20 words), specific and written to the student.`;
+
+const DIAGRAM_SCHEMA = {
+  type: "object",
+  properties: {
+    items: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: { ok: { type: "boolean" }, note: { type: "string" } },
+        required: ["ok", "note"],
+        additionalProperties: false,
+      },
+    },
+    summary: { type: "string", description: "One or two sentences: overall verdict and the single most important fix" },
+  },
+  required: ["items", "summary"],
+  additionalProperties: false,
+};
+
 // ---------- helpers ----------
 
 function sendJson(res, status, body) {
@@ -214,6 +239,46 @@ Mark the student answer out of ${max}.`;
   result.score = Math.max(0, Math.min(max, Math.round(Number(result.score) || 0)));
   result.max = max;
   sendJson(res, 200, result);
+}
+
+async function handleMarkDiagram(req, res) {
+  const b = await readBody(req, 6_000_000);
+  const m = String(b.image || "").match(/^data:(image\/(?:jpeg|png|webp|gif));base64,([A-Za-z0-9+/=]+)$/);
+  if (!m) return sendJson(res, 400, { error: "Send the diagram as a JPEG or PNG image." });
+  const items = (Array.isArray(b.items) ? b.items : []).slice(0, 12).map((x) => str(x, 400));
+  if (!items.length) return sendJson(res, 400, { error: "No checklist sent." });
+  const text = `Diagram expected: ${str(b.diagram, 120)}
+
+<question>
+${str(b.question, 4000)}
+</question>
+
+<markscheme>
+${(Array.isArray(b.ms) ? b.ms : []).map((p) => "- " + str(p, 1000)).join("\n")}
+</markscheme>
+
+<diagram_checklist>
+${items.map((t, i) => `${i + 1}. ${t}`).join("\n")}
+</diagram_checklist>
+
+<common_errors>
+${(Array.isArray(b.errors) ? b.errors : []).slice(0, 8).map((t) => "- " + str(t, 300)).join("\n")}
+</common_errors>
+
+Check the student's diagram in the image. Return exactly ${items.length} items, in checklist order.`;
+  const message = await client.beta.messages.create({
+    model: MODEL,
+    max_tokens: 4000,
+    system: DIAGRAM_SYSTEM,
+    messages: [{ role: "user", content: [{ type: "image", source: { type: "base64", media_type: m[1], data: m[2] } }, { type: "text", text }] }],
+    output_config: { effort: "medium", format: { type: "json_schema", schema: DIAGRAM_SCHEMA } },
+    betas: [FALLBACK_BETA],
+    fallbacks: "default",
+  });
+  if (message.stop_reason === "refusal") return sendJson(res, 422, { error: "The AI declined this request." });
+  const out = JSON.parse(textOf(message));
+  out.items = items.map((_, i) => ({ ok: !!(out.items[i] && out.items[i].ok), note: String((out.items[i] && out.items[i].note) || "") }));
+  sendJson(res, 200, out);
 }
 
 async function handleGenerate(req, res) {
@@ -331,6 +396,7 @@ const server = http.createServer(async (req, res) => {
       if (rateLimited(req)) return sendJson(res, 429, { error: "Hourly AI limit reached - try again later." });
       if (!client) return sendJson(res, 503, { error: "AI is not configured on this server. Set ANTHROPIC_API_KEY and restart." });
       if (req.url === "/api/mark") return await handleMark(req, res);
+      if (req.url === "/api/mark-diagram") return await handleMarkDiagram(req, res);
       if (req.url === "/api/generate") return await handleGenerate(req, res);
       if (req.url === "/api/tutor") return await handleTutor(req, res);
       if (req.url === "/api/json") return await handleJson(req, res);
