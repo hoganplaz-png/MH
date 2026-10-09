@@ -858,3 +858,81 @@ table.mf-table th, table.mf-table td { display: table-cell; }
 .fig svg { width: 100%; max-width: 420px; height: auto; display: block; margin: 0 auto; }
 .fig figcaption { font-size: .85rem; color: var(--muted); text-align: center; margin-top: 4px; }
 .fig text { fill: currentColor; font-family: inherit; }
+
+/* ---------- animated background ----------
+   Two layers, both pure CSS and transform/opacity-only so they stay on the GPU:
+   1. the page ground: faint graph paper plus slow-drifting cobalt / highlighter glows (body::before, body::after)
+   2. the dark header bands: a slow aurora sheen behind the floating symbols (.band::before)
+   Everything is still under prefers-reduced-motion (the global rule above stops the motion) and hidden in print. */
+:root {
+  --bg-glow-a: rgba(45, 91, 255, .13);
+  --bg-glow-b: rgba(255, 197, 61, .16);
+  --bg-glow-c: rgba(124, 58, 237, .09);
+  --bg-grid: rgba(15, 27, 45, .045);
+  --band-glow-a: rgba(45, 91, 255, .42);
+  --band-glow-b: rgba(124, 58, 237, .30);
+  --band-glow-c: rgba(255, 197, 61, .14);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-glow-a: rgba(123, 152, 255, .14); --bg-glow-b: rgba(255, 197, 61, .07); --bg-glow-c: rgba(151, 117, 250, .10);
+    --bg-grid: rgba(234, 240, 250, .035);
+  }
+}
+:root[data-theme="dark"] {
+  --bg-glow-a: rgba(123, 152, 255, .14); --bg-glow-b: rgba(255, 197, 61, .07); --bg-glow-c: rgba(151, 117, 250, .10);
+  --bg-grid: rgba(234, 240, 250, .035);
+}
+body::before, body::after { content: ""; position: fixed; pointer-events: none; z-index: -1; }
+/* graph paper, fading out towards the bottom so long pages stay calm */
+body::before {
+  inset: -48px;
+  background-image:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000 30%, transparent 85%);
+          mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, #000 30%, transparent 85%);
+  animation: bg-grid-pan 40s linear infinite;
+}
+/* soft glows, drawn as gradients (no blur filter) on an oversized layer that drifts and turns slowly */
+body::after {
+  inset: -30vmax;
+  background:
+    radial-gradient(28vmax 28vmax at 30% 32%, var(--bg-glow-a), transparent 70%),
+    radial-gradient(24vmax 24vmax at 72% 40%, var(--bg-glow-b), transparent 70%),
+    radial-gradient(30vmax 30vmax at 55% 72%, var(--bg-glow-c), transparent 70%);
+  will-change: transform;
+  animation: bg-drift 48s ease-in-out infinite alternate;
+}
+@keyframes bg-grid-pan { to { transform: translate3d(48px, 48px, 0); } }
+@keyframes bg-drift {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate3d(4vmax, -3vmax, 0) rotate(12deg) scale(1.06); }
+  100% { transform: translate3d(-3vmax, 2vmax, 0) rotate(-8deg) scale(.97); }
+}
+
+/* aurora behind the dark header bands */
+.band::before {
+  content: ""; position: absolute; inset: -40% -20%; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(40% 55% at 18% 50%, var(--band-glow-a), transparent 70%),
+    radial-gradient(35% 50% at 82% 48%, var(--band-glow-b), transparent 70%),
+    radial-gradient(30% 45% at 60% 90%, var(--band-glow-c), transparent 70%);
+  /* fade in below the sticky header so the header and band still read as one dark surface */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 20%, #000 42%);
+          mask-image: linear-gradient(to bottom, transparent 20%, #000 42%);
+  will-change: transform;
+  animation: band-aurora 26s ease-in-out infinite alternate;
+}
+@keyframes band-aurora {
+  0% { transform: translate3d(-4%, 0, 0) rotate(0deg); opacity: .85; }
+  50% { transform: translate3d(3%, -4%, 0) rotate(6deg); opacity: 1; }
+  100% { transform: translate3d(5%, 3%, 0) rotate(-4deg); opacity: .8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body::after, .band::before { animation: none !important; }
+}
+@media print {
+  body::before, body::after, .band::before { display: none !important; }
+}
