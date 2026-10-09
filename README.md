@@ -31,6 +31,15 @@ npm start          # http://localhost:3000
 npm run check      # validates every question, generator and the marker
 ```
 
+## Put it online with Claude (IA & EE Coach, AI tutor)
+
+Firebase Hosting only serves files, so the Claude features need the Node server. The repo includes `render.yaml`:
+
+1. Create an API key at console.anthropic.com (add some credit).
+2. On render.com: **New → Blueprint**, pick this repository.
+3. Fill in `ANTHROPIC_API_KEY`, and set `ACCESS_CODE` to a code you share with your students (stops strangers spending your credit). `RATE_LIMIT` caps AI requests per visitor per hour.
+4. Deploy, then open `https://<your-app>.onrender.com/coach.html`.
+
 ## Put it online with Google sign-in
 
 See **[SETUP.md](SETUP.md)**. In short: create a free Firebase project, turn on Google sign-in and Firestore, paste the web config into `public/js/firebase-config.js`, then run `firebase deploy`. Without that config the site still works fully, in guest mode.
