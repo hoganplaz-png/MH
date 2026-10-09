@@ -911,7 +911,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     const page = document.body.dataset.page || "";
     const link = (href, label, id) => `<a href="${href}" class="${page === id ? "active" : ""}">${label}</a>`;
     const header = IB.el(`<header class="site-header"><div class="container nav">
-      <a class="brand" href="index.html"><span class="brand-mark">IB</span><span class="brand-text">Revision Hub</span></a>
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">IB</span><span class="brand-text">Revision Hub</span></a>
       <nav class="nav-links" id="navLinks">
         ${link("notes.html", "Notes", "notes")}
         ${link("questionbank.html", "Questions", "bank")}
@@ -934,7 +934,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
     document.body.prepend(header);
     document.body.appendChild(
       IB.el(`<footer class="site-footer"><div class="container">
-      <p><strong>IB Revision Hub</strong> · Economics SL/HL · Chemistry SL/HL · Physics SL/HL · Geography SL/HL · Mathematics AA SL/HL · Biology SL/HL · English B HL · 中文A 語言與文學 SL</p>
+      <p><strong>IB Revision Hub</strong> covers Economics, Chemistry, Physics, Geography, Mathematics AA and Biology at SL and HL, English B HL and 中文A 語言與文學 SL.</p>
       <p>All notes and questions are original IB-style material written for revision. They are not official IB past-paper questions and this site is not affiliated with or endorsed by the International Baccalaureate Organization. Get official past papers and markschemes from your school or the IB store.</p>
     </div></footer>`)
     );

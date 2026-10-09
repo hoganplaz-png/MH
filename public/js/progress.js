@@ -81,13 +81,13 @@ IB.page = function () {
 
     const saved = Object.keys(d.flags).map(IB.question).filter(Boolean);
     IB.qs("#saved").innerHTML = saved.length
-      ? `<ul>${saved.map((q) => `<li><span class="pill ${q.subject}">${IB.subjects[q.subject].short}</span> ${IB.esc(q.q.replace(/<[^>]+>/g, "").slice(0, 110))}… <a href="questionbank.html?subject=${q.subject}&topic=${q.topic}">open</a></li>`).join("")}</ul><a class="btn small" href="questionbank.html">Practise saved questions (Status → Saved)</a>`
+      ? `<ul>${saved.map((q) => `<li><span class="pill ${q.subject}">${IB.subjects[q.subject].short}</span> ${IB.esc(q.q.replace(/<[^>]+>/g, "").slice(0, 110))}… <a href="questionbank.html?subject=${q.subject}&topic=${q.topic}">open</a></li>`).join("")}</ul><a class="btn small" href="questionbank.html">Practise saved questions (Status Saved)</a>`
       : `<p class="muted" style="margin:0">Use "☆ Save for review" on any question to build a personal revision list.</p>`;
 
     const ex = d.exams.slice().reverse();
     IB.qs("#exams").innerHTML = ex.length
       ? `<table><tr><th>Date</th><th>Activity</th><th>Score</th><th>%</th><th>Grade est.</th></tr>${ex.map((e) => { const p = IB.pct(e.sc, e.mx); return `<tr><td>${IB.fmtDate(e.at)}</td><td>${IB.esc(e.title)}</td><td>${e.sc}/${e.mx}</td><td>${p}%</td><td>${IB.grade(p, e.s)}</td></tr>`; }).join("")}</table>`
-      : `<p class="muted" style="margin:0">No quizzes or mocks yet. <a href="practice.html">Start one →</a></p>`;
+      : `<p class="muted" style="margin:0">No quizzes or mocks yet. <a href="practice.html">Start one</a></p>`;
 
     IB.qs("#exp").onclick = () => IB.download(`ib-revision-progress-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(IB.store.get(), null, 1), "application/json");
     IB.qs("#csv").onclick = () => {
