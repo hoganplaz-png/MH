@@ -13,6 +13,34 @@
   };
   const dp = (x, d = 2) => Number(x.toFixed(d));
   const money = (x) => x.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  // Maths formatting: 3 s.f. keeping trailing zeros (19.0, not 19), exact fractions, and polynomials without 1x / 0x terms.
+  const s3 = (x) => (Math.abs(x) >= 1000 ? String(Math.round(x)) : Number(x).toPrecision(3));
+  const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
+  const fracTex = (n, d) => {
+    if (d < 0) (n = -n), (d = -d);
+    const g = gcd(n, d) || 1;
+    (n /= g), (d /= g);
+    return d === 1 ? String(n) : `${n < 0 ? "-" : ""}\\frac{${Math.abs(n)}}{${d}}`;
+  };
+  const poly = (terms) => {
+    let s = "";
+    terms.forEach(([c, v]) => {
+      if (!c) return;
+      const coef = Math.abs(c) === 1 && v ? "" : String(Math.abs(c));
+      s += (c < 0 ? (s ? " - " : "-") : s ? " + " : "") + coef + v;
+    });
+    return s || "0";
+  };
+  // like poly, but each coefficient is the fraction n/d: [[n, d, "x^3"], ...]
+  const fpoly = (terms) => {
+    let s = "";
+    terms.forEach(([n, d, v]) => {
+      if (!n) return;
+      const f = fracTex(Math.abs(n), d);
+      s += (n < 0 ? (s ? " - " : "-") : s ? " + " : "") + (f === "1" ? "" : f) + v;
+    });
+    return s || "0";
+  };
 
   const G = {
 
@@ -398,38 +426,39 @@
     ],
 
     // ===================== MATHEMATICS =====================
+    // Paper 1 (no GDC) answers are exact (integers, fractions); Paper 2 answers are exact or 3 s.f., as in IB markschemes.
     "math-1": [
       () => {
         const a = R(-10, 20), d = R(-5, 9) || 3, n = R(8, 30);
         const un = a + (n - 1) * d;
-        return { paper: "P1", marks: 2, diff: 1, q: `An arithmetic sequence has first term ${a} and common difference ${d}. Find the ${n}th term.`, numeric: { value: un, tol: 0.001 }, ms: [`\\(u_{${n}} = ${a} + ${n - 1}(${d})\\) [M1]`, `= ${un} [A1]`] };
+        return { paper: "P1", marks: 2, diff: 1, q: `An arithmetic sequence has first term ${a} and common difference ${d}. Find the ${n}th term.`, numeric: { value: un, tol: 0.001 }, ms: [`\\(u_{${n}} = ${a} + (${n} - 1)(${d})\\) [M1]`, `\\(u_{${n}} = ${un}\\) [A1]`] };
       },
       () => {
         const a = R(1, 15), d = R(2, 8), n = R(10, 40);
         const s = (n / 2) * (2 * a + (n - 1) * d);
-        return { paper: "P1", marks: 3, diff: 2, q: `Find the sum of the first ${n} terms of the arithmetic series ${a} + ${a + d} + ${a + 2 * d} + …`, numeric: { value: s, tol: 0.001 }, ms: [`d = ${d} [A1]`, `\\(S_{${n}} = \\frac{${n}}{2}(2(${a}) + ${n - 1}(${d}))\\) [M1]`, `= ${s} [A1]`] };
+        return { paper: "P1", marks: 3, diff: 2, q: `Find the sum of the first ${n} terms of the arithmetic series ${a} + ${a + d} + ${a + 2 * d} + …`, numeric: { value: s, tol: 0.001 }, ms: [`\\(d = ${d}\\) [A1]`, `\\(S_{${n}} = \\frac{${n}}{2}\\left(2(${a}) + (${n} - 1)(${d})\\right)\\) [M1]`, `\\(S_{${n}} = ${s}\\) [A1]`] };
       },
       () => {
         const a = P([12, 18, 24, 30, 40, 60, 81, 100]), r = P([[1, 2], [1, 3], [2, 3], [3, 4], [1, 4], [-1, 2]]);
-        const rv = r[0] / r[1], s = a / (1 - rv);
-        return { paper: "P1", marks: 3, diff: 2, q: `Find the sum to infinity of the geometric series with first term ${a} and common ratio \\(${rv < 0 ? "-" : ""}\\frac{${Math.abs(r[0])}}{${r[1]}}\\).`, numeric: { value: dp(s, 4), tol: 0.005 }, ms: [`\\(|r| < 1\\) so converges [R1]`, `\\(S_\\infty = \\frac{${a}}{1 - (${dp(rv, 4)})}\\) [M1]`, `= ${dp(s, 4)} [A1]`] };
+        const rv = r[0] / r[1], s = a / (1 - rv), rt = fracTex(r[0], r[1]), st = fracTex(a * r[1], r[1] - r[0]);
+        return { paper: "P1", marks: 3, diff: 2, q: `Find the sum to infinity of the geometric series with first term ${a} and common ratio \\(${rt}\\).`, numeric: { value: dp(s, 4), tol: 0.005 }, ms: [`\\(|r| < 1\\), so the sum to infinity exists [R1]`, `\\(S_\\infty = \\frac{${a}}{1 - \\left(${rt}\\right)}\\) [M1]`, `\\(S_\\infty = ${st}\\) [A1]`] };
       },
       () => {
         const pv = R(10, 200) * 100, rate = P([2, 2.5, 3, 4, 4.5, 5, 6]), k = P([1, 4, 12]), n = R(3, 20);
         const fv = pv * Math.pow(1 + rate / (100 * k), k * n);
-        return { paper: "P2", marks: 3, diff: 2, q: `$${pv.toLocaleString()} is invested at ${rate}% per annum compounded ${k === 1 ? "annually" : k === 4 ? "quarterly" : "monthly"}. Find the value after ${n} years, to the nearest dollar.`, numeric: { value: Math.round(fv), tol: 1.5 }, ms: [`\\(${pv}\\left(1 + \\frac{${rate}}{${100 * k}}\\right)^{${k * n}}\\) [M1][A1]`, `= $${Math.round(fv).toLocaleString()} [A1]`] };
+        return { paper: "P2", marks: 3, diff: 2, q: `$${pv.toLocaleString()} is invested at ${rate}% per annum compounded ${k === 1 ? "annually" : k === 4 ? "quarterly" : "monthly"}. Find the value after ${n} years, to the nearest dollar.`, numeric: { value: Math.round(fv), tol: 1.5 }, ms: [`\\(${pv}\\left(1 + \\frac{${rate}}{${100 * k}}\\right)^{${k * n}}\\) or TVM with N = ${k * n}, I% = ${rate}, PV = −${pv}, P/Y = C/Y = ${k} [M1][A1]`, `$${Math.round(fv).toLocaleString()} [A1]`] };
       },
     ],
     "math-2": [
       () => {
         const b = P([2, 3, 4, 5, 10]), e = R(-2, 5);
-        const v = Math.pow(b, e);
-        return { paper: "P1", marks: 1, diff: 1, q: `Evaluate \\(\\log_{${b}} ${e < 0 ? `\\frac{1}{${Math.pow(b, -e)}}` : v}\\).`, numeric: { value: e, tol: 0.001 }, ms: [`\\(${b}^{${e}} = ${e < 0 ? `\\frac{1}{${Math.pow(b, -e)}}` : v}\\), so the answer is ${e} [A1]`] };
+        const v = Math.pow(b, e), arg = e < 0 ? `\\frac{1}{${Math.pow(b, -e)}}` : v;
+        return { paper: "P1", marks: 1, diff: 1, q: `Write down the value of \\(\\log_{${b}} ${arg}\\).`, numeric: { value: e, tol: 0.001 }, ms: [`\\(${b}^{${e}} = ${arg}\\), so \\(\\log_{${b}} ${arg} = ${e}\\) [A1]`] };
       },
       () => {
         const n0 = R(50, 500), k = P([0.05, 0.08, 0.1, 0.12, 0.2, 0.25]), mult = P([2, 3, 5, 10]);
         const t = Math.log(mult) / k;
-        return { paper: "P2", marks: 3, diff: 2, q: `A quantity grows according to \\(N = ${n0}e^{${k}t}\\). Find the time taken for N to reach ${n0 * mult}.`, numeric: { value: Number(sig(t)), tol: t * 0.004 }, ms: [`\\(${n0 * mult} = ${n0}e^{${k}t}\\) [M1]`, `\\(t = \\frac{\\ln ${mult}}{${k}}\\) [A1]`, `t = ${sig(t)} [A1]`] };
+        return { paper: "P2", marks: 3, diff: 2, q: `A quantity grows according to \\(N = ${n0}e^{${k}t}\\). Find the time taken for N to reach ${n0 * mult}.`, numeric: { value: Number(s3(t)), tol: t * 0.004 }, ms: [`\\(${n0 * mult} = ${n0}e^{${k}t}\\) (or a GDC graph/solver) [M1]`, `\\(t = \\frac{\\ln ${mult}}{${k}}\\) [A1]`, `\\(t = ${s3(t)}\\) [A1]`] };
       },
     ],
     "math-3": [
@@ -437,37 +466,37 @@
         const n = R(4, 8), a = R(1, 3), b = R(1, 3) * P([1, -1]), r = R(1, n - 1);
         const nCr = (n, r) => { let x = 1; for (let i = 1; i <= r; i++) x = (x * (n - r + i)) / i; return Math.round(x); };
         const coef = nCr(n, r) * Math.pow(a, n - r) * Math.pow(b, r);
-        return { paper: "P1", marks: 3, diff: 2, q: `Find the coefficient of \\(x^{${r}}\\) in the expansion of \\((${a} ${b < 0 ? "-" : "+"} ${Math.abs(b) === 1 ? "" : Math.abs(b)}x)^{${n}}\\).`, numeric: { value: coef, tol: 0.001 },
-          ms: [`\\(\\binom{${n}}{${r}}(${a})^{${n - r}}(${b}x)^{${r}}\\) [M1]`, `\\(${nCr(n, r)} \\times ${Math.pow(a, n - r)} \\times ${Math.pow(b, r)}\\) [A1]`, `= ${coef} [A1]`] };
+        const bx = b === 1 ? "x" : b === -1 ? "-x" : `${b}x`, br = Math.pow(b, r);
+        return { paper: "P1", marks: 3, diff: 2, q: `Find the coefficient of \\(${r === 1 ? "x" : `x^{${r}}`}\\) in the expansion of \\((${a} ${b < 0 ? "-" : "+"} ${Math.abs(b) === 1 ? "" : Math.abs(b)}x)^{${n}}\\).`, numeric: { value: coef, tol: 0.001 },
+          ms: [`\\(\\binom{${n}}{${r}}(${a})^{${n - r}}(${bx})^{${r}}\\) (accept \\(\\binom{${n}}{${n - r}}\\)) [M1]`, `\\(${nCr(n, r)} \\times ${Math.pow(a, n - r)} \\times ${br < 0 ? `(${br})` : br}\\) [A1]`, `\\(${coef}\\) [A1]`] };
       },
     ],
     "math-5": [
       () => {
         const c = P([4, 9, 16, 25, 36, 49]), a = P([1, 1, 4]);
         const k = 2 * Math.sqrt(a * c);
-        return { paper: "P1", marks: 3, diff: 2, q: `Find the positive value of k for which \\(${a === 1 ? "" : a}x^2 + kx + ${c} = 0\\) has two equal real roots.`, numeric: { value: k, tol: 0.001 }, ms: [`\\(\\Delta = k^2 - 4(${a})(${c}) = 0\\) [M1]`, `\\(k^2 = ${4 * a * c}\\) [A1]`, `k = ${k} [A1]`] };
+        return { paper: "P1", marks: 3, diff: 2, q: `Find the positive value of k for which \\(${a === 1 ? "" : a}x^2 + kx + ${c} = 0\\) has two equal real roots.`, numeric: { value: k, tol: 0.001 }, ms: [`\\(\\Delta = k^2 - 4(${a})(${c}) = 0\\) [M1]`, `\\(k^2 = ${4 * a * c}\\) [A1]`, `\\(k = ${k}\\) (reject \\(k = -${k}\\)) [A1]`] };
       },
       () => {
         const h = R(-6, 6), k = R(-9, 9), a = P([1, 2, -1, 3]);
         const b = -2 * a * h, c = a * h * h + k;
-        const fmt = (n, x) => (n === 0 ? "" : `${n < 0 ? " - " : " + "}${Math.abs(n) === 1 && x ? "" : Math.abs(n)}${x}`);
-        return { paper: "P1", marks: 2, diff: 2, q: `Find the y-coordinate of the vertex of \\(y = ${a === 1 ? "" : a === -1 ? "-" : a}x^2${fmt(b, "x")}${fmt(c, "")}\\).`, numeric: { value: k, tol: 0.001 }, ms: [`\\(x = -\\frac{b}{2a} = ${h}\\) [M1]`, `y = ${k} [A1]`] };
+        return { paper: "P1", marks: 2, diff: 2, q: `Find the y-coordinate of the vertex of \\(y = ${poly([[a, "x^2"], [b, "x"], [c, ""]])}\\).`, numeric: { value: k, tol: 0.001 }, ms: [`\\(x = -\\frac{b}{2a} = ${h}\\) (or completing the square) [M1]`, `\\(y = ${k}\\) [A1]`] };
       },
     ],
     "math-7": [
       () => {
         const a = R(4, 15), b = R(4, 15), C = R(25, 140);
         const c = Math.sqrt(a * a + b * b - 2 * a * b * Math.cos((C * Math.PI) / 180));
-        return { paper: "P2", marks: 3, diff: 2, q: `In triangle ABC, BC = ${a} cm, AC = ${b} cm and angle ACB = ${C}°. Find AB.`, numeric: { value: Number(sig(c)), tol: 0.01 }, ms: [`\\(AB^2 = ${a}^2 + ${b}^2 - 2(${a})(${b})\\cos ${C}°\\) [M1][A1]`, `AB = ${sig(c)} cm [A1]`] };
+        return { paper: "P2", marks: 3, diff: 2, q: `In triangle ABC, BC = ${a} cm, AC = ${b} cm and angle ACB = ${C}°. Find AB.`, numeric: { value: Number(s3(c)), tol: 0.01 }, ms: [`\\(AB^2 = ${a}^2 + ${b}^2 - 2(${a})(${b})\\cos ${C}°\\) [M1][A1]`, `AB = ${s3(c)} cm [A1]`] };
       },
       () => {
         const a = R(3, 14), b = R(3, 14), C = R(20, 150);
         const A = 0.5 * a * b * Math.sin((C * Math.PI) / 180);
-        return { paper: "P2", marks: 2, diff: 1, q: `Find the area of a triangle with sides ${a} cm and ${b} cm enclosing an angle of ${C}°.`, numeric: { value: Number(sig(A)), tol: A * 0.005 }, ms: [`\\(\\frac{1}{2}(${a})(${b})\\sin ${C}°\\) [M1]`, `= ${sig(A)} cm² [A1]`] };
+        return { paper: "P2", marks: 2, diff: 1, q: `Find the area of a triangle with sides ${a} cm and ${b} cm enclosing an angle of ${C}°.`, numeric: { value: Number(s3(A)), tol: A * 0.005 }, ms: [`\\(\\frac{1}{2}(${a})(${b})\\sin ${C}°\\) [M1]`, `${s3(A)} cm² [A1]`] };
       },
       () => {
         const r = R(3, 20), th = dp(R(3, 30) / 10, 1);
-        return { paper: "P2", marks: 2, diff: 1, q: `A sector has radius ${r} cm and angle ${th} radians. Find its area.`, numeric: { value: dp(0.5 * r * r * th, 2), tol: 0.02 }, ms: [`\\(\\frac{1}{2}(${r})^2(${th})\\) [M1]`, `= ${dp(0.5 * r * r * th, 2)} cm² [A1]`] };
+        return { paper: "P2", marks: 2, diff: 1, q: `A sector has radius ${r} cm and angle ${th} radians. Find its area.`, numeric: { value: dp(0.5 * r * r * th, 2), tol: 0.02 }, ms: [`\\(\\frac{1}{2}(${r})^2(${th})\\) [M1]`, `${dp(0.5 * r * r * th, 2)} cm² [A1]`] };
       },
     ],
     "math-10": [
@@ -475,12 +504,12 @@
         const pa = dp(R(2, 6) / 10, 1), pb = dp(R(2, 6) / 10, 1), indep = Math.random() < 0.5;
         const pab = indep ? dp(pa * pb, 2) : dp(Math.min(pa, pb) * P([0.3, 0.5]), 2);
         const union = dp(pa + pb - pab, 2);
-        return { paper: "P1", marks: 2, diff: 1, q: `P(A) = ${pa}, P(B) = ${pb} and P(A ∩ B) = ${pab}. Find P(A ∪ B).`, numeric: { value: union, tol: 0.001 }, ms: [`${pa} + ${pb} − ${pab} [M1]`, `= ${union} [A1]`] };
+        return { paper: "P1", marks: 2, diff: 1, q: `P(A) = ${pa}, P(B) = ${pb} and P(A ∩ B) = ${pab}. Find P(A ∪ B).`, numeric: { value: union, tol: 0.001 }, ms: [`\\(P(A \\cup B) = ${pa} + ${pb} - ${pab}\\) [M1]`, `\\(= ${union}\\) [A1]`] };
       },
       () => {
         const r = R(3, 8), b = R(2, 7), t = r + b;
         const p = (r / t) * ((r - 1) / (t - 1));
-        return { paper: "P1", marks: 3, diff: 2, q: `A bag contains ${r} red and ${b} blue counters. Two are taken without replacement. Find the probability that both are red (as a decimal to 4 d.p.).`, numeric: { value: dp(p, 4), tol: 0.0006 }, ms: [`\\(\\frac{${r}}{${t}} \\times \\frac{${r - 1}}{${t - 1}}\\) [M1][A1]`, `= ${dp(p, 4)} [A1]`] };
+        return { paper: "P1", marks: 3, diff: 2, q: `A bag contains ${r} red and ${b} blue counters. Two are taken without replacement. Find the probability that both are red.`, numeric: { value: dp(p, 4), tol: 0.0006 }, ms: [`\\(\\frac{${r}}{${t}} \\times \\frac{${r - 1}}{${t - 1}}\\) (multiplying along the branches, second denominator reduced) [M1][A1]`, `\\(${fracTex(r * (r - 1), t * (t - 1))}\\) [A1]`] };
       },
     ],
     "math-11": [
@@ -488,40 +517,40 @@
         const n = R(5, 20), p = P([0.1, 0.2, 0.25, 0.3, 0.4, 0.5]), k = R(1, Math.min(6, n - 1));
         let c = 1; for (let i = 1; i <= k; i++) c = (c * (n - k + i)) / i;
         const v = c * Math.pow(p, k) * Math.pow(1 - p, n - k);
-        return { paper: "P2", marks: 2, diff: 2, q: `\\(X \\sim B(${n}, ${p})\\). Find P(X = ${k}).`, numeric: { value: dp(v, 4), tol: 0.0006 }, ms: [`\\(\\binom{${n}}{${k}}(${p})^{${k}}(${dp(1 - p, 2)})^{${n - k}}\\) [M1]`, `= ${dp(v, 4)} [A1]`] };
+        return { paper: "P2", marks: 2, diff: 2, q: `\\(X \\sim B(${n}, ${p})\\). Find P(X = ${k}).`, numeric: { value: Number(s3(v)), tol: Math.max(0.0006, v * 0.005) }, ms: [`\\(\\binom{${n}}{${k}}(${p})^{${k}}(${dp(1 - p, 2)})^{${n - k}}\\) or GDC binomial pdf [M1]`, `\\(P(X = ${k}) = ${s3(v)}\\) [A1]`] };
       },
       () => {
         const n = R(10, 60), p = P([0.1, 0.2, 0.25, 0.4, 0.5, 0.6]);
-        return { paper: "P1", marks: 1, diff: 1, q: `\\(X \\sim B(${n}, ${p})\\). Write down E(X).`, numeric: { value: dp(n * p, 2), tol: 0.001 }, ms: [`np = ${dp(n * p, 2)} [A1]`] };
+        return { paper: "P1", marks: 1, diff: 1, q: `\\(X \\sim B(${n}, ${p})\\). Write down E(X).`, numeric: { value: dp(n * p, 2), tol: 0.001 }, ms: [`\\(E(X) = np = ${dp(n * p, 2)}\\) [A1]`] };
       },
     ],
     "math-12": [
       () => {
         const a = R(1, 5), b = R(-6, 6), c = R(-9, 9), x0 = R(-3, 4);
         const d = 3 * a * x0 * x0 + 2 * b * x0 + c;
-        return { paper: "P1", marks: 2, diff: 1, q: `Let \\(f(x) = ${a === 1 ? "" : a}x^3 ${b < 0 ? "-" : "+"} ${Math.abs(b)}x^2 ${c < 0 ? "-" : "+"} ${Math.abs(c)}x\\). Find the gradient of the curve at x = ${x0}.`, numeric: { value: d, tol: 0.001 }, ms: [`\\(f'(x) = ${3 * a}x^2 ${2 * b < 0 ? "-" : "+"} ${Math.abs(2 * b)}x ${c < 0 ? "-" : "+"} ${Math.abs(c)}\\) [A1]`, `f'(${x0}) = ${d} [A1]`] };
+        return { paper: "P1", marks: 2, diff: 1, q: `Let \\(f(x) = ${poly([[a, "x^3"], [b, "x^2"], [c, "x"]])}\\). Find the gradient of the curve at x = ${x0}.`, numeric: { value: d, tol: 0.001 }, ms: [`\\(f'(x) = ${poly([[3 * a, "x^2"], [2 * b, "x"], [c, ""]])}\\) [A1]`, `\\(f'(${x0}) = ${d}\\) [A1]`] };
       },
       () => {
-        const p = R(-4, 1), q = R(p + 1, 5);
-        // f'(x) = 3(x - p)(x - q) -> f(x) = x^3 - 1.5(p+q)x^2 + 3pq x
-        const B = -1.5 * (p + q), C = 3 * p * q;
-        const f = (x) => x ** 3 + B * x * x + C * x;
-        return { paper: "P1", marks: 3, diff: 2, q: `Find the x-coordinate of the local minimum of \\(f(x) = x^3 ${B < 0 ? "-" : "+"} ${Math.abs(B)}x^2 ${C < 0 ? "-" : "+"} ${Math.abs(C)}x\\).`, numeric: { value: q, tol: 0.001 },
-          ms: [`\\(f'(x) = 3x^2 ${2 * B < 0 ? "-" : "+"} ${Math.abs(2 * B)}x ${C < 0 ? "-" : "+"} ${Math.abs(C)} = 3(x ${p < 0 ? "+" : "-"} ${Math.abs(p)})(x ${q < 0 ? "+" : "-"} ${Math.abs(q)})\\) [M1]`, `Stationary at x = ${p}, x = ${q} [A1]`, `Minimum at x = ${q} (f'' > 0), f(${q}) = ${dp(f(q), 2)} [A1]`] };
+        // f'(x) = 3(x - p)(x - q) with p + q even, so every coefficient is an integer
+        const p = R(-4, 1), q = p + 2 * R(1, 3);
+        const B = (-3 * (p + q)) / 2, C = 3 * p * q;
+        const lin = (r) => (r === 0 ? "x" : `(x ${r < 0 ? "+" : "-"} ${Math.abs(r)})`);
+        return { paper: "P1", marks: 3, diff: 2, q: `Find the x-coordinate of the local minimum point of the graph of \\(f(x) = ${poly([[1, "x^3"], [B, "x^2"], [C, "x"]])}\\).`, numeric: { value: q, tol: 0.001 },
+          ms: [`\\(f'(x) = ${poly([[3, "x^2"], [2 * B, "x"], [C, ""]])}\\) [A1]`, `\\(f'(x) = 0 \\Rightarrow 3${q === 0 ? lin(q) + lin(p) : lin(p) + lin(q)} = 0\\), so x = ${p} or x = ${q} [M1]`, `\\(f''(x) = ${poly([[6, "x"], [2 * B, ""]])}\\), \\(f''(${q}) = ${6 * q + 2 * B} > 0\\), so the local minimum is at x = ${q} [A1]`] };
       },
     ],
     "math-13": [
       () => {
-        const a = R(1, 4), b = R(-5, 5), lo = R(0, 2), hi = lo + R(1, 3);
-        const F = (x) => (a * x ** 3) / 3 + (b * x * x) / 2;
-        const v = F(hi) - F(lo);
-        return { paper: "P1", marks: 3, diff: 2, q: `Evaluate \\(\\int_{${lo}}^{${hi}} (${a === 1 ? "" : a}x^2 ${b < 0 ? "-" : "+"} ${Math.abs(b)}x)\\,dx\\). Give your answer as a decimal to 3 d.p. if necessary.`, numeric: { value: dp(v, 3), tol: 0.002 },
-          ms: [`\\(\\left[\\frac{${a}x^3}{3} ${b < 0 ? "-" : "+"} \\frac{${Math.abs(b)}x^2}{2}\\right]_{${lo}}^{${hi}}\\) [A1]`, `Substituting limits [M1]`, `= ${dp(v, 3)} [A1]`] };
+        const a = R(1, 4), b = R(-5, 5) || 2, lo = R(0, 2), hi = lo + R(1, 3);
+        const F6 = (x) => 2 * a * x ** 3 + 3 * b * x * x; // 6 × antiderivative
+        return { paper: "P1", marks: 3, diff: 2, q: `Find the exact value of \\(\\displaystyle\\int_{${lo}}^{${hi}} \\left(${poly([[a, "x^2"], [b, "x"]])}\\right)dx\\).`, numeric: { value: dp((F6(hi) - F6(lo)) / 6, 4), tol: 0.002 },
+          ms: [`\\(\\left[${fpoly([[a, 3, "x^3"], [b, 2, "x^2"]])}\\right]_{${lo}}^{${hi}}\\) [A1]`, `substituting the limits: \\(${fracTex(F6(hi), 6)} - ${F6(lo) < 0 ? `\\left(${fracTex(F6(lo), 6)}\\right)` : fracTex(F6(lo), 6)}\\) [M1]`, `\\(${fracTex(F6(hi) - F6(lo), 6)}\\) [A1]`] };
       },
       () => {
         const k = R(1, 6);
-        // area between y = x^2 and y = kx from 0 to k: k^3/6
-        return { paper: "P1", marks: 4, diff: 3, q: `Find the area enclosed by \\(y = x^2\\) and \\(y = ${k === 1 ? "" : k}x\\) (to 3 d.p.).`, numeric: { value: dp(k ** 3 / 6, 3), tol: 0.002 }, ms: [`Intersections x = 0, x = ${k} [A1]`, `\\(\\int_0^{${k}} (${k}x - x^2)dx\\) [M1]`, `\\(\\left[\\frac{${k}x^2}{2} - \\frac{x^3}{3}\\right]_0^{${k}}\\) [A1]`, `= ${dp(k ** 3 / 6, 3)} [A1]`] };
+        const kx = k === 1 ? "x" : `${k}x`;
+        return { paper: "P1", marks: 4, diff: 3, q: `Find the exact area of the region enclosed by \\(y = x^2\\) and \\(y = ${kx}\\).`, numeric: { value: dp(k ** 3 / 6, 4), tol: 0.002 },
+          ms: [`\\(x^2 = ${kx} \\Rightarrow x = 0\\) and \\(x = ${k}\\) [A1]`, `\\(\\displaystyle\\int_0^{${k}} (${kx} - x^2)\\,dx\\) (upper − lower) [M1]`, `\\(\\left[${fpoly([[k, 2, "x^2"], [-1, 3, "x^3"]])}\\right]_0^{${k}}\\) [A1]`, `\\(${fracTex(k ** 3, 6)}\\) [A1]`] };
       },
     ],
     "math-14": [
@@ -529,8 +558,8 @@
         const a = R(1, 4), b = R(-8, 8), c = R(-5, 5), t = R(1, 5);
         // s = a t^3 + b t^2 + c t ; v = 3a t^2 + 2b t + c
         const v = 3 * a * t * t + 2 * b * t + c;
-        return { paper: "P1", marks: 2, diff: 1, q: `The displacement of a particle is \\(s(t) = ${a === 1 ? "" : a}t^3 ${b < 0 ? "-" : "+"} ${Math.abs(b)}t^2 ${c < 0 ? "-" : "+"} ${Math.abs(c)}t\\) m. Find its velocity when t = ${t} s.`, numeric: { value: v, tol: 0.001 },
-          ms: [`\\(v = ${3 * a}t^2 ${2 * b < 0 ? "-" : "+"} ${Math.abs(2 * b)}t ${c < 0 ? "-" : "+"} ${Math.abs(c)}\\) [A1]`, `v(${t}) = ${v} m s⁻¹ [A1]`] };
+        return { paper: "P1", marks: 2, diff: 1, q: `The displacement of a particle is \\(s(t) = ${poly([[a, "t^3"], [b, "t^2"], [c, "t"]])}\\) m. Find its velocity when t = ${t} s.`, numeric: { value: v, tol: 0.001 },
+          ms: [`\\(v = \\frac{ds}{dt} = ${poly([[3 * a, "t^2"], [2 * b, "t"], [c, ""]])}\\) [A1]`, `\\(v(${t}) = ${v}\\) m s⁻¹ [A1]`] };
       },
     ],
     // ===================== BIOLOGY =====================
