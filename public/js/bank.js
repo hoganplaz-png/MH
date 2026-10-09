@@ -28,18 +28,26 @@ IB.page = function () {
       </div>
     </div>
     <div class="card paper-opts hidden no-print" id="paperOpts">
-      <strong>Export the filtered questions as an IB-style paper</strong>
-      <p class="small muted" style="margin:4px 0 10px">Cover page with instructions, numbered questions with marks, lined answer boxes, and the markscheme at the end.</p>
-      <div class="filters">
-        <label class="field">Questions<select id="pN"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option></select></label>
-        <label class="field">Order<select id="pOrder"><option value="mix">Shuffle</option><option value="list">As listed</option></select></label>
+      <strong>Export questions as an IB-style paper</strong>
+      <p class="small muted" style="margin:4px 0 10px">Cover page with instructions, numbered questions with marks, lined answer boxes, and the markscheme at the end. Tick one or more topics to download every question in them, or leave them all unticked to use the filters above.</p>
+      <div class="ptopics">
+        <div class="ptopics-head">
+          <span class="small"><strong>Topics</strong> <span class="muted" id="pTopicSum"></span></span>
+          <span class="btn-row"><button class="btn small" type="button" id="pAll">Tick all</button><button class="btn small" type="button" id="pNone">Clear</button></span>
+        </div>
+        <div class="ptopics-list" id="pTopicList"></div>
+      </div>
+      <div class="filters" style="margin-top:12px">
+        <label class="field">Questions<select id="pN"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option><option value="100">100</option><option value="150">150</option><option value="200">200</option><option value="300">300</option><option value="all">All matching</option></select></label>
+        <label class="field">Order<select id="pOrder"><option value="mix">Shuffle</option><option value="topic">By topic</option><option value="list">As listed</option></select></label>
         <label class="field">Paper title<input type="text" id="pTitle" placeholder="Practice paper"></label>
       </div>
       <div class="btn-row" style="margin-top:10px">
         <label class="small"><input type="checkbox" id="pMs" checked> Markscheme at the end</label>
         <label class="small"><input type="checkbox" id="pTopics"> Show topic under each question</label>
         <label class="small"><input type="checkbox" id="pExam" checked> Exam-style questions first</label>
-        <button class="btn primary" id="pGo" style="margin-left:auto">⬇ Create PDF</button>
+        <span class="small muted" id="pCount" style="margin-left:auto"></span>
+        <button class="btn primary" id="pGo">⬇ Create PDF</button>
       </div>
     </div>
     <div id="list"></div>
@@ -62,14 +70,14 @@ IB.page = function () {
   fillTopics();
   if (IB.param("topic")) f.topic.value = IB.param("topic");
 
-  function filtered() {
+  function filtered(topicSet) {
     const data = IB.store.get();
     const last = {};
     data.attempts.forEach((a) => (last[a.id] = a.sc / a.mx));
     const term = f.search.value.trim().toLowerCase();
     let qs = extra.concat(IB.allQuestions(f.sub.value || undefined)).filter((q) => !f.sub.value || q.subject === f.sub.value);
     return qs.filter((q) => {
-      if (f.topic.value && q.topic !== f.topic.value) return false;
+      if (topicSet ? !topicSet.has(q.topic) : f.topic.value && q.topic !== f.topic.value) return false;
       if (f.paper.value && q.paper !== f.paper.value) return false;
       if (f.source.value === "mine" && !q.custom) return false;
       if (f.source.value === "site" && q.custom) return false;
@@ -158,29 +166,99 @@ IB.page = function () {
     b.textContent = "✦ AI: write new questions for this topic";
   };
 
-  IB.qs("#paperBtn").onclick = () => IB.qs("#paperOpts").classList.toggle("hidden");
-  IB.qs("#pGo").onclick = (ev) => {
-    let qs = filtered();
-    if (!qs.length) return IB.toast("No questions match these filters.");
-    if (IB.qs("#pExam").checked) qs = qs.filter((q) => !q.derived).concat(qs.filter((q) => q.derived));
-    if (IB.qs("#pOrder").value === "mix") {
-      const head = qs.filter((q) => !q.derived), tail = qs.filter((q) => q.derived);
-      qs = IB.qs("#pExam").checked ? IB.shuffle(head).concat(IB.shuffle(tail)) : IB.shuffle(qs);
+  // ---------- PDF / worksheet export: any number of questions, one or many whole topics ----------
+  const picked = new Set();
+  const pTopicList = IB.qs("#pTopicList");
+  const topicOrder = () => {
+    const ord = {};
+    IB.subjectList().forEach((s, si) => s.allTopics.forEach((t, ti) => (ord[t.id] = si * 1000 + ti)));
+    return ord;
+  };
+  function drawTopicPicker() {
+    const subs = f.sub.value ? [IB.subjects[f.sub.value]] : IB.subjectList();
+    const counts = {};
+    filtered(new Set(subs.flatMap((s) => s.topics.map((t) => t.id)))).forEach((q) => (counts[q.topic] = (counts[q.topic] || 0) + 1));
+    const visible = new Set(subs.flatMap((s) => s.topics.map((t) => t.id)));
+    Array.from(picked).forEach((id) => { if (!visible.has(id)) picked.delete(id); });
+    pTopicList.innerHTML = subs.map((s) => `<div class="ptopics-sub"><div class="ptopics-subh"><label><input type="checkbox" data-psub="${s.id}"> ${IB.esc(s.name)}</label></div>${s.topics.map((t) => `<label class="ptopic${counts[t.id] ? "" : " none"}" title="${IB.esc(t.code)} ${IB.esc(t.title)}"><input type="checkbox" data-ptopic="${t.id}" data-psubof="${s.id}"${picked.has(t.id) ? " checked" : ""}${counts[t.id] ? "" : " disabled"}><span>${IB.esc(t.code)} ${IB.esc(t.title)}</span><em>${counts[t.id] || 0}</em></label>`).join("")}</div>`).join("");
+    syncPicker();
+  }
+  function syncPicker() {
+    pTopicList.querySelectorAll("[data-psub]").forEach((box) => {
+      const kids = Array.from(pTopicList.querySelectorAll(`[data-psubof="${box.dataset.psub}"]:not(:disabled)`));
+      const on = kids.filter((k) => k.checked).length;
+      box.checked = !!kids.length && on === kids.length;
+      box.indeterminate = on > 0 && on < kids.length;
+    });
+    const qs = exportPool();
+    const n = IB.qs("#pN").value === "all" ? qs.length : Math.min(qs.length, +IB.qs("#pN").value);
+    IB.qs("#pTopicSum").textContent = picked.size ? `${picked.size} ticked · ${qs.length} questions` : `none ticked · using the filters above (${qs.length} questions)`;
+    IB.qs("#pCount").textContent = `${n} question${n === 1 ? "" : "s"} · ${qs.slice(0, n).reduce((m, q) => m + (q.marks || 0), 0)} marks`;
+  }
+  // questions the export draws from: ticked topics (other filters still apply), or the filtered list
+  const exportPool = () => filtered(picked.size ? picked : null);
+  function exportQuestions() {
+    let qs = exportPool();
+    const order = IB.qs("#pOrder").value, exam = IB.qs("#pExam").checked;
+    if (order === "topic") {
+      const ord = topicOrder();
+      qs = qs.slice().sort((a, b) => (ord[a.topic] ?? 1e9) - (ord[b.topic] ?? 1e9));
     }
-    qs = qs.slice(0, +IB.qs("#pN").value);
+    if (exam) qs = qs.filter((q) => !q.derived).concat(qs.filter((q) => q.derived));
+    if (order === "mix") {
+      const head = qs.filter((q) => !q.derived), tail = qs.filter((q) => q.derived);
+      qs = exam ? IB.shuffle(head).concat(IB.shuffle(tail)) : IB.shuffle(qs);
+    }
+    const n = IB.qs("#pN").value;
+    return n === "all" ? qs : qs.slice(0, +n);
+  }
+  function exportTitle(sub) {
+    const ts = picked.size ? Array.from(picked).map(IB.topic).filter(Boolean) : f.topic.value ? [IB.topic(f.topic.value)] : [];
+    const ord = topicOrder();
+    ts.sort((a, b) => ord[a.id] - ord[b.id]);
+    if (ts.length === 1) return `${ts[0].code} ${ts[0].title}`;
+    if (ts.length > 1) return ts.length <= 4 ? `Topics ${ts.map((t) => t.code).join(", ")}` : `Topics ${ts.slice(0, 3).map((t) => t.code).join(", ")} + ${ts.length - 3} more`;
+    return f.paper.value ? IB.paperName(sub, f.paper.value) : "Practice paper";
+  }
+
+  pTopicList.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset.ptopic) t.checked ? picked.add(t.dataset.ptopic) : picked.delete(t.dataset.ptopic);
+    if (t.dataset.psub) pTopicList.querySelectorAll(`[data-psubof="${t.dataset.psub}"]:not(:disabled)`).forEach((k) => { k.checked = t.checked; t.checked ? picked.add(k.dataset.ptopic) : picked.delete(k.dataset.ptopic); });
+    if (picked.size) IB.qs("#pN").value = "all"; // ticking a topic means "give me the whole topic"
+    IB.qs("#pTopics").checked = picked.size > 1;
+    syncPicker();
+  });
+  IB.qs("#pAll").onclick = () => { pTopicList.querySelectorAll("[data-ptopic]:not(:disabled)").forEach((k) => { k.checked = true; picked.add(k.dataset.ptopic); }); IB.qs("#pN").value = "all"; IB.qs("#pTopics").checked = picked.size > 1; syncPicker(); };
+  IB.qs("#pNone").onclick = () => { picked.clear(); pTopicList.querySelectorAll("[data-ptopic]").forEach((k) => (k.checked = false)); IB.qs("#pN").value = "20"; IB.qs("#pTopics").checked = false; syncPicker(); };
+  IB.qs("#pN").onchange = syncPicker;
+  Object.values(f).forEach((el) => el.addEventListener(el.tagName === "INPUT" ? "input" : "change", () => { if (!IB.qs("#paperOpts").classList.contains("hidden")) el === f.sub ? drawTopicPicker() : syncPicker(); }));
+
+  IB.qs("#paperBtn").onclick = () => {
+    const box = IB.qs("#paperOpts");
+    box.classList.toggle("hidden");
+    if (box.classList.contains("hidden")) return;
+    if (f.topic.value && !picked.size) { picked.add(f.topic.value); IB.qs("#pN").value = "all"; }
+    drawTopicPicker();
+  };
+  IB.qs("#pGo").onclick = (ev) => {
+    const qs = exportQuestions();
+    if (!qs.length) return IB.toast("No questions match - tick a topic or loosen the filters.");
+    if (qs.length > 400 && !confirm(`This paper has ${qs.length} questions, so the PDF will be long and can take a few minutes to build. Continue?`)) return;
     const sub = f.sub.value || (new Set(qs.map((q) => q.subject)).size === 1 ? qs[0].subject : null);
-    const t = f.topic.value && IB.topic(f.topic.value);
     const b = ev.currentTarget;
     b.disabled = true;
     IB.paperPdf({
-      title: IB.qs("#pTitle").value.trim() || (t ? `${t.code} ${t.title}` : f.paper.value ? IB.paperName(sub, f.paper.value) : "Practice paper"),
+      title: IB.qs("#pTitle").value.trim() || exportTitle(sub),
       subject: sub, questions: qs, markscheme: IB.qs("#pMs").checked, showTopics: IB.qs("#pTopics").checked, paper: f.paper.value,
     }).catch(() => {}).finally(() => (b.disabled = false));
   };
   IB.qs("#sheetBtn").onclick = () => {
-    const qs = filtered().slice(0, 40);
+    const open = !IB.qs("#paperOpts").classList.contains("hidden");
+    const qs = open ? exportQuestions() : filtered();
     if (!qs.length) return IB.toast("Nothing to download.");
-    const title = f.topic.value ? IB.topic(f.topic.value).title : f.sub.value ? IB.subjects[f.sub.value].name : "Mixed";
+    const sub = f.sub.value || (new Set(qs.map((q) => q.subject)).size === 1 ? qs[0].subject : null);
+    const title = open ? IB.qs("#pTitle").value.trim() || exportTitle(sub) : f.topic.value ? IB.topic(f.topic.value).title : f.sub.value ? IB.subjects[f.sub.value].name : "Mixed";
     IB.download(`IB-worksheet-${title.replace(/[^\w]+/g, "-")}.html`, IB.standaloneDoc(`${title} worksheet`, `<h1>${IB.esc(title)} - practice worksheet</h1><p class="meta">${qs.length} questions · total ${qs.reduce((n, q) => n + q.marks, 0)} marks</p>` + IB.worksheetHtml(qs, "Questions")));
   };
 

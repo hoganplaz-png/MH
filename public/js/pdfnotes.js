@@ -633,14 +633,17 @@ table.fn-table{margin:0 0 8px}table.fn-table thead th{background:#E2E8F0;color:#
       });
       const h2c = window.html2canvas.default || window.html2canvas.html2canvas || window.html2canvas;
       const pdf = new window.jspdf.jsPDF({ unit: "pt", format: "a4", compress: true });
+      const big = all.length > 60;
       all.forEach((p) => p.remove());
       for (let i = 0; i < all.length; i++) {
         prog.set(`Rendering page ${i + 1} of ${all.length}`, 0.3 + (0.7 * i) / all.length);
         root.appendChild(all[i]);
-        const canvas = await h2c(all[i], { scale: 1.7, backgroundColor: "#ffffff", logging: false, useCORS: true, width: PW, height: PH, windowWidth: PW, windowHeight: PH });
+        // long papers (whole topics / several topics) render a little lighter so the file stays small
+        const canvas = await h2c(all[i], { scale: big ? 1.4 : 1.7, backgroundColor: "#ffffff", logging: false, useCORS: true, width: PW, height: PH, windowWidth: PW, windowHeight: PH });
         root.removeChild(all[i]);
         if (i) pdf.addPage();
-        pdf.addImage(canvas.toDataURL("image/jpeg", 0.82), "JPEG", 0, 0, 595.28, 841.89, undefined, "FAST");
+        pdf.addImage(canvas.toDataURL("image/jpeg", big ? 0.76 : 0.82), "JPEG", 0, 0, 595.28, 841.89, undefined, "FAST");
+        canvas.width = canvas.height = 0;
       }
       pdf.setProperties({ title, subject: s ? s.name : "IB practice paper", creator: "IB Revision Hub" });
       prog.set("Done", 1);
