@@ -167,7 +167,7 @@
   IB.caseSource = (c) =>
     `${c.text ? `<div class="case-text">${c.text}</div>` : ""}${(c.data || []).map((d) => `<div class="case-data">${d.caption ? `<div class="case-cap">${d.caption}</div>` : ""}<div class="table-wrap"><table class="compare"><tr>${d.head.map((h) => `<th>${h}</th>`).join("")}</tr>${d.rows.map((r) => `<tr>${r.map((x, i) => (i ? `<td>${x}</td>` : `<th scope="row">${x}</th>`)).join("")}</tr>`).join("")}</table></div></div>`).join("")}`;
   IB.caseHead = (c, open) =>
-    `<details class="case-src"${open ? " open" : ""}><summary>📄 ${c.title} <span class="case-meta">${c.paper} · ${c.parts.reduce((n, p) => n + p.marks, 0)} marks · ${open ? "text & data" : "show text & data"}</span></summary>${IB.caseSource(c)}</details>`;
+    `<details class="case-src"${open ? " open" : ""}><summary>📄 ${c.title} <span class="case-meta">${c.subject === "chia" ? `${c.paper === "P1" ? "試卷一" : c.paper} · ${c.parts.reduce((n, p) => n + p.marks, 0)}分 · ${open ? "文本" : "顯示文本"}` : `${c.paper} · ${c.parts.reduce((n, p) => n + p.marks, 0)} marks · ${open ? "text & data" : "show text & data"}`}</span></summary>${IB.caseSource(c)}</details>`;
 
   IB.subjectList = () => IB.order.map((id) => IB.subjects[id]).filter(Boolean);
   IB.topic = (topicId) => {
