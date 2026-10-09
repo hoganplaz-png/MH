@@ -628,7 +628,7 @@ Mark the student answer out of ${q.marks}. Reply with only a JSON object of this
 {"score": <integer 0-${q.marks}>, "level": "<level/band for extended responses, else empty string>", "summary": "<1-2 sentence verdict>", "awarded": ["<markscheme points earned>"], "missing": ["<points missed or wrong>"], "improvements": ["<concrete actions to gain the missing marks>"], "model_answer": "<concise full-mark model answer>"}`;
         let r;
         try {
-          r = await sample.json(prompt, { modelTier: "default" });
+          r = await sample.json(prompt, { model: "claude-sonnet-5-5", modelTier: "default" });
         } catch (e) {
           throw sampleError(e);
         }
@@ -658,7 +658,7 @@ Mark the student answer out of ${q.marks}. Reply with only a JSON object of this
         const sample = await this.sampler();
         if (!sample) throw new Error("AI isn't available here.");
         try {
-          return await sample.json(prompt, { modelTier: "default", cache: false });
+          return await sample.json(prompt, { model: "claude-sonnet-5-5", modelTier: "default", cache: false });
         } catch (e) {
           throw sampleError(e);
         }
@@ -681,7 +681,7 @@ Markscheme: a list of mark points (one creditworthy point per mark where possibl
 Write maths with \\( \\) delimiters.
 Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "short"|"extended"|"mcq", "options": ["A text","B text","C text","D text"] or [], "answer": <0-based index for mcq, else -1>, "ms": ["point 1", "point 2"]}]}`;
         try {
-          const r = await sample.json(prompt, { modelTier: "default", cache: false });
+          const r = await sample.json(prompt, { model: "claude-sonnet-5-5", modelTier: "default", cache: false });
           return (r && Array.isArray(r.questions) ? r.questions : []).filter((x) => x && x.q).map((x) => ({
             q: String(x.q), marks: Math.max(1, Math.min(20, parseInt(x.marks, 10) || 2)), type: ["mcq", "short", "extended"].includes(x.type) ? x.type : "short",
             options: Array.isArray(x.options) ? x.options.map(String) : [], answer: Number.isInteger(x.answer) ? x.answer : -1, ms: Array.isArray(x.ms) ? x.ms.map(String) : [],
@@ -704,7 +704,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
           (payload.messages || []).filter((m) => m.content && (m.role === "user" || m.role === "assistant")).slice(-20).map((m) => ({ role: m.role, content: String(m.content).slice(0, 12000) }))
         );
         try {
-          await sample(turns, { cache: false, onText: ({ delta }) => onDelta(delta) });
+          await sample(turns, { model: "claude-sonnet-5-5", modelTier: "default", cache: false, onText: ({ delta }) => onDelta(delta) });
         } catch (e) {
           throw sampleError(e);
         }

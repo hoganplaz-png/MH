@@ -14,7 +14,7 @@ import Anthropic from "@anthropic-ai/sdk";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(here, "public");
 const PORT = Number(process.env.PORT) || 3000;
-const MODEL = process.env.CLAUDE_MODEL || "claude-opus-5-5";
+const MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-5-5";
 const FALLBACK_BETA = "server-side-fallback-2026-07-01";
 
 // AI is on when credentials are configured (ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN),
