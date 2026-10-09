@@ -10,55 +10,61 @@ IB.page = function () {
   const streak = IB.streak(data).days;
 
   app.innerHTML = `
-  <section class="band home-band">
+  <section class="band">
     <div class="hero">
       <div class="hero-copy">
-        <h1>Write the answer. See where the marks went.</h1>
-        <p class="lead">Notes with 答題框架, an exam-style question bank and IB-style papers for eight Diploma subjects at SL and HL. Every answer is marked against the markscheme, point by point.</p>
+        <span class="eyebrow">IB Diploma · 8 subjects · SL &amp; HL · Notes · Questions · Mocks · IA &amp; EE</span>
+        <h1>Every topic. Every paper. <span class="hl">Marked like the real thing.</span></h1>
+        <p class="lead">Notes with 答題框架 for every topic, an exam-style question bank, IB-style PDF papers and mocks, marked instantly and strictly against the markscheme.</p>
         <div class="btn-row">
           <a class="btn primary" href="practice.html">Start a quiz</a>
-          ${recentTopic ? `<a class="btn" href="notes.html?subject=${recentTopic.subject}&topic=${recentTopic.id}">Continue ${IB.esc(recentTopic.title)}</a>` : `<a class="btn" href="notes.html">Browse the notes</a>`}
+          ${recentTopic ? `<a class="btn" href="notes.html?subject=${recentTopic.subject}&topic=${recentTopic.id}">Continue: ${IB.esc(recentTopic.title)} →</a>` : `<a class="btn" href="notes.html">Browse notes →</a>`}
         </div>
-        <p class="hero-facts"><strong>${totalT} syllabus topics</strong> with notes, <strong>${totalQ.toLocaleString()} questions</strong> with markschemes, and fresh calculation questions whenever you want more.</p>
       </div>
-      <figure class="script" aria-label="Example: a 4-mark Economics answer marked against the markscheme, scoring 3 out of 4">
-        <div class="script-q" aria-hidden="true">
-          <span class="qn">3.</span>
-          <span><span class="script-src">Economics SL, Paper 2</span>Using a diagram, explain how a severe drought in Brazil is likely to affect the world price of coffee.</span>
-          <span class="marks">[4]</span>
+      <div class="hero-demo" aria-label="Example of markscheme marking">
+        <div class="btn-row" style="justify-content:space-between">
+          <span class="pill econ">Econ SL · Paper 2</span>
+          <span class="mono" style="font-weight:700">[4 marks]</span>
         </div>
-        <ol class="script-lines" aria-hidden="true">
-          <li><span class="tick" style="--i:0"><svg viewBox="0 0 28 24" width="26" height="22"><path d="M2.5 13.5c2.6 1.4 4.6 4 6.4 7.2C12 13 17.4 6.2 25.5 2.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Drought cuts yields, so supply shifts left from S₁ to S₂.</li>
-          <li><span class="tick" style="--i:1"><svg viewBox="0 0 28 24" width="26" height="22"><path d="M2.5 13.5c2.6 1.4 4.6 4 6.4 7.2C12 13 17.4 6.2 25.5 2.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>At the old price P₁ there is now a shortage.</li>
-          <li><span class="tick" style="--i:2"><svg viewBox="0 0 28 24" width="26" height="22"><path d="M2.5 13.5c2.6 1.4 4.6 4 6.4 7.2C12 13 17.4 6.2 25.5 2.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>The price rises to P₂ until the market clears.</li>
-          <li><span class="tick" style="--i:3"><svg viewBox="0 0 28 24" width="26" height="22"><path d="M2.5 13.5c2.6 1.4 4.6 4 6.4 7.2C12 13 17.4 6.2 25.5 2.2" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Diagram: demand, S₁, S₂, P₁ and P₂ shown.</li>
-          <li><span class="tick miss" style="--i:4">Q₂?</span>&nbsp;</li>
-        </ol>
-        <p class="script-note" aria-hidden="true">Clear chain of reasoning. Label the new equilibrium quantity for the last mark.</p>
-        <span class="script-total" aria-hidden="true">3/4</span>
-      </figure>
+        <div style="font-size:1.05rem;line-height:1.5;font-weight:500">Using a diagram, explain how a severe drought in Brazil is likely to affect the world price of coffee.</div>
+        <div class="answer">Drought reduces crop yields, so supply shifts left from S₁ to S₂. At the old price there is a shortage, so the price rises to P₂…</div>
+        <div class="verdict demo-anim">
+          <div style="display:flex;align-items:center;gap:12px"><span class="big"><span data-count="3">3</span>/4</span><span class="pill" style="background:#DDF3E6;color:#155E34">Markscheme marker</span></div>
+          <div><strong style="color:#155E34">✓</strong> Supply shifts left · <strong style="color:#155E34">✓</strong> Shortage → price rises · <strong style="color:#155E34">✓</strong> Diagram</div>
+          <div><strong style="color:#B42318">✗</strong> Missing: label the new equilibrium Q₂</div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <div style="margin-top:8px">${IB.gamePanel(data, { compact: true })}</div>
+  <div style="margin-top:40px">${IB.gamePanel(data, { compact: true })}</div>
+  <section class="grid grid-4 stat-grid" style="margin-top:20px" aria-label="Site statistics">
+    <div class="card stat-tile"><span class="stat-big" data-count="${totalT}">${totalT}</span><span class="muted">syllabus topics with notes</span></div>
+    <div class="card stat-tile"><span class="stat-big" data-count="${totalQ}">${totalQ}</span><span class="muted">exam-style questions with markschemes</span></div>
+    <div class="card stat-tile"><span class="stat-big">∞</span><span class="muted">fresh calculation questions</span></div>
+    <div class="card stat-tile accent"><span class="stat-big">${streak} day${streak === 1 ? "" : "s"}</span><span class="muted">your revision streak</span></div>
+  </section>
 
-  <div class="section-head">
-    <h2>Your subjects</h2>
-    <span class="muted small">Grades are estimated from your last 20 attempts on each topic.</span>
+  <div class="btn-row" style="justify-content:space-between;align-items:flex-end;margin-top:56px">
+    <h2 style="margin:0">Your subjects</h2>
+    <span class="muted small">Mastery from your last 20 attempts per topic</span>
   </div>
-  <section class="subject-grid" id="subjects"></section>
+  <section class="subject-grid" id="subjects" style="margin-top:20px"></section>
 
-  <div class="section-head"><h2>What you can do here</h2></div>
-  <ul class="contents" id="features">
+  <h2 style="margin-top:56px">Everything you need for a 7</h2>
+  <section class="features" id="features">
     ${[
-      ["notes.html", "Topic notes and PDFs", "Concepts, fastest methods, common traps and worked examples, with a four-colour highlight key. Download any topic or a whole subject as a PDF booklet.", "Browse the notes"],
-      ["questionbank.html", `${totalQ.toLocaleString()} practice questions`, "Exam-style questions, calculations, worked-example replays, explain-the-concept, key-term drills and spot-the-mistake for every topic.", "Open the question bank"],
-      ["practice.html?mode=mock", "Quizzes and mock papers", "Timed papers in the real structure, unit quizzes, and smart quizzes that target your weakest topics, all marked as soon as you finish.", "Sit a mock"],
-      ["skills.html", "Answer frameworks", "A framework for every command term and question type, sentence starters, top-band checklists and the markscheme explained band by band.", "Learn the frameworks"],
-      ["ia.html", "IA and EE predictor", "Score your coursework on each criterion against the official descriptors and see your predicted grade and core points.", "Predict my grade"],
-      ["mistakes.html", "Mistakes notebook", "Every question you get wrong is saved here. Retry it until you get it right and it leaves the notebook.", "Open my mistakes"],
-    ].map(([href, title, text, cta]) => `<li><a href="${href}"><h3>${title}</h3><p>${text}</p><span class="go">${cta}</span></a></li>`).join("")}
-  </ul>`;
+      ["notes.html", "∑", "Learn", "Topic notes + PDFs", "Concepts, fastest methods, traps, worked examples and a four-colour highlight key - download any topic or subject as a designed PDF booklet.", "Browse notes"],
+      ["questionbank.html", "?", "Practise", `${totalQ.toLocaleString()} questions`, "A structured bank for every topic: exam-style, calculations, worked-example replays, explain-the-concept, key-term drills and spot-the-mistake.", "Open the bank"],
+      ["practice.html?mode=mock", "⏱", "Test yourself", "Quizzes & mock papers", "Timed papers in the real structure, unit quizzes and smart quizzes that target your weakest topics - marked instantly.", "Sit a mock"],
+      ["skills.html", "✎", "Exam technique", "Answer frameworks", "A framework for every question type, sentence starters, top-band checklists and the markscheme decoded band by band.", "Learn the frameworks"],
+      ["ia.html", "◎", "Coursework", "IA & EE predictor", "Score yourself on every criterion against the official descriptors and see your predicted grade and core points.", "Predict my grade"],
+      ["mistakes.html", "✗", "Fix your gaps", "Mistakes notebook", "Every question you get wrong is saved automatically. Retry them until you get them right, then they graduate out.", "Open my mistakes"],
+    ].map(([href, icon, eyebrow, title, text, cta], i) => `<a class="card feature" href="${href}" data-reveal style="--i:${i}">
+      <span class="f-icon" aria-hidden="true">${icon}</span>
+      <span class="eyebrow">${String(i + 1).padStart(2, "0")} · ${eyebrow}</span>
+      <h3>${title}</h3><p class="muted">${text}</p><span class="f-cta">${cta} →</span></a>`).join("")}
+  </section>`;
 
   const grid = IB.qs("#subjects");
   subs.forEach((s) => {
@@ -67,15 +73,21 @@ IB.page = function () {
     const tried = rows.filter((m) => m !== null);
     const pct = tried.length ? Math.round(rows.reduce((n, m) => n + (m ?? 0), 0) / rows.length) : 0;
     const next = s.topics.map((t, i) => ({ t, m: rows[i] })).sort((a, b) => (a.m ?? -1) - (b.m ?? -1))[0].t;
+    const mono = { econ: "Ec", chem: "Ch", phys: "Ph", geo: "Ge", math: "Ma", bio: "Bi", engb: "En", chia: "中" }[s.id] || s.short.slice(0, 2);
+    const C = 2 * Math.PI * 26;
     grid.appendChild(
-      IB.el(`<a class="card subject-card" href="notes.html?subject=${s.id}" style="--c:${s.color}">
+      IB.el(`<a class="card subject-card" href="notes.html?subject=${s.id}" style="--c:${s.color}" data-reveal>
         <div class="stripe"></div>
         <div class="body">
           <div class="sc-top">
-            <div><h3>${s.name}</h3><div class="stats">${s.topics.length} topics, ${qs.length.toLocaleString()} questions</div></div>
-            <span class="sc-ring${tried.length ? "" : " none"}" title="${tried.length ? "Estimated grade " + IB.grade(pct, s.id) : "Not started yet"}"><b>${tried.length ? IB.grade(pct, s.id) : "new"}</b></span>
+            <span class="sc-mono">${mono}</span>
+            <span class="sc-ring" title="${tried.length ? "Estimated grade " + IB.grade(pct, s.id) : "Not started yet"}">
+              <svg viewBox="0 0 60 60" aria-hidden="true"><circle cx="30" cy="30" r="26" class="trk"/><circle cx="30" cy="30" r="26" class="val" style="stroke-dasharray:${C};--off:${C * (1 - pct / 100)}"/></svg>
+              <b>${tried.length ? IB.grade(pct, s.id) : "–"}</b>
+            </span>
           </div>
-          <div class="sc-next"><span class="muted">Next up</span><span>${IB.esc(next.title)}</span><strong class="mono">${tried.length ? pct + "%" : ""}</strong></div>
+          <div><h3>${s.name}</h3><div class="stats">${s.topics.length} topics · ${qs.length.toLocaleString()} questions</div></div>
+          <div class="sc-next"><span class="muted">Next up</span><span>${IB.esc(next.title)}</span><strong class="mono">${tried.length ? pct + "%" : "new"}</strong></div>
         </div>
       </a>`)
     );

@@ -106,7 +106,7 @@ IB.page = function () {
       };
       btn("← Prev", page - 1, page === 1);
       pager.appendChild(IB.el(`<span class="muted small" style="align-self:center">Page ${page} of ${pages}</span>`));
-      btn("Next", page + 1, page === pages);
+      btn("Next →", page + 1, page === pages);
     }
   }
 
