@@ -12,6 +12,7 @@
     "skills.html": ["skills", "js/skills.js"],
     "ia.html": ["ia", "js/iaee.js"],
     "tutor.html": ["tutor", "js/tutor.js"],
+    "coach.html": ["coach", "js/coach.js"],
     "mypapers.html": ["mypapers", "js/mypapers.js"],
     "progress.html": ["progress", "js/progress.js"],
     "mistakes.html": ["mistakes", "js/mistakes.js"],

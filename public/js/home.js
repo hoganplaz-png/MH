@@ -58,6 +58,7 @@ IB.page = function () {
       ["questionbank.html", "?", "Practise", `${totalQ.toLocaleString()} questions`, "A structured bank for every topic: exam-style, calculations, worked-example replays, explain-the-concept, key-term drills and spot-the-mistake.", "Open the bank"],
       ["practice.html?mode=mock", "⏱", "Test yourself", "Quizzes & mock papers", "Timed papers in the real structure, unit quizzes and smart quizzes that target your weakest topics - marked instantly.", "Sit a mock"],
       ["skills.html", "✎", "Exam technique", "Answer frameworks", "A framework for every question type, sentence starters, top-band checklists and the markscheme decoded band by band.", "Learn the frameworks"],
+      ["coach.html", "✦", "Claude coach", "IA & EE grading", "Upload your IA or EE draft: Claude marks every criterion with evidence, then coaches you as a supervisor.", "Grade my draft"],
       ["ia.html", "◎", "Coursework", "IA & EE predictor", "Score yourself on every criterion against the official descriptors and see your predicted grade and core points.", "Predict my grade"],
       ["mistakes.html", "✗", "Fix your gaps", "Mistakes notebook", "Every question you get wrong is saved automatically. Retry them until you get them right, then they graduate out.", "Open my mistakes"],
     ].map(([href, icon, eyebrow, title, text, cta], i) => `<a class="card feature" href="${href}" data-reveal style="--i:${i}">
