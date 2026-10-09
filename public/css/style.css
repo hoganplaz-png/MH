@@ -990,3 +990,28 @@ body::after {
 @media print { .dg-panel { display: none !important; } }
 .dg-opt { font-style: normal; font-size: .72rem; font-weight: 700; color: var(--muted); }
 .dg-model .plot { max-width: 420px; }
+/* diagram panel polish */
+.dg-panel { background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%); border-color: var(--border); overflow: hidden; }
+.dg-panel[open] { box-shadow: var(--shadow); border-left: 5px solid var(--econ); }
+.dg-panel > summary { padding: 14px 16px; font-size: 1.02rem; }
+.dg-panel > summary strong { font-family: var(--font-display); color: var(--text); }
+.dg-ico { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: color-mix(in srgb, var(--econ) 14%, transparent); }
+.dg-body { gap: 20px; padding: 4px 16px 18px; }
+.dg-step { display: flex; align-items: center; gap: 8px; font: 800 .74rem var(--font); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
+.dg-step span { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--on-ink); font-size: .75rem; letter-spacing: 0; }
+.dg-drop { border-radius: 16px; padding: 26px 18px; min-height: 220px; background: repeating-linear-gradient(0deg, transparent 0 27px, color-mix(in srgb, var(--primary) 8%, transparent) 27px 28px), var(--surface); }
+.dg-drop:hover, .dg-drop:focus-visible { border-color: var(--primary); }
+.dg-drop-ico { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; font-size: 1.5rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); margin-bottom: 6px; transition: transform .25s; }
+.dg-drop:hover .dg-drop-ico, .dg-drop.over .dg-drop-ico { transform: translateY(-4px); }
+.dg-fig img { border-radius: 14px; box-shadow: 0 6px 20px rgba(15, 27, 45, .12); }
+.dg-items { gap: 8px; }
+.dg-item { border-radius: 12px; padding: 10px 12px; transition: background .2s, border-color .2s, transform .15s; }
+.dg-item:hover { transform: translateX(2px); border-color: var(--muted); }
+.dg-item input { accent-color: var(--good); width: 18px; height: 18px; flex: none; }
+.dg-meter { height: 8px; border-radius: 99px; background: var(--border); overflow: hidden; margin: 4px 0 8px; }
+.dg-meter i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--primary); transition: width .4s ease-out, background .3s; }
+.dg-meter i.full { background: var(--good); }
+.dg-meter i.warn { background: var(--mark); }
+.dg-score { border-radius: 12px; }
+.dg-more summary { font-weight: 700; }
+@media (prefers-reduced-motion: reduce) { .dg-item, .dg-meter i, .dg-drop-ico { transition: none; } }

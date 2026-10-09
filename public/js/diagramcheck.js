@@ -120,7 +120,9 @@
       <summary><span class="dg-ico" aria-hidden="true">📈</span> <strong>${expected ? "Your diagram" : "Add a diagram (optional)"}</strong> ${worth}</summary>
       <div class="dg-body">
         <div class="dg-shot">
+          <div class="dg-step"><span>1</span> Add your diagram</div>
           <div class="dg-drop" tabindex="0">
+            <div class="dg-drop-ico" aria-hidden="true">⤒</div>
             <p><strong>Upload a photo or screenshot of your diagram</strong></p>
             <p class="small muted">Draw it on paper or a tablet, then add it here. You can also paste (Ctrl+V) or drag the image in.</p>
             <label class="btn small primary dg-pick">📷 Choose image<input type="file" accept="image/*" hidden></label>
@@ -128,8 +130,10 @@
           <figure class="dg-fig" hidden><img alt="Your uploaded diagram"><figcaption class="btn-row"><button type="button" class="btn small dg-zoom">Enlarge</button><label class="btn small">Replace<input type="file" accept="image/*" hidden></label><button type="button" class="btn small dg-del">Remove</button></figcaption></figure>
         </div>
         <div class="dg-check">
+          <div class="dg-step"><span>2</span> Check it like an examiner</div>
           <label class="dg-type small"><span class="muted">Diagram markscheme for</span> <select aria-label="Diagram type">${order.map((id) => `<option value="${id}">${esc(D.types[id].name)}</option>`).join("")}</select></label>
           <div class="dg-items"></div>
+          <div class="dg-meter" aria-hidden="true"><i></i></div>
           <div class="dg-score small"></div>
           <div class="btn-row dg-ai-row" hidden><button type="button" class="btn small mark dg-ai">✦ Check my diagram with AI</button><span class="small muted dg-ai-msg"></span></div>
           <details class="dg-more"><summary class="small">Common errors that lose the diagram mark</summary><ul class="small dg-errors"></ul></details>
@@ -156,6 +160,9 @@
       const n = d.items.filter((it, i) => !D.optional(it) || state.ticks[i]).length;
       const earned = D.score(state.type, state.ticks, pts.length);
       const keyMiss = d.items.some((it, i) => it.key && !state.ticks[i]);
+      const bar = IB.qs(".dg-meter i", el);
+      bar.style.width = (state.img ? Math.round((100 * got) / Math.max(1, n)) : 0) + "%";
+      bar.className = keyMiss ? "warn" : got >= n ? "full" : "";
       scoreEl.innerHTML = !state.img
         ? `<span class="muted">Upload your diagram to have it marked. Until then, use the checklist as a guide while you draw.</span>`
         : `<strong>${got}/${n}</strong> checklist points${pts.length ? ` → <strong>${earned}/${pts.length}</strong> diagram mark${pts.length > 1 ? "s" : ""}` : ""}${keyMiss ? ` <span class="dg-warn">· an essential point is missing</span>` : ""}${state.ai ? ` <span class="pill good">checked by AI</span>` : ` <span class="pill">self-checked</span>`}`;
