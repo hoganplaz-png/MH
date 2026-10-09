@@ -951,13 +951,15 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
   IB.toast = function (msg) {
     let t = document.getElementById("toast");
     if (!t) {
-      t = IB.el(`<div id="toast" style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:10px;z-index:99;font-size:.92rem;max-width:90vw;box-shadow:var(--shadow);transition:opacity .3s"></div>`);
+      // styled in style.css; hidden toasts take no clicks, so they never block the buttons underneath
+      t = IB.el(`<div id="toast" role="status" aria-live="polite"></div>`);
       document.body.appendChild(t);
     }
     t.textContent = msg;
-    t.style.opacity = 1;
+    void t.offsetWidth;
+    t.classList.add("show");
     clearTimeout(t._h);
-    t._h = setTimeout(() => (t.style.opacity = 0), 3200);
+    t._h = setTimeout(() => t.classList.remove("show"), 3200);
   };
 
   function chrome() {
@@ -983,7 +985,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       ${IB.gameChip ? IB.gameChip() : ""}
       <span id="acctSlot"></span>
       <button class="icon-btn lvl-btn" id="lvlBtn" title="Choose SL or HL for each subject" aria-label="Choose SL or HL" aria-expanded="false">SL/HL</button>
-      <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode">◐</button>
+      <button class="icon-btn" id="themeBtn" title="Toggle dark mode" aria-label="Toggle dark mode"><svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></g><path class="moon" d="M20.5 14.6A8.5 8.5 0 1 1 9.4 3.5a6.8 6.8 0 0 0 11.1 11.1z"/></svg></button>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">☰</button>
     </div></header>`);
     document.body.prepend(header);
@@ -1006,13 +1008,28 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       const close = (ev) => { if (!panel.contains(ev.target) && ev.target !== lvlBtn) { panel.remove(); lvlBtn.setAttribute("aria-expanded", "false"); document.removeEventListener("click", close); } };
       setTimeout(() => document.addEventListener("click", close), 0);
     };
-    IB.qs("#themeBtn").onclick = () => {
-      const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      const next = cur === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      try { localStorage.setItem("ibrev:theme", next); } catch (e) { /* ignore */ }
+    IB.qs("#themeBtn").onclick = (e) => {
+      const next = isDark() ? "light" : "dark";
+      const apply = () => {
+        document.documentElement.dataset.theme = next;
+        syncTheme();
+        try { localStorage.setItem("ibrev:theme", next); } catch (err) { /* ignore */ }
+      };
+      // the new theme spreads out in a circle from the button where the browser supports view transitions
+      const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!document.startViewTransition || calm) return apply();
+      const r = e.currentTarget.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      document.startViewTransition(apply).ready.then(() => {
+        document.documentElement.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] }, { duration: 550, easing: "cubic-bezier(.4, 0, .2, 1)", pseudoElement: "::view-transition-new(root)" });
+      }).catch(() => {});
     };
+    syncTheme();
   }
+  // .is-dark on <html> tells CSS which icon the theme button shows, whichever way dark mode was chosen
+  const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+  const syncTheme = () => document.documentElement.classList.toggle("is-dark", isDark());
+  if (window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncTheme);
   try {
     const th = localStorage.getItem("ibrev:theme");
     if (th) document.documentElement.dataset.theme = th;
@@ -1042,6 +1059,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       const app = document.getElementById("app");
       if (IB.floaters) IB.qsa(".band", app).forEach(IB.floaters);
       if (IB.animate) IB.animate(app);
+      if (IB.fx) IB.fx(app);
     });
   };
 

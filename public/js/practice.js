@@ -15,7 +15,7 @@ IB.page = function () {
     <div id="run"></div>
     <div id="history"></div>`;
 
-  const subjectSelect = (id, val) => `<label class="field">Subject<select id="${id}">${IB.subjectList().map((s) => `<option value="${s.id}" ${s.id === val ? "selected" : ""}>${s.name}</option>`).join("")}</select></label>`;
+  const subjectSelect = (id, val, only) => `<label class="field">Subject<select id="${id}">${IB.subjectList().filter((s) => !only || only(s)).map((s) => `<option value="${s.id}" ${s.id === val ? "selected" : ""}>${s.name}</option>`).join("")}</select></label>`;
   const setup = IB.qs("#setup");
   const run = IB.qs("#run");
 
@@ -263,10 +263,11 @@ IB.page = function () {
       };
     },
     drill() {
-      const sid = subParam || "math";
+      const hasGen = (s) => IB.generatorTopics(s.id).length > 0;
+      const sid = IB.subjects[subParam] && hasGen(IB.subjects[subParam]) ? subParam : "math";
       setup.innerHTML = `<div class="card"><h2 style="margin-top:0">Calculation drill</h2>
         <p class="muted">Endless fresh calculation questions with instant marking. Build speed and accuracy - keep your streak going.</p>
-        <div class="filters">${subjectSelect("dSub", sid)}<label class="field">Topic<select id="dTopic"></select></label></div>
+        <div class="filters">${subjectSelect("dSub", sid, hasGen)}<label class="field">Topic<select id="dTopic"></select></label></div>
         <div class="btn-row" style="margin:14px 0"><span class="pill good" id="streak">Streak 0</span><span class="pill" id="dScore">0/0 correct</span></div>
         <div id="dQ"></div></div>`;
       let streak = 0, right = 0, total = 0;
@@ -278,8 +279,9 @@ IB.page = function () {
       };
       const next = () => {
         const ts = IB.qs("#dTopic").value ? [IB.qs("#dTopic").value] : IB.generatorTopics(IB.qs("#dSub").value);
-        const q = IB.generate(IB.pick(ts));
+        const q = ts.length ? IB.generate(IB.pick(ts)) : null;
         const box = IB.qs("#dQ");
+        if (!q) { box.innerHTML = `<p class="muted">No calculation questions for this subject yet - pick another subject.</p>`; return; }
         box.innerHTML = `<div class="q-card"><div class="q-meta"><span class="pill ${q.subject}">${IB.esc(IB.topic(q.topic).title)}</span><span class="marks">[${q.marks}]</span></div>
           <div class="q-text rich">${q.q}</div>
           <div class="btn-row" style="margin-top:10px"><input type="text" id="dAns" placeholder="Your final answer" style="max-width:260px" autocomplete="off"><button class="btn primary" id="dCheck">Check</button><button class="btn" id="dSkip">Skip</button></div>
