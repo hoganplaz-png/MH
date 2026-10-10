@@ -161,7 +161,8 @@
           alt: x.s !== "C" && !x.numeric && !x.options,
         };
         if (/\+/.test(String(x.m))) q.split = String(x.m);
-        if (x.numeric) q.numeric = x.numeric;
+        // drill tolerances were written both as absolute and as relative values: never accept more than 2% off
+        if (x.numeric) q.numeric = Object.assign({}, x.numeric, { tol: Math.min(x.numeric.tol ?? Infinity, Math.max(Math.abs(x.numeric.value) * 0.02, 1e-12)) });
         if (x.options) Object.assign(q, { options: x.options, answer: x.answer });
         if (t.hl) q.hl = true;
         t.questions.push(q);
