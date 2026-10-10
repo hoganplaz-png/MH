@@ -623,6 +623,7 @@
   let counter = 0;
   IB._generated = IB._generated || {};
 
+  IB._gens = G; // later files (js/data/math-pp.js) add graph generators
   IB.hasGenerator = (topicId) => !!G[topicId];
   IB.generatorTopics = (subjectId) => Object.keys(G).filter((k) => !subjectId || k.startsWith(subjectId + "-"));
 
