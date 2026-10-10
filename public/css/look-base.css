@@ -1,0 +1,59 @@
+/* Shared by every design try (css/look-*.css). Strips the ambient effects that make a page feel generated
+   (drifting dots, cursor glow, floating symbols, gradient icon tiles, shine sweeps) and replaces them with
+   a small, consistent motion system: one easing, short durations, movement only where it explains something. */
+:root[data-look] {
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --t-fast: 140ms;
+  --t: 220ms;
+  --t-slow: 420ms;
+}
+
+/* ambient effects off */
+[data-look] .floaters, [data-look] .band-curves, [data-look] .fx-net, [data-look] .fx-glow { display: none !important; }
+[data-look] .card:hover, [data-look] .callout:hover, [data-look] .sec-tab:hover, [data-look] .fw-chip:hover { background-image: none; }
+[data-look] .btn.primary:hover { animation: none; }
+[data-look] .stat-tile.accent { animation: none; }
+[data-look] .subject-card:hover .sc-mono, [data-look] .feature:hover .f-icon { transform: none; }
+[data-look] .feature:hover .f-cta { letter-spacing: normal; }
+[data-look] .read-progress { background: var(--primary); height: 2px; }
+
+/* page to page: a quick cross-fade instead of every page sliding in */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 180ms; animation-timing-function: ease-out; }
+[data-look] #app { animation: none; }
+[data-look] main { animation: none; }
+
+/* scroll reveal: shorter travel, no long cascades */
+[data-look] .rv { opacity: 0; transform: translateY(8px); }
+[data-look] .rv.in { opacity: 1; transform: none; transition: opacity var(--t-slow) ease-out calc(var(--rv-delay, 0ms) * .6), transform var(--t-slow) var(--ease) calc(var(--rv-delay, 0ms) * .6); }
+
+/* hero: one entrance for the copy, then the demo */
+[data-look] .hero-copy > * { animation: rise var(--t-slow) var(--ease) both; }
+[data-look] .hero-copy > *:nth-child(2) { animation-delay: 60ms; }
+[data-look] .hero-copy > *:nth-child(3) { animation-delay: 120ms; }
+[data-look] .hero-copy > *:nth-child(4) { animation-delay: 180ms; }
+[data-look] .hero-demo { animation: rise 520ms 200ms var(--ease) both; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* controls answer the pointer quickly and the same way everywhere */
+[data-look] .btn, [data-look] .icon-btn, [data-look] .subject-tabs button, [data-look] .tabs button, [data-look] .topic-list li a {
+  transition: background-color var(--t-fast) ease-out, border-color var(--t-fast) ease-out, color var(--t-fast) ease-out, transform var(--t-fast) ease-out;
+}
+[data-look] .btn:active, [data-look] .icon-btn:active { transform: translateY(1px); }
+[data-look] .subject-card, [data-look] .feature { transition: border-color var(--t) ease-out, transform var(--t) var(--ease), box-shadow var(--t) ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}
+
+/* no drifting glows, no aurora, no panning grid, no shine gradient on primary buttons */
+[data-look] body::before, [data-look] body::after, [data-look] .band::before { display: none !important; }
+[data-look] .btn.primary { background-image: none; }
+/* no spinning conic border on the demo, no tilt on hover, no glow under the active tab */
+[data-look] .hero-demo::before { display: none; }
+[data-look] .hero-demo:hover { transform: none; }
+[data-look] .subject-tabs button.active { box-shadow: none; animation: none; }
+[data-look] .xp-chip .xpbar span { background: var(--mark); }
+[data-look] a.card:hover, [data-look] .subject-card:hover, [data-look] .section-card:hover { box-shadow: none; }
+[data-look] .feature:hover .f-icon, [data-look] .subject-card:hover .grade { animation: none; transform: none; }
+[data-look] .subject-grid > .card + .card { margin-top: 0; }

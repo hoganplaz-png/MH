@@ -1,0 +1,124 @@
+/* Try 2 - "Editorial": reads like a well-set study guide. Warm paper, a serif for headings (Newsreader),
+   Public Sans for text, light header and intro bands instead of dark ones, red-pen marks in the marking
+   demo, and hairline rules in place of boxes and shadows. Motion is ink-like: things fade and draw in. */
+@import url("look-base.css");
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+:root[data-look="editorial"] {
+  --font-display: "Newsreader", Georgia, serif;
+  --font: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --bg: #F8F6F1;
+  --surface: #FFFFFF;
+  --surface-2: #F1EEE6;
+  --text: #1B1A17;
+  --muted: #5E5A50;
+  --border: #E3DED2;
+  --primary: #1F45C4;
+  --primary-hover: #15339A;
+  --primary-soft: #E8ECFA;
+  --pen: #C8102E;
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow: none;
+  --on-ink: #1B1A17;
+  --on-ink-muted: #5E5A50;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-look="editorial"]:not([data-theme="light"]) {
+    --bg: #161513; --surface: #1E1D1A; --surface-2: #26241F; --text: #ECE8DF; --muted: #A9A396; --border: #34312B;
+    --primary: #8FA6FF; --primary-hover: #B3C2FF; --primary-soft: #1F2440; --pen: #FF6B6B; --on-ink: #ECE8DF; --on-ink-muted: #A9A396;
+  }
+}
+:root[data-look="editorial"][data-theme="dark"] {
+  --bg: #161513; --surface: #1E1D1A; --surface-2: #26241F; --text: #ECE8DF; --muted: #A9A396; --border: #34312B;
+  --primary: #8FA6FF; --primary-hover: #B3C2FF; --primary-soft: #1F2440; --pen: #FF6B6B; --on-ink: #ECE8DF; --on-ink-muted: #A9A396;
+}
+
+[data-look="editorial"] body { font-size: 16px; line-height: 1.65; }
+[data-look="editorial"] h1, [data-look="editorial"] h2, [data-look="editorial"] h3 { font-weight: 500; letter-spacing: -.01em; }
+[data-look="editorial"] h1 { font-size: clamp(2.2rem, 4.6vw, 3.2rem); letter-spacing: -.02em; }
+[data-look="editorial"] h4 { font-family: var(--font); font-weight: 700; }
+
+/* header: paper, with a rule */
+[data-look="editorial"] .site-header { background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: saturate(1.4) blur(8px); color: var(--text); border-bottom: 1px solid var(--border); }
+[data-look="editorial"] .brand { color: var(--text); font-weight: 600; font-size: 1.3rem; letter-spacing: -.01em; }
+[data-look="editorial"] .brand:hover { color: var(--text); }
+[data-look="editorial"] .brand-mark { background: var(--text); color: var(--bg); border-radius: 4px; width: 28px; height: 28px; font: 600 .72rem var(--font); }
+[data-look="editorial"] .icon-btn, [data-look="editorial"] .xp-chip { color: var(--text); border: 1px solid var(--border); border-radius: 6px; min-height: 36px; font-weight: 600; font-size: .85rem; }
+[data-look="editorial"] .icon-btn:hover { background: var(--surface-2); }
+[data-look="editorial"] .nav-links a { color: var(--muted); }
+[data-look="editorial"] .nav-links a:hover, [data-look="editorial"] .nav-links a.active { color: var(--text); }
+[data-look="editorial"] .nav-links a.active { border-bottom-color: var(--pen); }
+@media (max-width: 1420px) { [data-look="editorial"] .nav-links { background: var(--bg); border-top-color: var(--border); } [data-look="editorial"] .nav-links a { border-bottom-color: var(--border); } }
+
+/* intro bands become part of the page */
+[data-look="editorial"] .band { background: transparent; color: var(--text); border-bottom: 1px solid var(--border); }
+[data-look="editorial"] .band h1, [data-look="editorial"] .band h2 { color: var(--text); }
+[data-look="editorial"] .band .lead, [data-look="editorial"] .band p { color: var(--muted); }
+[data-look="editorial"] .eyebrow { font-family: var(--font); text-transform: uppercase; letter-spacing: .12em; font-size: .72rem; font-weight: 600; color: var(--muted); }
+[data-look="editorial"] .band .eyebrow { color: var(--pen); }
+[data-look="editorial"] .band .btn:not(.primary):not(.mark) { color: var(--text); border-color: var(--text); }
+[data-look="editorial"] .hero { padding-block: 72px 80px; }
+[data-look="editorial"] .hero h1 { font-weight: 500; font-size: clamp(2.6rem, 6vw, 4.8rem); line-height: 1; letter-spacing: -.03em; }
+[data-look="editorial"] .hl, [data-look="editorial"] .band .hl { color: inherit; font-style: italic; background: linear-gradient(transparent 66%, color-mix(in srgb, var(--mark) 70%, transparent) 66%, color-mix(in srgb, var(--mark) 70%, transparent) 94%, transparent 94%) no-repeat; background-size: 100% 100%; animation: sweep 800ms 450ms var(--ease) both; }
+
+/* marking demo: an answer script with red-pen marking */
+[data-look="editorial"] .hero-demo { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 4px; box-shadow: 6px 6px 0 var(--surface-2); }
+[data-look="editorial"] .hero-demo .answer { background: transparent; color: var(--text); border-left: 2px solid var(--border); border-radius: 0; font-family: var(--font-display); font-size: 1.05rem; }
+[data-look="editorial"] .hero-demo .verdict { border: 0; border-top: 1px dashed var(--pen); border-radius: 0; padding: 14px 0 0; color: var(--pen); }
+[data-look="editorial"] .hero-demo .verdict * { color: var(--pen); }
+[data-look="editorial"] .hero-demo .verdict .pill { background: transparent; border: 1px solid var(--pen); }
+[data-look="editorial"] .hero-demo .big { font-family: var(--font-display); font-style: italic; font-weight: 600; color: var(--pen); }
+
+/* surfaces: rules, not boxes */
+[data-look="editorial"] .card { border-radius: var(--radius); }
+[data-look="editorial"] .btn { border-radius: 4px; border-width: 1px; font-weight: 600; }
+[data-look="editorial"] .btn.primary { background: var(--text); color: var(--bg); }
+[data-look="editorial"] .btn.primary:hover { background: var(--primary); color: #FFFFFF; }
+[data-look="editorial"] .pill { border-radius: 3px; font-weight: 600; }
+[data-look="editorial"] .stat-big { font-family: var(--font-display); font-weight: 500; }
+[data-look="editorial"] .card.accent { background: var(--surface); color: var(--text); border-color: var(--border); }
+[data-look="editorial"] .card.accent .stat-big { color: var(--pen); font-style: italic; }
+
+[data-look="editorial"] .subject-card { border-radius: 4px; }
+[data-look="editorial"] .subject-card .stripe { height: 2px; }
+[data-look="editorial"] .subject-card:hover { border-color: var(--text); }
+[data-look="editorial"] .sc-mono { background: transparent; color: var(--c); box-shadow: none; border: 1px solid currentColor; border-radius: 50%; width: 44px; height: 44px; font: italic 600 1.15rem var(--font-display); }
+[data-look="editorial"] .sc-ring b { font: 600 1rem var(--font-display); }
+[data-look="editorial"] .subject-card h3 { font-size: 1.3rem; }
+
+[data-look="editorial"] .features { gap: 0; border-top: 1px solid var(--border); }
+[data-look="editorial"] .feature { background: transparent; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; padding: 26px 24px 26px 0; }
+[data-look="editorial"] .feature:hover { border-color: var(--border); }
+[data-look="editorial"] .feature h3 { font-size: 1.45rem; }
+[data-look="editorial"] .f-icon, [data-look="editorial"] .feature:nth-child(n) .f-icon { display: none; }
+[data-look="editorial"] .feature .eyebrow { color: var(--pen); }
+[data-look="editorial"] .f-cta { color: var(--text); font-weight: 600; text-decoration: underline; text-decoration-color: var(--border); text-underline-offset: 4px; transition: text-decoration-color var(--t) ease-out; }
+[data-look="editorial"] .feature:hover .f-cta { text-decoration-color: var(--pen); }
+
+/* notes */
+[data-look="editorial"] .subject-tabs { gap: 0; border-bottom: 1px solid var(--border); }
+[data-look="editorial"] .subject-tabs button { border: 0; border-radius: 0; background: transparent; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-weight: 600; }
+[data-look="editorial"] .subject-tabs button:hover { color: var(--text); }
+[data-look="editorial"] .subject-tabs button.active { background: transparent; color: var(--text); border-bottom-color: var(--c); }
+[data-look="editorial"] .subject-hero, [data-look="editorial"] .topic-banner { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-top: 3px solid var(--c); border-radius: 4px; }
+[data-look="editorial"] .topic-banner::after { display: none; }
+[data-look="editorial"] .subject-hero h1, [data-look="editorial"] .topic-banner h1 { color: var(--text); }
+[data-look="editorial"] .subject-hero .eyebrow { color: var(--c); }
+[data-look="editorial"] .subject-hero p, [data-look="editorial"] .subject-hero .muted, [data-look="editorial"] .topic-banner p { color: var(--muted); }
+[data-look="editorial"] .subject-hero .btn:not(.mark) { color: var(--text); border-color: var(--border); }
+[data-look="editorial"] .subject-hero .lvl-switch, [data-look="editorial"] .topic-banner .lvl-switch { background: var(--surface-2); border-color: var(--border); }
+[data-look="editorial"] .chip, [data-look="editorial"] a.chip:hover { background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 3px; transform: none; }
+[data-look="editorial"] a.chip:hover { border-color: var(--c); }
+[data-look="editorial"] .tabs { border-radius: 4px; }
+[data-look="editorial"] .tabs button.active { background: var(--text); color: var(--bg); border-radius: 3px; }
+[data-look="editorial"] .topic-list li a { border-radius: 0; }
+[data-look="editorial"] .topic-list li a.active { background: transparent; box-shadow: inset 2px 0 0 var(--c); }
+[data-look="editorial"] .concept h3 { font-size: 1.45rem; }
+[data-look="editorial"] .lvl-switch button { color: var(--muted); }
+[data-look="editorial"] .lvl-switch button.on { background: var(--text); color: var(--bg); }
+[data-look="editorial"] .hero-progress .bar { background: var(--surface-2); }
+[data-look="editorial"] .xp-chip .xpbar { background: var(--surface-2); }
+[data-look="editorial"] .xp-chip:hover { background: var(--surface-2); color: var(--text); }
+[data-look="editorial"] .hero-demo .pill.econ { color: var(--text); background: color-mix(in srgb, var(--econ) 16%, transparent); }

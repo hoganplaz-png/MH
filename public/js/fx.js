@@ -243,8 +243,11 @@
 
   /* ---------- wiring ---------- */
   // Called after every page render (see IB.runPage in app.js).
+  // A design try (js/look.js) keeps only the motion that explains something: the typed marking demo.
+  const look = () => document.documentElement.hasAttribute("data-look");
   IB.fx = function (root) {
     if (!root || reduce()) return;
+    if (look()) return typedDemo(root);
     root.querySelectorAll(".band").forEach(bandFx);
     heroWords(root);
     typedDemo(root);
@@ -253,7 +256,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     backToTop();
-    if (reduce() || saveData) return;
+    if (reduce() || saveData || look()) return;
     document.documentElement.classList.add("fx-on");
     if (window.HTMLCanvasElement) constellation();
     if (fine()) pointerGlow();
