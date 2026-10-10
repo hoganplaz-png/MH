@@ -1,0 +1,165 @@
+/* Design try C: "Library".
+   Warm and bookish, like a good revision guide: cream paper with a faint grain, a deep forest-green
+   header band instead of navy, Newsreader serif headings with Public Sans for reading, saffron highlights
+   and a terracotta accent. Subject colours are retuned to sit together on cream.
+   Motion is slow and soft: pages settle in, headings get an ink underline that draws itself, cards lift gently. */
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,500;1,6..72,600&family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+:root {
+  --font-display: "Newsreader", Georgia, serif;
+  --font: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --bg: #F3EEE4;
+  --surface: #FFFCF6;
+  --surface-2: #EFE8DA;
+  --text: #1F2420;
+  --muted: #5E625A;
+  --border: #DDD4C3;
+  --ink: #15291F;
+  --ink-2: #213A2D;
+  --on-ink: #F3EEE4;
+  --on-ink-muted: #BFC9BE;
+  --primary: #1F6B4F;
+  --primary-hover: #155139;
+  --primary-ink: #FFFCF6;
+  --primary-soft: #DDEBE2;
+  --accent: #C4572B;
+  --mark: #F2B33D;
+  --mark-soft: #FBEBC7;
+  --econ: #C4572B; --chem: #13808F; --geo: #4F7F2E; --math: #6B4FA0; --bio: #B03A5B; --engb: #2F5E8E; --chia: #9A6B12; --phys: #3E55A8;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 1px 1px rgba(60, 45, 20, .05), 0 2px 6px rgba(60, 45, 20, .04);
+  --lift: 0 2px 2px rgba(60, 45, 20, .04), 0 18px 36px -18px rgba(60, 45, 20, .35);
+  --soft: cubic-bezier(.25, .7, .25, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121512; --surface: #1A1E1A; --surface-2: #222822; --text: #ECE6D9; --muted: #A7A99E; --border: #2F362F;
+    --ink: #0B1510; --ink-2: #1A2A21;
+    --primary: #7CC4A2; --primary-hover: #A2D8BE; --primary-ink: #0B1510; --primary-soft: #1B3328;
+    --accent: #E58A62; --mark-soft: #3A2E12;
+    --shadow: none; --lift: 0 18px 36px -18px rgba(0, 0, 0, .7);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121512; --surface: #1A1E1A; --surface-2: #222822; --text: #ECE6D9; --muted: #A7A99E; --border: #2F362F;
+  --ink: #0B1510; --ink-2: #1A2A21;
+  --primary: #7CC4A2; --primary-hover: #A2D8BE; --primary-ink: #0B1510; --primary-soft: #1B3328;
+  --accent: #E58A62; --mark-soft: #3A2E12;
+  --shadow: none; --lift: 0 18px 36px -18px rgba(0, 0, 0, .7);
+}
+
+body { font-size: 16.5px; line-height: 1.65; }
+h1, h2, h3, h4 { font-weight: 600; letter-spacing: -.012em; line-height: 1.1; }
+h1 { font-size: clamp(2.2rem, 4.6vw, 3.3rem); }
+h2 { font-size: clamp(1.7rem, 2.8vw, 2.3rem); }
+h3 { font-size: 1.32rem; }
+.eyebrow, .section-title, .unit-label, .callout-title { font-weight: 500; letter-spacing: .14em; }
+.eyebrow { color: var(--accent); }
+
+/* ---------- paper ground: grain instead of glows ---------- */
+.fx-net, .fx-glow, .floaters, .hero-demo::before, .band::before { display: none !important; }
+@media (hover: hover) { .card:hover, .callout:hover, .sec-tab:hover, .fw-chip:hover { background-image: none; } }
+body::before { inset: 0; animation: none; -webkit-mask-image: none; mask-image: none; opacity: .5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px; }
+body::after { display: none; }
+.read-progress { background: var(--mark); height: 3px; }
+
+/* ---------- header + band in forest green ---------- */
+.brand { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; letter-spacing: -.01em; }
+.brand-mark { border-radius: 50%; background: var(--mark); color: var(--ink); font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: .95rem; }
+.nav-links a { font-weight: 500; }
+.nav-links a.active { border-bottom-color: var(--mark); }
+.icon-btn, .xp-chip { border-color: rgba(243, 238, 228, .2); border-radius: 999px; }
+.icon-btn:hover, .xp-chip:hover { background: var(--ink-2); }
+.xp-chip .xpbar span { background: var(--mark); }
+
+.band { background: var(--ink); }
+.band-curves .c1 { stroke: rgba(243, 238, 228, .14); stroke-width: 1.5; }
+.band-curves .c2 { stroke: rgba(242, 179, 61, .38); stroke-width: 1.5; }
+.band-curves .c2b { stroke: rgba(124, 196, 162, .22); stroke-width: 1.5; }
+.band-curves .c4 { stroke: rgba(243, 238, 228, .10); }
+.band-curves .c3 { fill: var(--mark); }
+.hero { padding-block: 72px 88px; }
+.hero h1 { font-size: clamp(2.6rem, 5.4vw, 4.4rem); font-weight: 600; line-height: 1.02; letter-spacing: -.02em; }
+.hero h1 .hl, .band .hl { font-style: italic; color: var(--mark); background: none; animation: none; }
+.band .eyebrow { color: var(--mark); }
+.hero p.lead { font-size: 1.15rem; color: var(--on-ink-muted); }
+.hero-demo { background: #FFFCF6; border-radius: 6px; box-shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 40px 70px -30px rgba(0, 0, 0, .7); transform: rotate(-1.5deg); }
+.hero-demo:hover { transform: rotate(-.5deg) translateY(-4px); }
+.hero-demo { transition: transform .8s var(--soft); }
+.hero-demo .answer { background: #F3EEE4; font-family: var(--font-display); font-style: italic; font-size: 1.02rem; color: #3A3A30; }
+.hero-demo .verdict { border-color: #1F6B4F; border-radius: 6px; }
+.hero-demo .big { font-family: var(--font-display); font-weight: 700; }
+/* headline words settle in softly */
+.fx-split .fx-w { animation-name: c-word; animation-duration: 1.1s; animation-timing-function: var(--soft); }
+@keyframes c-word { from { opacity: 0; transform: translateY(.25em); } to { opacity: 1; transform: none; } }
+
+/* section headings get an underline that draws itself */
+#app > h2, #app > .btn-row > h2 { position: relative; padding-bottom: 10px; }
+#app > h2::after, #app > .btn-row > h2::after { content: ""; position: absolute; left: 0; bottom: 0; width: 64px; height: 3px; border-radius: 3px; background: var(--accent); transform-origin: left; animation: c-rule 1.2s .3s var(--soft) both; }
+@keyframes c-rule { from { transform: scaleX(0); } }
+
+/* ---------- buttons ---------- */
+.btn { border-radius: 999px; font-weight: 600; padding-inline: 20px; }
+.btn.primary { background-image: none; }
+.btn.primary:hover { animation: none; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 14px -6px rgba(60, 45, 20, .35); }
+.band .btn.primary { background: var(--mark); color: var(--ink); }
+.band .btn.primary:hover { background: #F6C561; color: var(--ink); }
+.band .btn:not(.primary):not(.mark) { border-color: rgba(243, 238, 228, .3); }
+
+/* ---------- cards ---------- */
+.card, .q-card { box-shadow: var(--shadow); }
+a.card:hover, .subject-card:hover, .section-card:hover { transform: translateY(-3px); box-shadow: var(--lift); }
+.card, .subject-card, .feature { transition: transform .5s var(--soft), box-shadow .5s var(--soft), border-color .3s; }
+.stat-big { font-family: var(--font-display); font-weight: 600; font-size: 2.8rem; letter-spacing: -.02em; font-variant-numeric: lining-nums tabular-nums; }
+.card.accent { background: var(--accent); color: #FFFCF6; }
+.stat-tile.accent { animation: none; }
+.gp-ring span, .gp-xp { font-family: var(--font-display); }
+
+/* subject cards: like book spines - a coloured band down the left with the monogram set in it */
+.subject-card { flex-direction: row; }
+.subject-card .stripe { display: block; width: 58px; height: auto; flex: none; background: var(--c); }
+.sc-mono { position: absolute; left: 0; top: 18px; width: 58px; height: auto; background: none; box-shadow: none; color: #FFFCF6; font-family: var(--font-display); font-style: italic; font-weight: 600; font-size: 1.5rem; border-radius: 0; }
+.subject-card { position: relative; }
+.subject-card:hover .sc-mono { transform: translateY(-2px); }
+.sc-mono { transition: transform .5s var(--soft); }
+.sc-top { justify-content: flex-end; min-height: 0; }
+.sc-ring { width: 48px; height: 48px; position: absolute; top: 14px; right: 16px; }
+.subject-card .body { padding: 20px 20px 18px; }
+.subject-card h3 { font-size: 1.3rem; padding-right: 50px; }
+.sc-ring b { font-family: var(--font-display); font-size: 1.05rem; }
+.sc-next { border-top-style: solid; }
+
+/* features: quiet glyphs set in serif italic */
+.f-icon, .feature:nth-child(n) .f-icon { background: var(--surface-2); color: var(--primary); border-radius: 50%; font-family: var(--font-display); font-weight: 600; width: 44px; height: 44px; }
+.feature:hover .f-icon { animation: none; transform: rotate(-8deg); background: var(--mark); color: var(--ink); }
+.f-icon { transition: transform .6s var(--soft), background .3s, color .3s; }
+.f-cta { font-weight: 600; color: var(--primary); }
+.feature:hover .f-cta { letter-spacing: 0; color: var(--accent); }
+.feature h3 { font-size: 1.35rem; }
+
+/* ---------- notes ---------- */
+.subject-tabs button { font-weight: 600; }
+.subject-tabs button.active { box-shadow: none; }
+.topic-list li a.active { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--c); border-radius: 0 10px 10px 0; }
+.topic-banner, .subject-hero { background: var(--ink); border-radius: 16px; }
+.topic-banner::after { width: 280px; height: 280px; right: -90px; top: -110px; background: var(--c); opacity: .35; }
+.topic-big-num { font-family: var(--font-display); font-style: italic; font-weight: 600; color: var(--mark); opacity: 1; }
+.tabs button.active { background: var(--primary); }
+.callout { border-radius: 12px; }
+.fn-head { background: var(--ink); border-radius: 12px; }
+.fn-title { font-weight: 600; }
+
+/* ---------- motion: slower, softer ---------- */
+.rv { transform: translateY(14px); }
+.rv.in { transition: opacity .9s var(--soft) var(--rv-delay, 0ms), transform 1s var(--soft) var(--rv-delay, 0ms); }
+#app { animation-duration: .7s; }
+@media (prefers-reduced-motion: reduce) { #app > h2::after, #app > .btn-row > h2::after { animation: none; } }
+
+/* layout fix shared by every try: cards inside a grid never take the stacked-card top margin
+   (today the 2nd+ subject and feature cards, and the game panel cards, sit 16px lower than the first) */
+.subject-grid > .card + .card, .features > .card + .card, .game-panel > .card + .card, [class*="grid"] > .card + .card { margin-top: 0; }
