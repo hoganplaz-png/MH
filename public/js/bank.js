@@ -116,7 +116,7 @@ IB.page = function () {
     const marked = base.filter((q) => last[q.id]).length;
     const tp = f.topic.value && IB.topic(f.topic.value);
     bar.innerHTML = base.length ? `<div class="card no-print">
-      <h3 style="margin:0 0 12px">Topic drill${tp ? `: ${IB.esc(tp.code)} ${IB.esc(tp.title)}` : ""}</h3>
+      <h3 style="margin:0 0 12px">Question bank${tp ? `: ${IB.esc(tp.code)} ${IB.esc(tp.title)}` : ""}</h3>
       <div style="display:flex;flex-wrap:wrap;gap:12px 22px">${tile(`${marked}/${base.length}`, "questions marked")}${tile(pct(base), "of available marks")}${Object.entries(groups).slice(0, 8).map(([k, list]) => tile(pct(list), k)).join("")}</div>
       <p class="small muted" style="margin:10px 0 0">Write your answer, then mark it or open the markscheme and tap your mark. Aim for about one minute per mark, and 20-25 minutes for a 10-mark essay. Set Status to "Scored under 60%" to redo weak ones.</p>
       <div class="btn-row" style="margin-top:10px"><button class="btn primary" id="drillGo">🎲 ${drillId ? "Next random question" : "Start a random drill"}</button>${drillId ? `<button class="btn" id="drillAll">Show all questions</button>` : ""}</div>
