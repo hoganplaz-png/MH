@@ -34,6 +34,7 @@
   --soft: cubic-bezier(.25, .7, .25, 1);
 }
 @media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .card.accent { color: #1A1208; }
   :root:not([data-theme="light"]) {
     --bg: #121512; --surface: #1A1E1A; --surface-2: #222822; --text: #ECE6D9; --muted: #A7A99E; --border: #2F362F;
     --ink: #0B1510; --ink-2: #1A2A21;
@@ -42,6 +43,7 @@
     --shadow: none; --lift: 0 18px 36px -18px rgba(0, 0, 0, .7);
   }
 }
+:root[data-theme="dark"] .card.accent { color: #1A1208; }
 :root[data-theme="dark"] {
   --bg: #121512; --surface: #1A1E1A; --surface-2: #222822; --text: #ECE6D9; --muted: #A7A99E; --border: #2F362F;
   --ink: #0B1510; --ink-2: #1A2A21;
@@ -147,7 +149,7 @@ a.card:hover, .subject-card:hover, .section-card:hover { transform: translateY(-
 .subject-tabs button.active { box-shadow: none; }
 .topic-list li a.active { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--c); border-radius: 0 10px 10px 0; }
 .topic-banner, .subject-hero { background: var(--ink); border-radius: 16px; }
-.topic-banner::after { width: 280px; height: 280px; right: -90px; top: -110px; background: var(--c); opacity: .35; }
+.topic-banner::after { width: 280px; height: 280px; right: -90px; top: -110px; background: var(--c); opacity: .18; }
 .topic-big-num { font-family: var(--font-display); font-style: italic; font-weight: 600; color: var(--mark); opacity: 1; }
 .tabs button.active { background: var(--primary); }
 .callout { border-radius: 12px; }
@@ -159,6 +161,18 @@ a.card:hover, .subject-card:hover, .section-card:hover { transform: translateY(-
 .rv.in { transition: opacity .9s var(--soft) var(--rv-delay, 0ms), transform 1s var(--soft) var(--rv-delay, 0ms); }
 #app { animation-duration: .7s; }
 @media (prefers-reduced-motion: reduce) { #app > h2::after, #app > .btn-row > h2::after { animation: none; } }
+
+/* the seventh feature becomes a full-width forest strip instead of an orphan card */
+@media (min-width: 700px) {
+  .feature:last-child { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto auto; column-gap: 20px; align-items: center; background: var(--ink); color: var(--on-ink); border-color: transparent; }
+  .feature:last-child .f-icon { grid-column: 1; grid-row: 1 / span 3; margin: 0; border-color: rgba(255, 255, 255, .2); color: var(--mark); }
+  .feature:last-child .eyebrow, .feature:last-child h3 { grid-column: 2; }
+  .feature:last-child .eyebrow { color: rgba(255, 255, 255, .55); }
+  .feature:last-child h3 { color: #FFFFFF; }
+  .feature:last-child p { grid-column: 2; color: var(--on-ink-muted); }
+  .feature:last-child .f-cta { grid-column: 3; grid-row: 1 / span 3; color: var(--mark); margin: 0; }
+  .feature:last-child:hover { color: var(--on-ink); }
+}
 
 /* layout fix shared by every try: cards inside a grid never take the stacked-card top margin
    (today the 2nd+ subject and feature cards, and the game panel cards, sit 16px lower than the first) */
