@@ -1,0 +1,58 @@
+/* Try A: "Calm" - the current layout and colours, made quieter and more exact.
+   One sans family (Geist), tighter type, smaller radii, hairline borders, tinted (not gradient) chips,
+   a flat ink band with one faint static grid, and short, consistent motion. */
+:root {
+  --font-display: "Geist", system-ui, sans-serif; --font: "Geist", system-ui, sans-serif; --font-mono: "Geist Mono", ui-monospace, monospace;
+  --radius: 12px; --radius-sm: 8px;
+  --shadow: 0 1px 0 rgba(15, 27, 45, .04);
+  --bg: #F6F7F9; --border: #E3E6EC; --ink: #0E1726;
+}
+:root[data-theme="dark"] { --bg: #0B1018; --surface: #121924; --surface-2: #19212E; --border: #232D3C; --ink: #070B11; }
+body { font-size: 15.5px; letter-spacing: -.003em; }
+h1, h2, h3, h4 { font-weight: 650 !important; letter-spacing: -.025em; }
+.hero h1 { font-size: clamp(2.3rem, 4.8vw, 3.9rem); line-height: 1.04; letter-spacing: -.04em; }
+h2 { font-size: clamp(1.4rem, 2.2vw, 1.75rem); }
+.band { background: var(--ink); background-image: radial-gradient(rgba(255,255,255,.07) 1px, transparent 1px); background-size: 22px 22px; background-position: center top; }
+.site-header { background: color-mix(in srgb, var(--ink) 92%, transparent); backdrop-filter: saturate(140%) blur(10px); border-bottom: 1px solid rgba(255,255,255,.06); }
+.brand { font-weight: 650; letter-spacing: -.02em; }
+.brand-mark { border-radius: 7px; width: 28px; height: 28px; font-size: .72rem; }
+.nav-links a::after { display: none; }
+.eyebrow { font-family: var(--font-mono); font-size: .74rem; letter-spacing: .04em; text-transform: none; }
+.band .eyebrow { color: #9FB0CC; }
+/* highlighter becomes a drawn underline */
+.hero .hl { background: none !important; color: #fff; position: relative; display: inline; text-decoration: underline; text-decoration-color: var(--mark); text-decoration-thickness: .09em; text-underline-offset: .14em; animation: none !important; }
+.btn { border-radius: 8px; font-weight: 600; border-width: 1px; min-height: 42px; transition: background .15s, border-color .15s, transform .1s; }
+.btn:active { transform: translateY(1px); }
+.card { border-radius: var(--radius); box-shadow: none; transition: border-color .18s var(--ease), transform .25s var(--ease-out); }
+a.card:hover { border-color: color-mix(in srgb, var(--text) 28%, var(--border)); transform: translateY(-2px); box-shadow: 0 6px 18px -10px rgba(15,27,45,.25); }
+.hero-demo { border-radius: 14px; box-shadow: 0 1px 0 rgba(255,255,255,.08) inset, 0 30px 60px -30px rgba(0,0,0,.6); }
+.hero-demo .verdict { border-width: 1px; border-radius: 10px; }
+.stat-big, .gp-xp, .gp-ring span, .sc-ring b { font-family: var(--font) !important; font-weight: 650 !important; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.stat-big { font-size: 2rem; }
+/* subject cards: no stripe, a tinted chip */
+.subject-card .stripe { display: none; }
+.sc-mono { width: 38px; height: 38px; border-radius: 9px; font: 650 .95rem var(--font); color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); box-shadow: none; }
+.subject-card h3 { font-size: 1.08rem; }
+.sc-ring { width: 40px; height: 40px; }
+.sc-ring svg { transform: rotate(-90deg) scale(.72); transform-origin: center; }
+.sc-ring b { font-size: .85rem !important; }
+.sc-next { border-top-style: solid; }
+.f-icon { width: 34px; height: 34px; border-radius: 8px; font: 600 1rem var(--font) !important; background: var(--primary-soft) !important; color: var(--primary); }
+.feature h3 { font-size: 1.08rem; }
+.f-cta { font-weight: 600; }
+.f-cta::after { content: ""; }
+.pill { font-weight: 600; border-radius: 6px; }
+.gp-ring { width: 56px; height: 56px; background: conic-gradient(var(--primary) calc(var(--p) * 1%), var(--border) 0); }
+.gp-ring::before { inset: 4px; }
+.gp-streak .flame { font-size: 1.7rem; }
+/* motion */
+.lk-anim .fx-w { animation: a-word .5s var(--ease-out) both; animation-delay: calc(var(--wi) * 45ms); display: inline-block; }
+.lk-anim .hero .hl .fx-w { display: inline; animation-name: a-fade; }
+.lk-anim .hero .hl { animation: a-ul .8s .55s var(--ease-out) both !important; }
+@keyframes a-word { from { opacity: 0; transform: translateY(.25em); } }
+@keyframes a-fade { from { opacity: 0; } }
+@keyframes a-ul { from { text-decoration-color: transparent; } }
+.hero-copy > * { animation-duration: .5s; }
+.subject-hero, .topic-banner, .fw-head, .ia-hero { background: var(--ink) !important; border-radius: 14px; box-shadow: inset 4px 0 0 var(--c, var(--primary)); }
+.subject-tabs button { border-width: 1px; border-radius: 8px; font-weight: 600; }
+.chip { border-radius: 6px; }

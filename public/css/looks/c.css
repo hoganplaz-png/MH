@@ -1,0 +1,56 @@
+/* Try C: "Bold" - sticker-like and playful but deliberate: 2px ink outlines, hard offset shadows,
+   a wide grotesque for headings, buttons that press in, and a stamped score on the demo card. */
+:root {
+  --font-display: "Archivo", system-ui, sans-serif; --font: "Figtree", system-ui, sans-serif;
+  --bg: #F3F1EA; --surface: #FFFFFF; --border: #0F1B2D; --text: #0F1B2D; --muted: #4A5568;
+  --ink: #0F1B2D; --primary: #2D5BFF; --mark: #FFC53D;
+  --radius: 14px; --radius-sm: 10px;
+  --hard: 4px 4px 0 var(--ink);
+}
+:root[data-theme="dark"] { --bg: #0D1420; --surface: #172235; --surface-2: #1F2C44; --border: #3A4A66; --text: #EEF2FA; --hard: 4px 4px 0 #000; }
+h1, h2, h3 { font-family: var(--font-display); font-stretch: 112%; font-weight: 800 !important; letter-spacing: -.02em; }
+.hero h1 { font-size: clamp(2.3rem, 5vw, 4.1rem); line-height: 1; text-transform: none; }
+.hero .hl { background: var(--mark) !important; color: var(--ink) !important; padding: 0 .12em; border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; animation: none; }
+.band { background: var(--ink); }
+.brand-mark { background: var(--mark); color: var(--ink); border: 2px solid #fff; border-radius: 8px; transform: rotate(-4deg); }
+.brand { font-family: var(--font-display); font-stretch: 112%; }
+.band .eyebrow { color: var(--mark); }
+.card { border: 2px solid var(--border); box-shadow: var(--hard); border-radius: var(--radius); transition: transform .12s var(--ease), box-shadow .12s var(--ease); }
+a.card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
+a.card:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+.btn { border: 2px solid var(--ink); border-radius: 10px; font-weight: 800; box-shadow: 3px 3px 0 var(--ink); transition: transform .1s var(--ease), box-shadow .1s var(--ease); }
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+.band .btn { border-color: #fff; box-shadow: 3px 3px 0 #fff; }
+.band .btn.primary { background: var(--mark); color: var(--ink); border-color: var(--mark); box-shadow: 3px 3px 0 #fff; }
+.hero-demo { border: 2px solid #fff; box-shadow: 8px 8px 0 var(--primary); transform: rotate(1.2deg); border-radius: 16px; }
+.hero-demo .verdict { border: 2px dashed #1F8A4C; position: relative; }
+.hero-demo .big { font-family: var(--font-display); font-stretch: 112%; color: #C0262D; display: inline-block; border: 3px solid #C0262D; border-radius: 10px; padding: 2px 10px; transform: rotate(-6deg); }
+.stat-big { font-family: var(--font-display); font-stretch: 112%; }
+.stat-grid .stat-tile:nth-child(2) { background: var(--mark); color: var(--ink); }
+.stat-grid .stat-tile:nth-child(2) .muted { color: var(--ink); }
+/* subject cards: colour header block with the monogram */
+.subject-card .stripe { height: 64px; border-bottom: 2px solid var(--ink); background: var(--c); background-image: radial-gradient(rgba(255,255,255,.22) 1.5px, transparent 1.5px); background-size: 12px 12px; }
+.subject-card .body { padding-top: 0; }
+.sc-top { margin-top: -28px; }
+.sc-mono { background: #fff !important; color: var(--ink); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); border-radius: 12px; font-family: var(--font-display) !important; }
+.sc-ring { background: var(--surface); border-radius: 50%; border: 2px solid var(--ink); }
+.f-icon { background: var(--mark) !important; color: var(--ink); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); font-family: var(--font-display) !important; }
+.feature:nth-child(2n) .f-icon { background: #9BE7B5 !important; }
+.feature:nth-child(3n) .f-icon { background: #B9C8FF !important; }
+.pill { border: 1.5px solid currentColor; }
+.gp-ring { background: conic-gradient(var(--primary) calc(var(--p) * 1%), var(--surface-2) 0); border: 2px solid var(--ink); }
+/* motion: words drop in, the score is stamped */
+.lk-anim .fx-w { display: inline-block; animation: c-drop .45s cubic-bezier(.3, 1.4, .5, 1) both; animation-delay: calc(var(--wi) * 70ms); }
+.lk-anim .hero .hl { animation: c-fade .3s .25s both; }
+@keyframes c-drop { from { opacity: 0; transform: translateY(-.4em) rotate(-3deg); } }
+@keyframes c-fade { from { opacity: 0; } }
+.lk-anim .hero-demo .big { animation: c-stamp .5s 1.6s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes c-stamp { 0% { opacity: 0; transform: rotate(-6deg) scale(2.4); } 60% { opacity: 1; transform: rotate(-6deg) scale(.92); } 100% { transform: rotate(-6deg) scale(1); } }
+.lk-anim .subject-card.rv.in { transition-timing-function: cubic-bezier(.3, 1.4, .5, 1); }
+.qbar { background: var(--surface-2) !important; }
+.hero-demo { animation: none !important; }
+.subject-hero, .topic-banner, .fw-head, .ia-hero { background: var(--c, var(--primary)) !important; border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); border-radius: 18px; }
+.subject-hero .chip { background: rgba(255,255,255,.16); }
+.subject-tabs button { border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.subject-tabs button.active { box-shadow: 2px 2px 0 var(--ink) !important; }
