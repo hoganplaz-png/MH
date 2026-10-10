@@ -401,4 +401,90 @@ IB.addDrill("engb", {
         pts: ["They test comprehension, not location [1]; copying shows you found the text but not that you understood it [1]."] }
     ]
   },
+  "engb-10": {
+    units: { a: "Format & criteria", b: "Presenting the extract", c: "Discussion & interaction" },
+    paper: "IO",
+    qs: [
+      /* ---------- a. format and criteria ---------- */
+      { u: "a", s: "A", m: "1", t: "State the stimulus used for the HL individual oral.", rule: "[1] correct stimulus.",
+        pts: ["An extract (about 300 words) from one of the two literary works studied in English [1]. SL uses a visual stimulus."] },
+      { u: "a", s: "A", m: "3", t: "Outline the three parts of the HL individual oral.", rule: "[1] per part.",
+        pts: ["Presentation on the extract (3-4 minutes) [1].", "Follow-up discussion on the extract (4-5 minutes) [1].", "General conversation on at least one additional theme (5-6 minutes) [1]."] },
+      { u: "a", s: "A", m: "1", t: "State how long candidates have to prepare the extract.", rule: "[1].",
+        pts: ["15 minutes (supervised preparation) [1]."] },
+      { u: "a", s: "A", m: "2", t: "Name the assessment criteria for the HL individual oral and their maximum marks.", rule: "[1] for all names, [1] for all marks.",
+        pts: ["A Language; B1 Message: literary extract; B2 Message: conversation; C Interactive skills [1].", "A 12, B1 6, B2 6, C 6 = 30 [1]."] },
+      { u: "a", s: "A", m: "2", t: "Outline what Criterion B1 rewards.", rule: "[1] each aspect.",
+        pts: ["Relevance of the presentation to the extract [1];", "use of specific details from the extract and development of observations / interpretation [1]."] },
+      /* ---------- b. presenting the extract ---------- */
+      { u: "b", s: "A", m: "2+2", t: "Explain two things examiners reward in a strong extract presentation.", rule: "[1] point + [1] development, twice.",
+        pts: ["Context [1]; briefly situating the extract in the work (where it occurs, characters involved) [1].", "Close reference to details [1]; quoting or referring to specific words and events [1].", "Interpretation / personal response [1]; explaining ideas, themes and the writer's message, not just retelling [1].", "Structure [1]; clear introduction, organised points, conclusion within time [1]."] },
+      { u: "b", s: "A", m: "2", t: "Explain why retelling the plot of the extract earns limited credit.", rule: "[1] point + [1] development.",
+        pts: ["B1 rewards developed observations and interpretation [1]; summary shows comprehension but not analysis of ideas, characters or themes [1]."] },
+      { u: "b", s: "A", m: "2", t: "Suggest two things to note during the 15-minute preparation.", rule: "[1] each.",
+        pts: ["Key ideas / theme of the extract and its link to course themes [1].", "Brief quotations / details to refer to [1].", "Structure of the presentation (intro, 2-3 points, conclusion) [1].", "Notes must be brief (up to 10 bullet points); no full script [1]."] },
+      { u: "b", s: "A", m: "2", t: "Give two phrases to introduce the context of an extract.", rule: "[1] each appropriate phrase.",
+        pts: ["'This extract comes from the beginning / middle / end of...' [1].", "'Just before this passage, the main character has...' [1].", "'The extract focuses on...' [1]."] },
+      /* ---------- c. discussion ---------- */
+      { u: "c", s: "A", m: "2", t: "Outline what Criterion C (Interactive skills) rewards.", rule: "[1] each.",
+        pts: ["Understanding questions and responding appropriately [1];", "sustaining the conversation / taking initiative, adding ideas, not just short answers [1]."] },
+      { u: "c", s: "A", m: "2+2", t: "Explain two strategies for sustaining the general conversation.", rule: "[1] strategy + [1] development, twice.",
+        pts: ["Extend answers [1]; give reasons and examples rather than yes/no [1].", "Link to own experience or culture [1]; e.g. comparing with your own country [1].", "Ask for clarification when needed [1]; 'Do you mean...?' keeps interaction natural [1].", "Express and justify opinions [1]; 'In my view... because...' [1]."] },
+      { u: "c", s: "A", m: "3", t: "Give three phrases a candidate can use to gain time while thinking.", rule: "[1] each.",
+        pts: ["'That's an interesting question...' [1].", "'Let me think about that for a moment.' [1].", "'Well, it depends on...' [1].", "'What I mean is...' [1]."] },
+      { u: "c", s: "A", m: "2", t: "Explain why memorised answers in the general conversation tend to score poorly.", rule: "[1] point + [1] development.",
+        pts: ["They do not respond to the actual question [1]; Criterion C rewards genuine, spontaneous interaction [1]."] },
+      /* ---------- extended oral prompts ---------- */
+      { u: "b", s: "C", m: "12+6+6+6", t: "Prepare a 3-4 minute presentation on an extract from Of Mice and Men (John Steinbeck, 1937) in which George and Lennie talk about their dream of owning a farm. Link the extract to the theme Identities or Experiences.", rule: "A [12] + B1 [6] + B2 [6] + C [6] = 30. B1 5-6 needs specific references to the extract and developed interpretation linked to a course theme.",
+        pts: ["Context: itinerant workers in Depression-era California; the dream is repeated through the novel.", "Ideas: friendship and loneliness, hope versus reality, belonging; Lennie's repeated 'tell about the rabbits'.", "Interpretation: the dream gives them identity and purpose, but the reader senses it is fragile.", "Link to theme: Experiences (life stories, hopes) or Identities (belonging, self-worth).", "Follow-up readiness: explain why the dream matters to George, compare with other characters such as Crooks or Candy.", "Language: accurate tenses, literary vocabulary (foreshadowing, symbol, isolation)."] },
+      { u: "c", s: "C", m: "12+6+6+6", t: "After your extract discussion, the teacher moves the conversation to the theme Sharing the planet. Outline how you would respond to: 'Do you think individuals or governments should take more responsibility for climate change?'", rule: "A [12] + B1 [6] + B2 [6] + C [6]. B2 5-6 needs relevant, developed ideas with examples; C 5-6 needs sustained, spontaneous interaction.",
+        pts: ["Clear opinion with reasons (e.g. both, but governments set rules and infrastructure).", "Examples: Paris Agreement 2015 targets; individual actions such as diet and transport.", "Personal/cultural connection: what your country or school does.", "Acknowledging another view and responding to follow-up questions.", "Interaction: asking for clarification, extending beyond one-sentence replies."] },
+      { u: "b", s: "C", m: "30", t: "Prepare a presentation on an extract from Animal Farm (George Orwell, 1945) in which the commandments on the barn wall are changed. Link it to the theme Social organization.", rule: "A [12] + B1 [6] + B2 [6] + C [6] = 30. B1 needs specific detail from the extract and interpretation of power and manipulation.",
+        pts: ["Context: allegory of the Russian Revolution; the pigs gradually take power.", "Detail: alteration of commandments, e.g. 'All animals are equal, but some animals are more equal than others'.", "Ideas: manipulation of language, propaganda (Squealer), the animals' poor memory and lack of education.", "Link: Social organization — law and order, leadership, the role of education and media in a society.", "Personal response: relevance today (fake news, rewriting history)."] }
+    ]
+  },
+  "engb-11": {
+    units: { a: "Tense & structure accuracy", b: "Vocabulary & idiom", c: "Complex sentences & cohesion" },
+    paper: "P1",
+    qs: [
+      /* ---------- a. grammar accuracy ---------- */
+      { u: "a", s: "A", m: "1", t: "Correct the error: 'I am living here since 2019.'", rule: "[1] correct tense.",
+        pts: ["I have been living / have lived here since 2019 [1]."] },
+      { u: "a", s: "A", m: "1", t: "Correct the error: 'If I would have known, I would have helped.'", rule: "[1] correct third conditional.",
+        pts: ["If I had known, I would have helped [1]."] },
+      { u: "a", s: "A", m: "1", t: "Correct the error: 'The number of students are increasing.'", rule: "[1] correct agreement.",
+        pts: ["The number of students is increasing [1]."] },
+      { u: "a", s: "A", m: "1", t: "Correct the error: 'She suggested me to apply for the job.'", rule: "[1] correct structure.",
+        pts: ["She suggested that I (should) apply / She suggested applying for the job [1]."] },
+      { u: "a", s: "A", m: "2", t: "Rewrite in the passive voice: 'The council will build a new park next year.' Explain when the passive is useful in formal writing.", rule: "[1] correct passive + [1] use.",
+        pts: ["A new park will be built (by the council) next year [1].", "It focuses on the action/result, sounds objective and impersonal, e.g. in reports [1]."] },
+      { u: "a", s: "A", m: "2", t: "Rewrite as reported speech: 'I will finish the project tomorrow,' said Ana.", rule: "[1] backshift + [1] time/pronoun change.",
+        pts: ["Ana said (that) she would finish [1] the project the next day / the following day [1]."] },
+      /* ---------- b. vocabulary ---------- */
+      { u: "b", s: "A", m: "2", t: "Distinguish between 'affect' and 'effect'.", rule: "[1] each.",
+        pts: ["Affect: usually a verb, to influence [1];", "effect: usually a noun, a result (as a verb 'to effect' means to bring about) [1]."] },
+      { u: "b", s: "A", m: "1", t: "Give the meaning of the idiom 'to bite off more than you can chew'.", rule: "[1] meaning.",
+        pts: ["To take on a task that is too big / difficult to manage [1]."] },
+      { u: "b", s: "A", m: "3", t: "Give a more precise alternative for 'good' in each: (a) a good argument (b) a good meal (c) a good student.", rule: "[1] each appropriate collocation.",
+        pts: ["(a) convincing / persuasive / compelling [1].", "(b) delicious / tasty / satisfying [1].", "(c) hard-working / diligent / conscientious [1]."] },
+      { u: "b", s: "A", m: "2", t: "Complete with the correct collocation: 'to ____ a decision' and 'to ____ attention'.", rule: "[1] each.",
+        pts: ["make / take (a decision) [1].", "pay (attention) [1]."] },
+      { u: "b", s: "A", m: "1", t: "Identify the false friend error: 'The film was very sensible and made me cry.'", rule: "[1] correct word.",
+        pts: ["sensitive / moving / emotional (not 'sensible', which means reasonable) [1]."] },
+      /* ---------- c. complex sentences ---------- */
+      { u: "c", s: "A", m: "2", t: "Combine into one sentence using a relative clause: 'Marie Curie won two Nobel Prizes. She was born in Warsaw.'", rule: "[1] correct relative pronoun + [1] punctuation.",
+        pts: ["Marie Curie, who was born in Warsaw, won two Nobel Prizes [1]; commas around the non-defining clause [1]."] },
+      { u: "c", s: "A", m: "2", t: "Rewrite using inversion for emphasis: 'I have never seen such a beautiful view.'", rule: "[1] inversion + [1] word order.",
+        pts: ["Never have I [1] seen such a beautiful view [1]."] },
+      { u: "c", s: "A", m: "2", t: "Correct the sentence: 'Despite it was raining, we went out.' Give two correct versions.", rule: "[1] each correct version.",
+        pts: ["Although it was raining, we went out [1].", "Despite the rain / Despite the fact that it was raining, we went out [1]."] },
+      { u: "c", s: "A", m: "2", t: "Explain why using a range of complex structures can raise a Criterion A mark.", rule: "[1] point + [1] development.",
+        pts: ["Criterion A rewards a varied and effective range of structures [1]; e.g. conditionals, relative clauses, passive, inversion — provided they are accurate [1]."] },
+      { u: "c", s: "A", m: "2", t: "Correct the run-on sentence: 'Many people recycle, it is not enough to stop pollution.'", rule: "[1] correct punctuation/connective + [1] logical link.",
+        pts: ["Many people recycle; however, it is not enough [1] / Many people recycle, but this is not enough to stop pollution [1].", "Comma splice must be removed."] },
+      /* ---------- Section C ---------- */
+      { u: "c", s: "C", m: "12+12+6", t: "Write a text for your school newspaper about whether school uniforms should be abolished, deliberately using a range of complex structures (conditionals, relative clauses, passive voice). Choose one text type: article, letter to the editor, or speech. Write 450-600 words.", rule: "A [12] + B [12] + C [6]. A 10-12 requires varied structures used accurately and idiomatically; errors in complex structures that impede meaning lower A.",
+        pts: ["Message: equality and belonging versus self-expression and cost.", "Language: conditionals (If uniforms were abolished...), relative clauses, passive (It has been argued that...).", "Language: precise vocabulary and collocations (dress code, peer pressure, sense of identity).", "Conventions of chosen type applied.", "Clear conclusion and recommendation."] }
+    ]
+  },
 });
