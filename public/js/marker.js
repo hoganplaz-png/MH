@@ -325,6 +325,7 @@
     let fb;
     if (q.numeric) fb = markNumeric(q, answer, sid);
     else if (sid === "chia" || /[\u3400-\u9fff]{6,}/.test(plain(q.ms.join("")))) fb = markChinese(q, answer);
+    else if (q.alt) fb = markAlt(q, answer, sid, terms);
     else if (q.type === "extended" || (q.ms || []).some((p) => BAND.test(p))) fb = markExtended(q, answer, sid, terms, dg);
     else {
       const r = markPoints(q, answer, sid, terms);
@@ -360,6 +361,31 @@
     fb.marker = "markscheme";
     return fb;
   };
+
+  // Topic-drill markschemes list ALTERNATIVE creditworthy points, each tagged "[1]" per mark
+  // ("Remittances [1]; raise household incomes [1]"). A student needs any of them, not all: the score is the
+  // marks of every matched segment, capped at the question's marks. Lines without a [n] tag are examiner notes.
+  function markAlt(q, answer, sid, terms) {
+    const max = q.marks || 1;
+    let total = 0;
+    const awarded = [], missing = [];
+    (q.ms || []).forEach((p) => {
+      const segs = String(p).split(/(?<=\[\d\])/).filter((x) => /\[\d\]/.test(x)).map((x) => x.replace(/^[\s;,.:]+/, ""));
+      if (!segs.length) return;
+      const hit = new Set(markPoints({ ms: segs }, answer, sid, terms).awarded.map((x) => segs.indexOf(x)));
+      // a "China, relief:" style label names the case, so the point also counts when the answer words it differently
+      const unlabelled = segs[0].replace(/^[^:\[]{2,40}:\s*/, "");
+      if (unlabelled !== segs[0] && markPoints({ ms: [unlabelled] }, answer, sid, terms).awarded.length) hit.add(0);
+      let got = 0;
+      // the development mark needs its point: a matched development with no matched point earns 1 at most
+      segs.forEach((x, i) => { if (hit.has(i) && (i === 0 || hit.has(0))) got += +x.match(/\[(\d)\]/)[1]; });
+      if (!hit.has(0) && hit.size) got = Math.max(got, 1);
+      total += got;
+      (got ? awarded : missing).push(p);
+    });
+    const score = Math.min(max, total);
+    return { score, max, awarded, missing: score >= max ? [] : missing, summary: score >= max ? "Full marks: enough creditworthy points found." : `${score}/${max}: ${awarded.length ? "some points credited" : "no markscheme point found"}. Any of the missing points below would earn the remaining marks.` };
+  }
 
   function markChinese(q, answer) {
     const max = q.marks || 1;

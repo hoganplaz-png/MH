@@ -50,6 +50,7 @@ IB.page = function () {
         <button class="btn primary" id="pGo">⬇ Create PDF</button>
       </div>
     </div>
+    <div id="drillBar"></div>
     <div id="list"></div>
     <div class="pager no-print" id="pager"></div>`;
 
@@ -96,14 +97,52 @@ IB.page = function () {
     });
   }
 
+  // Topic drill: score by sub-topic, plus one random question at a time.
+  let drillId = null;
+  function drillBar(qs) {
+    const bar = IB.qs("#drillBar");
+    if (f.sec.value !== "drill") { bar.innerHTML = ""; drillId = null; return; }
+    const last = {};
+    IB.store.get().attempts.forEach((a) => (last[a.id] = a));
+    const groups = {};
+    const base = IB.allQuestions(f.sub.value || undefined).filter((q) => q.sec === "drill" && (!f.topic.value || q.topic === f.topic.value));
+    base.forEach((q) => { const k = f.topic.value ? q.unitName || "Other" : (IB.topic(q.topic) || {}).code || q.topic; (groups[k] = groups[k] || []).push(q); });
+    const pct = (list) => {
+      const done = list.filter((q) => last[q.id]);
+      if (!done.length) return "–";
+      return Math.round((done.reduce((m, q) => m + last[q.id].sc, 0) / done.reduce((m, q) => m + last[q.id].mx, 0)) * 100) + "%";
+    };
+    const tile = (big, label) => `<div class="stat-tile" style="min-width:90px"><span class="stat-big" style="font-size:1.6rem">${big}</span><span class="small muted">${IB.esc(label)}</span></div>`;
+    const marked = base.filter((q) => last[q.id]).length;
+    const tp = f.topic.value && IB.topic(f.topic.value);
+    bar.innerHTML = base.length ? `<div class="card no-print">
+      <h3 style="margin:0 0 12px">Topic drill${tp ? `: ${IB.esc(tp.code)} ${IB.esc(tp.title)}` : ""}</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:12px 22px">${tile(`${marked}/${base.length}`, "questions marked")}${tile(pct(base), "of available marks")}${Object.entries(groups).slice(0, 8).map(([k, list]) => tile(pct(list), k)).join("")}</div>
+      <p class="small muted" style="margin:10px 0 0">Write your answer, then mark it or open the markscheme and tap your mark. Aim for about one minute per mark, and 20-25 minutes for a 10-mark essay. Set Status to "Scored under 60%" to redo weak ones.</p>
+      <div class="btn-row" style="margin-top:10px"><button class="btn primary" id="drillGo">🎲 ${drillId ? "Next random question" : "Start a random drill"}</button>${drillId ? `<button class="btn" id="drillAll">Show all questions</button>` : ""}</div>
+    </div>` : "";
+    const go = IB.qs("#drillGo");
+    if (go) go.onclick = () => {
+      const pool = qs.filter((q) => q.id !== drillId);
+      if (!pool.length) return IB.toast("No questions match these filters.");
+      drillId = IB.pick(pool).id;
+      render();
+      window.scrollTo({ top: IB.qs("#drillBar").offsetTop - 80 });
+    };
+    const back = IB.qs("#drillAll");
+    if (back) back.onclick = () => { drillId = null; render(); };
+  }
+
   function render() {
-    const qs = filtered();
+    let qs = filtered();
+    drillBar(qs);
+    if (drillId) qs = qs.filter((q) => q.id === drillId);
     const pages = Math.max(1, Math.ceil(qs.length / PER_PAGE));
     page = Math.min(page, pages);
     IB.qs("#count").textContent = `${qs.length} question${qs.length === 1 ? "" : "s"}`;
     const list = IB.qs("#list");
     list.innerHTML = qs.length ? "" : `<div class="card muted">No questions match these filters.</div>`;
-    qs.slice((page - 1) * PER_PAGE, page * PER_PAGE).forEach((q, i) => list.appendChild(IB.renderQuestion(q, { number: (page - 1) * PER_PAGE + i + 1 })));
+    qs.slice((page - 1) * PER_PAGE, page * PER_PAGE).forEach((q, i) => list.appendChild(IB.renderQuestion(q, { number: (page - 1) * PER_PAGE + i + 1, onScored: () => f.sec.value === "drill" && drillBar(filtered()) })));
     const pager = IB.qs("#pager");
     pager.innerHTML = "";
     if (pages > 1) {
@@ -121,6 +160,7 @@ IB.page = function () {
   Object.values(f).forEach((el) => el.addEventListener(el.tagName === "INPUT" ? "input" : "change", () => {
     if (el === f.sub) fillTopics();
     page = 1;
+    drillId = null;
     history.replaceState(null, "", `questionbank.html?subject=${f.sub.value}${f.topic.value ? "&topic=" + f.topic.value : ""}${f.sec.value ? "&sec=" + f.sec.value : ""}`);
     render();
   }));
