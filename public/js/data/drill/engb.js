@@ -314,4 +314,91 @@ IB.addDrill("engb", {
         pts: ["Message: privacy settings, strong passwords, think before posting, dealing with cyberbullying, digital detox, checking sources.", "Podcast: host names, greeting, banter, guest, outro.", "Guidelines: title, numbered steps, imperatives, warning boxes.", "Blog: title, personal anecdotes, reader questions.", "Language: imperatives, modals of advice, topic vocabulary."] }
     ]
   },
+  "engb-8": {
+    units: { a: "Task analysis & planning", b: "Criteria A, B & C", c: "Organisation & cohesion" },
+    paper: "P1",
+    qs: [
+      /* ---------- a. task analysis ---------- */
+      { u: "a", s: "A", m: "1", t: "State the word range for an HL Paper 1 response in English B.", rule: "[1] correct range.",
+        pts: ["450-600 words [1]."] },
+      { u: "a", s: "A", m: "1", t: "State the total marks available for Paper 1 at HL.", rule: "[1] correct total.",
+        pts: ["30 marks [1] (A 12, B 12, C 6)."] },
+      { u: "a", s: "A", m: "3", t: "Before writing, a student should identify the context of the task. Identify three things to establish from the prompt.", rule: "[1] each, max [3].",
+        pts: ["Audience / who the reader is [1].", "Purpose / why writing (persuade, inform, reflect) [1].", "Text type / format [1].", "Context / situation and theme [1].", "Register / formality needed [1]."] },
+      { u: "a", s: "A", m: "2", t: "Explain why choosing the most suitable of the three text types matters.", rule: "[1] point + [1] development.",
+        pts: ["Criterion C rewards conventions appropriate to context [1]; a type that suits the audience and purpose (e.g. a speech for an assembly) makes conventions natural and convincing [1]."] },
+      { u: "a", s: "A", m: "2", t: "Suggest two planning steps that help a candidate stay within time and word limits.", rule: "[1] each.",
+        pts: ["Brief plan / outline of paragraphs before writing [1].", "Allocate time for checking / proofreading at the end [1].", "Count words per paragraph / aim for about 5 paragraphs of 100-120 words [1]."] },
+      /* ---------- b. criteria ---------- */
+      { u: "b", s: "A", m: "2", t: "Outline what Criterion A (Language) assesses.", rule: "[1] range + [1] accuracy/appropriacy.",
+        pts: ["Range / variety of vocabulary and grammatical structures [1];", "accuracy and how effectively language is used, including appropriate idiom and register [1]."] },
+      { u: "b", s: "A", m: "2", t: "Outline what Criterion B (Message) assesses.", rule: "[1] relevance + [1] development/organisation.",
+        pts: ["Relevance of ideas to the task [1];", "development, detail, clarity and logical organisation of ideas / coherence [1]."] },
+      { u: "b", s: "A", m: "2", t: "Outline what Criterion C (Conceptual understanding) assesses.", rule: "[1] each aspect.",
+        pts: ["Choice of appropriate text type for the context [1];", "register, tone and conventions appropriate to audience and purpose [1]."] },
+      { u: "b", s: "A", m: "2+2", t: "Explain two common reasons why candidates lose marks on Criterion B.", rule: "[1] reason + [1] development, twice.",
+        pts: ["Ideas not developed [1]; listing points without examples or explanation [1].", "Off-task / irrelevant content [1]; memorised material not adapted to the prompt [1].", "Weak organisation [1]; no clear paragraphing or progression [1].", "Ignoring part of the task [1]; e.g. only giving benefits when asked to evaluate [1]."] },
+      { u: "b", s: "A", m: "2", t: "A candidate writes a speech but never addresses the audience and uses no spoken features. Which criterion is most affected and why?", rule: "[1] criterion + [1] reason.",
+        pts: ["Criterion C [1]; conventions of the text type and audience awareness are missing [1]."] },
+      /* ---------- c. organisation and cohesion ---------- */
+      { u: "c", s: "A", m: "3", t: "Give three cohesive devices that can be used to add a contrasting idea.", rule: "[1] each.",
+        pts: ["However [1].", "On the other hand [1].", "Nevertheless / Nonetheless [1].", "Although / whereas / despite [1]."] },
+      { u: "c", s: "A", m: "2", t: "Complete with an appropriate linking word: '____ the cost is high, the long-term benefits are clear.' Explain your choice.", rule: "[1] correct linker + [1] explanation.",
+        pts: ["Although / Even though / While [1]; introduces a concession that contrasts with the main clause [1].", "'However' or 'Despite' (without 'the fact that') is grammatically incorrect here: [0]."] },
+      { u: "c", s: "A", m: "2", t: "Outline the function of a topic sentence.", rule: "[1] function + [1] development.",
+        pts: ["States the main idea of the paragraph [1]; guides the reader and links to the overall argument [1]."] },
+      { u: "c", s: "A", m: "2", t: "Suggest two ways to make the conclusion of a persuasive text effective.", rule: "[1] each.",
+        pts: ["Restate the main position concisely [1].", "Call to action [1].", "Memorable final line / rhetorical question [1]."] },
+      /* ---------- Section C ---------- */
+      { u: "a", s: "C", m: "12+12+6", t: "Your school is debating whether to replace printed textbooks with tablets. Write a text expressing your view to the school community. Choose one text type: speech, article, or formal email. Write 450-600 words.", rule: "A [12] + B [12] + C [6]. Use the full criteria: 10-12 in A needs varied, accurate, idiomatic language; 10-12 in B needs relevant, developed, well-organised ideas; 5-6 in C needs a type fully appropriate to context with consistent register.",
+        pts: ["For tablets: lighter bags, updated content, interactive resources.", "Against: distraction, eye strain, cost, unequal access, research suggesting better comprehension on paper.", "Clear judgement and recommendation (e.g. a mixed approach).", "Conventions of chosen type applied consistently.", "Cohesive devices and paragraphing guide the reader."] },
+      { u: "b", s: "C", m: "30", t: "Write a text encouraging students to learn an additional language. Choose one text type: leaflet, blog post, or speech to younger students. Write 450-600 words.", rule: "A [12] + B [12] + C [6] = 30. With a speech to younger students, C requires a register adapted to a younger audience.",
+        pts: ["Benefits: career, travel, cognitive benefits, understanding other cultures, access to literature and media.", "Practical tips: apps, language exchanges, films with subtitles, consistency.", "Anecdote or personal example to engage.", "Leaflet: headings, bullet points; blog: title and reader interaction; speech: greeting, simpler vocabulary, questions to audience.", "Language: imperatives, conditionals, persuasive devices."] },
+      { u: "c", s: "C", m: "12+12+6", t: "You have been asked to write guidance for younger students on how to manage exam stress. Choose one text type: set of instructions, blog post, or article in the school magazine. Write 450-600 words.", rule: "A [12] + B [12] + C [6]. High B depends on a logical order of advice with explanation, not a list.",
+        pts: ["Advice: planning a timetable, active revision, sleep, exercise, breaks, talking to someone.", "Explanation of why each strategy helps.", "Instructions: numbered steps, imperatives, headings.", "Article/blog: title, introduction with hook, body paragraphs, encouraging conclusion.", "Cohesion: sequencing (firstly, after that, finally)."] }
+    ]
+  },
+  "engb-9": {
+    units: { a: "Reading strategies", b: "Question types", c: "Listening comprehension" },
+    paper: "P2",
+    qs: [
+      /* ---------- a. reading strategies ---------- */
+      { u: "a", s: "A", m: "2", t: "Distinguish between skimming and scanning.", rule: "[1] each side.",
+        pts: ["Skimming: reading quickly for the general idea / gist [1];", "scanning: searching for specific information such as a word, name or number [1]."] },
+      { u: "a", s: "A", m: "2", t: "Outline two strategies for working out the meaning of an unknown word in a Paper 2 text.", rule: "[1] each.",
+        pts: ["Use context / surrounding sentences [1].", "Identify word class (noun, verb, adjective) to match the definition [1].", "Look at prefixes / suffixes / word roots [1]."] },
+      { u: "a", s: "A", m: "1", html: true, t: "<blockquote>The festival, which began as a gathering of a few dozen folk musicians in a farmer's field, now draws crowds of more than 50,000. Tickets sell out within hours, and the organisers have been forced to cap numbers to protect the surrounding meadows.</blockquote>Find the word that means 'set an upper limit on'.", rule: "[1] exact word.",
+        pts: ["cap [1]."] },
+      { u: "a", s: "A", m: "1", html: true, t: "<blockquote>The festival, which began as a gathering of a few dozen folk musicians in a farmer's field, now draws crowds of more than 50,000.</blockquote>In 'which began as a gathering', what does 'which' refer to?", rule: "[1] correct referent.",
+        pts: ["the festival [1]."] },
+      { u: "a", s: "A", m: "2", html: true, t: "<blockquote>Tickets sell out within hours, and the organisers have been forced to cap numbers to protect the surrounding meadows.</blockquote>True or false? Justify with a brief quotation: 'The organisers limit numbers for environmental reasons.'", rule: "[1] True + [1] justification.",
+        pts: ["True [1]; 'to protect the surrounding meadows' [1]."] },
+      /* ---------- b. question types ---------- */
+      { u: "b", s: "A", m: "2", t: "In a true/false-with-justification question, explain why a candidate who ticks the correct box but gives no justification scores zero.", rule: "[1] rule + [1] reason.",
+        pts: ["Both the correct answer and justification are required for the mark [1]; this prevents credit for guessing (50% chance) [1]."] },
+      { u: "b", s: "A", m: "2", t: "Outline two common errors in 'find the word' questions.", rule: "[1] each.",
+        pts: ["Copying extra words / the whole phrase [1].", "Choosing a word with the wrong word class or tense [1].", "Choosing a word from the wrong paragraph / outside the specified lines [1]."] },
+      { u: "b", s: "A", m: "2", t: "Suggest two strategies for matching sentence halves.", rule: "[1] each.",
+        pts: ["Check grammatical fit (tense, subject-verb agreement, singular/plural) [1].", "Check meaning against the text, not just general logic [1].", "Eliminate distractors / use each ending once [1]."] },
+      { u: "b", s: "A", m: "1", html: true, t: "<blockquote>Critics dismissed the novel as sentimental when it first appeared in 1960. Sixty years later, it is studied in schools across three continents, and its author's once-mocked style is widely imitated.</blockquote>Find the word that means 'made fun of'.", rule: "[1] exact word.",
+        pts: ["mocked [1].", "'once-mocked' accepted; 'dismissed' does not mean made fun of: [0]."] },
+      { u: "b", s: "A", m: "2", html: true, t: "<blockquote>Critics dismissed the novel as sentimental when it first appeared in 1960. Sixty years later, it is studied in schools across three continents, and its author's once-mocked style is widely imitated.</blockquote>Give two pieces of evidence that the novel's reputation has improved.", rule: "[1] each.",
+        pts: ["studied in schools (across three continents) [1].", "its style is widely imitated [1]."] },
+      { u: "b", s: "A", m: "2", t: "Explain why answers to Paper 2 short-answer questions should be brief.", rule: "[1] point + [1] development.",
+        pts: ["Marks are for locating the correct information [1]; extra incorrect or contradictory material can cancel the mark / wastes time [1]."] },
+      /* ---------- c. listening ---------- */
+      { u: "c", s: "A", m: "2", t: "Outline two strategies to use before the audio starts in the listening section.", rule: "[1] each.",
+        pts: ["Read the questions and underline key words [1].", "Predict likely answers / word class / numbers needed [1].", "Note the context (speakers, type of text: interview, podcast) [1]."] },
+      { u: "c", s: "A", m: "2", t: "Explain why listening for 'signpost' words (e.g. 'however', 'the main reason') helps comprehension.", rule: "[1] function + [1] development.",
+        pts: ["They signal structure / changes of direction [1]; alert the listener that the answer or a contrast is coming [1]."] },
+      { u: "c", s: "A", m: "2", t: "Suggest two ways a student can practise listening outside class.", rule: "[1] each.",
+        pts: ["Podcasts / radio (e.g. BBC) in English [1].", "Films or series with English subtitles [1].", "Note-taking from TED talks, then summarising [1]."] },
+      { u: "c", s: "A", m: "1", t: "In listening tests, why can a distractor be dangerous?", rule: "[1] explanation.",
+        pts: ["A speaker mentions an option that is later corrected or rejected, so candidates choose it wrongly [1]."] },
+      { u: "a", s: "A", m: "2", t: "Outline why reading the title, subtitle and any images before a Paper 2 text is useful.", rule: "[1] point + [1] development.",
+        pts: ["Gives the context / topic and text type [1]; helps predict content and vocabulary and speeds comprehension [1]."] },
+      { u: "b", s: "A", m: "2", t: "Explain why 'own words' questions require paraphrasing rather than copying.", rule: "[1] point + [1] development.",
+        pts: ["They test comprehension, not location [1]; copying shows you found the text but not that you understood it [1]."] }
+    ]
+  },
 });
