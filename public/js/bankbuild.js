@@ -6,6 +6,7 @@
   const IB = window.IB;
 
   IB.SECTIONS = [
+    ["drill", "Question bank", "Exam-style structured and essay questions by sub-topic, each with a clear marking rule and full markscheme"],
     ["exam", "Exam-style", "Hand-written questions in the style of the real papers"],
     ["case", "Data response / case studies", "Full exam-style questions built on one text and data extract, part by part, like the real paper"],
     ["frames", "Markscheme frames", "One question for every recurring IB question type in this topic, marked against its frame"],

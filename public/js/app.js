@@ -140,6 +140,36 @@
     });
   };
 
+  // Topic drills (js/data/drill/<subject>.js): IB-style structured and essay questions, each with an explicit
+  // marking rule ("[1] factor + [1] development, twice") and alternative creditworthy points tagged [1].
+  // { units: { a: "Sub-topic name", ... }, qs: [{ u, s: "A" | "C", m: "2+2", t, data?, rule, pts, numeric?, paper?, diff? }] }
+  IB.addDrill = function (subjectId, byTopic) {
+    const s = IB.subjects[subjectId];
+    if (!s) return;
+    Object.entries(byTopic).forEach(([id, d]) => {
+      const t = s.allTopics.find((x) => x.id === id);
+      if (!t) return;
+      t.units = Object.assign(t.units || {}, d.units || {});
+      t.questions = t.questions || [];
+      d.qs.forEach((x, i) => {
+        const marks = String(x.m).split("+").reduce((a, b) => a + Number(b), 0);
+        const table = x.data ? `<div class="table-wrap"><table class="data" style="width:auto">${x.data.map((r, ri) => `<tr>${r.map((c) => (ri ? `<td>${c}</td>` : `<th>${c}</th>`)).join("")}</tr>`).join("")}</table></div>` : "";
+        const q = {
+          id: `${t.id}-d${i + 1}`, subject: s.id, topic: t.id, sec: "drill", paper: x.paper || d.paper || "P2",
+          type: x.options ? "mcq" : x.s === "C" ? "extended" : "short", marks, diff: x.diff || (x.s === "C" ? 3 : marks <= 2 ? 1 : 2),
+          q: (x.html ? x.t : esc(x.t)) + table, ms: x.pts, rule: x.rule, unit: x.u, unitName: t.units[x.u] || x.u, part: x.s,
+          alt: x.s !== "C" && !x.numeric && !x.options,
+        };
+        if (/\+/.test(String(x.m))) q.split = String(x.m);
+        // drill tolerances were written both as absolute and as relative values: never accept more than 2% off
+        if (x.numeric) q.numeric = Object.assign({}, x.numeric, { tol: Math.min(x.numeric.tol ?? Infinity, Math.max(Math.abs(x.numeric.value) * 0.02, 1e-12)) });
+        if (x.options) Object.assign(q, { options: x.options, answer: x.answer });
+        if (t.hl) q.hl = true;
+        t.questions.push(q);
+      });
+    });
+  };
+
   // ⏱ 10-minute fast notes, one sheet per topic (js/data/fast/<subject>.js, loaded on demand by the notes page).
   IB.fast = IB.fast || {};
   IB.addFast = function (byTopic) {
@@ -781,7 +811,8 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
         ${q.generated ? `<span class="pill">Auto-generated</span>` : ""}
         ${q.sec && q.sec !== "exam" && IB.sectionName ? `<span class="pill sec ${q.sec}">${esc(IB.sectionName(q.sec))}</span>` : ""}
         ${q.custom ? `<span class="pill good">My past paper · ${esc(q.source)}</span>` : ""}
-        <span class="marks">[${q.marks}]</span>
+        ${q.unitName ? `<span class="pill">${esc(q.unitName)}</span>` : ""}
+        <span class="marks">[${esc(q.split || String(q.marks))}]</span>
       </div>
       <div class="q-text rich">${q.q}</div>
       <div class="q-answer"></div>
@@ -807,7 +838,7 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
 
     const showMs = () => {
       if (IB.qs(".ms", result)) return;
-      const ms = IB.el(`<div class="ms"><strong>Markscheme</strong><ul>${(q.ms || []).map((p) => `<li>${p}</li>`).join("")}</ul></div>`);
+      const ms = IB.el(`<div class="ms"><strong>Markscheme</strong>${q.rule ? `<p class="small" style="margin:.3em 0"><em>How marks are given:</em> ${esc(q.rule)}</p>` : ""}<ul>${(q.ms || []).map((p) => `<li>${p}</li>`).join("")}</ul></div>`);
       result.appendChild(ms);
       IB.math(ms);
     };
@@ -861,10 +892,36 @@ Reply with only a JSON object: {"questions": [{"q": "...", "marks": 4, "type": "
       const msBtn = IB.el(`<button class="btn small">Show markscheme & self-mark</button>`);
       if (!opts.hideActions && opts.mode !== "exam") {
         actions.append(aiBtn, msBtn);
+        // exam pace: about a minute per mark; a 10-mark essay gets the 20-25 minutes it gets in the exam
+        const mins = q.mins || (q.type === "extended" && q.marks >= 10 ? 22 : Math.max(1, Math.round(q.marks * 1.1)));
+        const tBtn = IB.el(`<button class="btn small">⏱ ${mins} min timer</button>`);
+        const tOut = IB.el(`<span class="small muted" aria-live="polite" style="font-variant-numeric:tabular-nums"></span>`);
+        tBtn.onclick = () => {
+          clearInterval(card._timer);
+          let left = mins * 60;
+          const tick = () => {
+            tOut.textContent = left > 0 ? `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")} left` : "Time's up - check the markscheme.";
+            if (left-- <= 0 || !card.isConnected) clearInterval(card._timer);
+          };
+          tick();
+          card._timer = setInterval(tick, 1000);
+        };
+        actions.append(tBtn, tOut);
       }
       const selfMark = () => {
         showMs();
         if (IB.qs(".self-mark", result) || scored) return;
+        if (q.marks <= 15) {
+          // one tap per mark, like marking against the markscheme by hand
+          const sm = IB.el(`<div class="self-mark"><span class="small muted">Your mark:</span>${Array.from({ length: q.marks + 1 }, (_, n) => `<button class="btn small" data-n="${n}">${n}</button>`).join("")}<span class="small">/ ${q.marks}</span></div>`);
+          result.appendChild(sm);
+          IB.qsa("button", sm).forEach((b) => (b.onclick = () => {
+            const v = +b.dataset.n;
+            finish(v, q.marks, opts.mode === "exam" ? "exam" : "self");
+            sm.innerHTML = `<span class="pill good">Saved ${v}/${q.marks}</span>`;
+          }));
+          return;
+        }
         const sm = IB.el(`<div class="self-mark"><span class="small muted">Your mark:</span><input type="number" min="0" max="${q.marks}" value="0"><span class="small">/ ${q.marks}</span><button class="btn small">Save mark</button></div>`);
         result.appendChild(sm);
         IB.qs("button", sm).onclick = () => {
