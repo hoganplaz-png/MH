@@ -226,4 +226,92 @@ IB.addDrill("engb", {
         pts: ["Message: problems of fast fashion (overproduction, worker exploitation, Rana Plaza 2013, textile waste).", "Message: evaluation of 'sustainable' claims; need for transparency and certification.", "Message: alternatives (second-hand, repair, rental, buy less).", "Formal email: subject line, 'Dear Sir or Madam', reasons for writing, constructive suggestions, polite sign-off.", "Review: title, rating, evaluative language.", "Language: evaluative adjectives, hedging, concessive clauses."] }
     ]
   },
+  "engb-6": {
+    units: { a: "Personal texts", b: "Professional texts", c: "Register & audience" },
+    paper: "P1",
+    qs: [
+      /* ---------- a. personal texts ---------- */
+      { u: "a", s: "A", m: "3", t: "Identify three conventions of a diary or journal entry.", rule: "[1] per valid convention, max [3].",
+        pts: ["Date / time [1].", "First person / personal voice [1].", "Reflection on feelings / thoughts [1].", "Informal, intimate register [1].", "No intended audience / optional 'Dear diary' [1]."] },
+      { u: "a", s: "A", m: "2", t: "Distinguish between a diary entry and a personal blog post.", rule: "[1] for each side of the distinction.",
+        pts: ["A diary is private, written for oneself with no audience [1];", "a blog is public, addressed to readers, often with a title and invitation to comment [1]."] },
+      { u: "a", s: "A", m: "3", t: "Identify three features that should appear in an informal email to a friend.", rule: "[1] per feature.",
+        pts: ["Informal greeting / 'Hi' + name [1].", "Contractions / colloquial language [1].", "Questions to the reader / reference to shared experiences [1].", "Informal sign-off / 'See you soon', 'Love' [1]."] },
+      { u: "a", s: "A", m: "2", t: "Explain why a blog post should begin with an engaging title and opening line.", rule: "[1] reason + [1] development.",
+        pts: ["To attract / hook readers [1]; online readers scroll quickly and decide in seconds whether to read on [1]."] },
+      { u: "a", s: "A", m: "2", t: "Rewrite this diary sentence in a more personal, reflective way: 'The exam took place. Results will be published.'", rule: "[1] first-person voice + [1] feelings/reflection.",
+        pts: ["Use of 'I' / first person [1]; expression of emotion or reflection, e.g. 'I can't stop thinking about question 3 — what if I've failed?' [1]."] },
+      /* ---------- b. professional texts ---------- */
+      { u: "b", s: "A", m: "3", t: "Identify three conventions of a formal letter of application.", rule: "[1] per valid convention.",
+        pts: ["Addresses / date [1].", "Formal salutation / 'Dear Sir or Madam' / 'Dear Ms X' [1].", "Reason for writing in the first paragraph [1].", "Formal register, no contractions [1].", "Formal close / 'Yours faithfully' or 'Yours sincerely' + full name [1]."] },
+      { u: "b", s: "A", m: "2", t: "State when British English uses 'Yours faithfully' and when it uses 'Yours sincerely'.", rule: "[1] each.",
+        pts: ["Yours faithfully: when the recipient's name is not known / after 'Dear Sir or Madam' [1].", "Yours sincerely: when the recipient is addressed by name [1]."] },
+      { u: "b", s: "A", m: "3", t: "Identify three conventions of a report.", rule: "[1] per valid convention.",
+        pts: ["Title / To-From-Date-Subject header [1].", "Headings / sections (introduction, findings, recommendations) [1].", "Impersonal / objective tone, passive voice [1].", "Recommendations / conclusion [1].", "Reference to data or sources [1]."] },
+      { u: "b", s: "A", m: "2", t: "Distinguish between a report and a proposal.", rule: "[1] each side.",
+        pts: ["A report presents findings about something that has happened or exists [1];", "a proposal suggests a future plan or action, persuading the reader to approve it (budget, timeline, benefits) [1]."] },
+      { u: "b", s: "A", m: "2", t: "Outline the purpose of the subject line in a formal email.", rule: "[1] purpose + [1] development.",
+        pts: ["Tells the reader the topic immediately [1]; helps them prioritise and find the email later [1]."] },
+      /* ---------- c. register and audience ---------- */
+      { u: "c", s: "A", m: "1", t: "Define the term register.", rule: "[1] for a precise definition.",
+        pts: ["The level of formality / variety of language chosen to suit audience, purpose and context [1]."] },
+      { u: "c", s: "A", m: "2", t: "Rewrite in a formal register: 'Hey, thanks loads for the stuff you sent, it was awesome.'", rule: "[1] formal vocabulary + [1] formal structure, no contractions/slang.",
+        pts: ["e.g. 'Thank you very much for the materials you sent [1]; they were extremely useful.' [1]"] },
+      { u: "c", s: "A", m: "2", t: "Rewrite in an informal register: 'I regret to inform you that I am unable to attend the event.'", rule: "[1] informal vocabulary + [1] informal structure.",
+        pts: ["e.g. 'Sorry, I can't make it [1] to the party!' [1]"] },
+      { u: "c", s: "A", m: "2+2", t: "Explain two ways a writer can show awareness of audience in a Paper 1 text.", rule: "[1] way + [1] development, twice.",
+        pts: ["Appropriate register [1]; formal for a principal, friendly for peers [1].", "Direct address [1]; 'you', rhetorical questions involve the reader [1].", "Content relevance [1]; examples the audience relates to [1].", "Suitable vocabulary [1]; avoid jargon for general readers [1]."] },
+      /* ---------- Section C ---------- */
+      { u: "b", s: "C", m: "12+12+6", t: "You want a summer job at an international youth camp. Write a text applying for the position and showing why you are suitable. Choose one text type: formal letter, formal email, or personal statement. Write 450-600 words.", rule: "A [12] + B [12] + C [6]. High C requires full formal conventions (salutation, purpose, close) and consistent formal register; high B requires specific, relevant experiences linked to the job.",
+        pts: ["Message: position named and where it was advertised.", "Message: relevant experience (CAS activities, languages, first aid, sports coaching) with examples.", "Message: personal qualities supported by evidence; availability; request for interview.", "Conventions: 'Dear Ms Smith' / 'Dear Sir or Madam', matching close, contact details.", "Language: formal vocabulary (responsible, enthusiastic, I would welcome the opportunity), no contractions."] },
+      { u: "a", s: "C", m: "12+12+6", t: "You have just returned from a school exchange. Write a text describing the experience and what you learned. Choose one text type: diary entry, blog post, or informal email to your host family. Write 450-600 words.", rule: "A [12] + B [12] + C [6]. Conventions must match the chosen type; high C shows clear understanding of audience (self, public readers, or host family).",
+        pts: ["Message: specific moments (food, school life, misunderstandings), feelings and reflection.", "Message: what was learned (language, cultural differences, independence).", "Diary: date, introspection, no audience address.", "Blog: title, readers addressed, tips for future exchange students.", "Email to host family: gratitude, shared memories, questions, warm sign-off.", "Language: range of past tenses, descriptive vocabulary, idiomatic expressions."] },
+      { u: "b", s: "C", m: "30", t: "The student council asked you to investigate why few students use the school library. Write a text presenting your findings and recommendations. Choose one text type: report, proposal, or formal email to the librarian. Write 450-600 words.", rule: "A [12] + B [12] + C [6] = 30. High C needs headings and impersonal style for a report; high B needs plausible findings and concrete recommendations.",
+        pts: ["Findings: survey of students (labelled as hypothetical), e.g. opening hours, noise, outdated books, preference for online resources.", "Recommendations: longer hours, quiet and group zones, e-books, events.", "Report: title, 'To/From/Date', Introduction, Findings, Recommendations, Conclusion.", "Proposal: future-focused, costs/benefits, request for approval.", "Language: passive voice (it was found that), reporting verbs, formal register."] }
+    ]
+  },
+  "engb-7": {
+    units: { a: "News & feature articles", b: "Persuasive media", c: "Digital media" },
+    paper: "P1",
+    qs: [
+      /* ---------- a. news and features ---------- */
+      { u: "a", s: "A", m: "2", t: "Distinguish between a news report and a feature article.", rule: "[1] for each side.",
+        pts: ["A news report presents recent facts objectively, most important information first (inverted pyramid) [1];", "a feature article explores a topic in depth, often with a human-interest angle, opinions and a more personal style [1]."] },
+      { u: "a", s: "A", m: "1", t: "State what is meant by the 'inverted pyramid' structure in news writing.", rule: "[1] precise explanation.",
+        pts: ["The most important information (who, what, when, where, why) comes first, details later [1]."] },
+      { u: "a", s: "A", m: "3", t: "Identify three conventions of a newspaper or magazine article.", rule: "[1] per convention.",
+        pts: ["Headline [1].", "Byline / writer's name [1].", "Sub-headings / standfirst [1].", "Quotations from sources / interviewees [1].", "Short paragraphs [1]."] },
+      { u: "a", s: "A", m: "2", t: "Write a suitable headline and standfirst (one-line summary) for an article about a school banning homework.", rule: "[1] headline (short, catchy) + [1] standfirst (summarises content).",
+        pts: ["Headline: e.g. 'Homework? Not here!' [1].", "Standfirst: e.g. 'One school has scrapped homework — so are its students doing better?' [1]."] },
+      { u: "a", s: "A", m: "2", t: "Explain why journalists include direct quotations in articles.", rule: "[1] reason + [1] development.",
+        pts: ["Credibility / evidence [1]; shows real sources support the story [1].", "Human interest / voice [1]; makes the article lively and personal [1]."] },
+      /* ---------- b. persuasive media ---------- */
+      { u: "b", s: "A", m: "3", t: "Identify three rhetorical devices commonly used in persuasive speeches.", rule: "[1] per device.",
+        pts: ["Rhetorical question [1].", "Rule of three / tricolon [1].", "Repetition / anaphora [1].", "Direct address / inclusive 'we' [1].", "Emotive language / anecdote [1]."] },
+      { u: "b", s: "A", m: "2", t: "Identify the device in 'We will not wait, we will not be silent, we will not give up' and explain its effect.", rule: "[1] device + [1] effect.",
+        pts: ["Repetition / anaphora / tricolon / rule of three [1]; creates rhythm, emphasis and determination; memorable [1]."] },
+      { u: "b", s: "A", m: "2", t: "Distinguish between an opinion column and an editorial.", rule: "[1] each side.",
+        pts: ["An opinion column expresses the views of a named individual writer [1];", "an editorial expresses the official view of the newspaper itself, usually unsigned [1]."] },
+      { u: "b", s: "A", m: "2+2", t: "Explain two techniques advertisers use to persuade young audiences.", rule: "[1] technique + [1] development, twice.",
+        pts: ["Celebrity / influencer endorsement [1]; fans trust and imitate them [1].", "Bandwagon / 'everyone has one' [1]; fear of missing out [1].", "Scarcity / limited offer [1]; urgency to buy now [1].", "Humour / catchy slogans [1]; memorable and shareable [1]."] },
+      { u: "b", s: "A", m: "2", t: "Identify two ways a speech differs from a written article.", rule: "[1] each.",
+        pts: ["Addresses a live audience directly / greeting and thanks [1].", "Signposting / repetition to help listeners follow [1].", "Spoken features: shorter sentences, rhetorical questions, pauses [1]."] },
+      /* ---------- c. digital media ---------- */
+      { u: "c", s: "A", m: "3", t: "Identify three conventions of a blog post.", rule: "[1] per convention.",
+        pts: ["Title [1].", "Date / author [1].", "Conversational first person [1].", "Direct address to readers / invitation to comment [1].", "Links / tags [1]."] },
+      { u: "c", s: "A", m: "2", t: "Outline two features of a podcast script that distinguish it from an article.", rule: "[1] each.",
+        pts: ["Host introductions / greeting listeners by the show's name [1].", "Speaker labels / dialogue between hosts or guests [1].", "Spoken, conversational style with fillers and signposting [1]."] },
+      { u: "c", s: "A", m: "1", t: "Define the term clickbait.", rule: "[1] precise definition.",
+        pts: ["Sensational or misleading headlines designed to make people click a link [1]."] },
+      { u: "c", s: "A", m: "2+2", t: "Explain two reasons why social media posts are effective for awareness campaigns.", rule: "[1] reason + [1] development, twice.",
+        pts: ["Reach / shareability [1]; content spreads quickly, e.g. the 2014 Ice Bucket Challenge raised money for ALS research [1].", "Targeting young audiences [1]; platforms where they spend time [1].", "Hashtags unify messages [1]; e.g. #MeToo (2017) built a global movement [1].", "Visual and short [1]; easy to understand quickly [1]."] },
+      /* ---------- Section C ---------- */
+      { u: "a", s: "C", m: "12+12+6", t: "A student from your school has achieved something remarkable. Write a text about the student for your local community. Choose one text type: news report, feature article, or interview. Write 450-600 words.", rule: "A [12] + B [12] + C [6]. High C requires conventions of the chosen journalistic type (headline, byline, quotations, or Q/A format).",
+        pts: ["Message: what was achieved, when, how; obstacles overcome.", "Message: quotations from the student, teachers, family.", "News report: inverted pyramid, objective tone, past tense.", "Feature: human interest, descriptive opening, mix of narrative and quotation.", "Interview: introduction, Q/A turns, closing.", "Language: reporting verbs (claimed, explained), varied sentence structures."] },
+      { u: "b", s: "C", m: "12+12+6", t: "Your government is considering lowering the voting age to 16. Write a text expressing your view. Choose one text type: speech to a youth parliament, opinion column, or letter to the editor. Write 450-600 words.", rule: "A [12] + B [12] + C [6]. High B needs a clear position, developed arguments and rebuttal.",
+        pts: ["For: 16-year-olds pay taxes, work; decisions affect their future (climate); examples of countries with votes at 16 (e.g. Austria, Scotland for Scottish elections).", "Against: maturity, influence of parents/social media, low turnout.", "Speech: address the chair and members, rhetorical devices, appeal.", "Column: headline, byline, strong voice.", "Letter: reference to a previous article, formal close.", "Language: persuasive devices and formal argumentative linkers."] },
+      { u: "c", s: "C", m: "30", t: "Write a text for teenagers about how to stay safe and positive online. Choose one text type: blog post, podcast script, or set of instructions/guidelines. Write 450-600 words.", rule: "A [12] + B [12] + C [6] = 30. High C requires spoken features for a podcast, clear numbered steps for guidelines, or conversational tone and title for a blog.",
+        pts: ["Message: privacy settings, strong passwords, think before posting, dealing with cyberbullying, digital detox, checking sources.", "Podcast: host names, greeting, banter, guest, outro.", "Guidelines: title, numbered steps, imperatives, warning boxes.", "Blog: title, personal anecdotes, reader questions.", "Language: imperatives, modals of advice, topic vocabulary."] }
+    ]
+  },
 });
