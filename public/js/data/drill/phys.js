@@ -904,8 +904,8 @@ IB.addDrill("phys", {
         pts: ["p = 1/d = 1 ÷ 25 = 0.04 arc-seconds / 0.040″ [1].", "d = 25 × 3.26 = 81.5 ly [1]."] },
       { u: "c", s: "A", m: "2", t: "Explain why stellar parallax can only be used for relatively nearby stars.", rule: "[1] parallax angle decreases with distance, [1] too small to measure.",
         pts: ["Parallax angle is inversely proportional to distance [1];", "for distant stars the angle becomes too small to measure accurately (limits of resolution / atmospheric blurring) [1]."] },
-      { u: "c", s: "A", m: "2", t: "A star has apparent brightness 2.0 × 10⁻⁹ W m⁻² and is at a distance of 3.0 × 10¹⁷ m. Calculate its luminosity.", rule: "M1 L = 4πd²b, A1.", numeric: { value: 2.26e27, tol: 2.26e+25 },
-        pts: ["L = 4π × (3.0 × 10¹⁷)² × 2.0 × 10⁻⁹ (M1) [1]", "= 2.26 × 10^27 W (A1) [1]."] },
+      { u: "c", s: "A", m: "2", t: "A star has apparent brightness 2.0 × 10⁻⁹ W m⁻² and is at a distance of 3.0 × 10¹⁵ m. Calculate its luminosity.", rule: "M1 L = 4πd²b, A1.", numeric: { value: 2.26e23, tol: 2.26e+21 },
+        pts: ["L = 4π × (3.0 × 10¹⁵)² × 2.0 × 10⁻⁹ (M1) [1]", "= 2.26 × 10^23 W (A1) [1]."] },
       /* ---------- Section C ---------- */
       { u: "c", s: "C", m: "2+3+3", t: "Star X has surface temperature 3500 K and luminosity 100 times that of the Sun. The Sun has surface temperature 5800 K and radius 7.0 × 10⁸ m. (a) Identify, with reasons, the region of the HR diagram where X is found. (b) Determine the radius of X. (c) Calculate the peak wavelength of X and explain its colour. Wien constant = 2.9 × 10⁻³ m K.",
         rule: "(a) [1] red giant region, [1] reason (cool but luminous). (b) M1 L ∝ R²T⁴, M1 substitution, A1. (c) M1 A1 peak wavelength, [1] red/orange colour.",
