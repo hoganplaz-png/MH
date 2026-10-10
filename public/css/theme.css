@@ -1,0 +1,150 @@
+/* Design try A: "Studio".
+   The closest to today's site: same dark ink header band, cobalt actions and highlighter marks,
+   but with a more deliberate type pairing (Schibsted Grotesk headings, an Instrument Serif italic accent,
+   Hanken Grotesk body), flatter surfaces, tighter corners, and quieter motion.
+   Removed: gradient icon tiles, purple glows, the aurora, the pointer spotlight, the spinning border and the dot network. */
+@import url("https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800;900&family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap");
+
+:root {
+  --font-display: "Schibsted Grotesk", "Hanken Grotesk", system-ui, sans-serif;
+  --font: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --bg: #F3F4F6;
+  --surface: #FFFFFF;
+  --surface-2: #EEF0F4;
+  --border: #DCDFE6;
+  --muted: #535D70;
+  --ink: #101521;
+  --ink-2: #1D2433;
+  --primary: #2F56E8;
+  --primary-hover: #1F3FC0;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 0 rgba(16, 21, 33, .04);
+  --lift: 0 1px 0 rgba(16, 21, 33, .04), 0 12px 28px -12px rgba(16, 21, 33, .22);
+  --ease: cubic-bezier(.22, .8, .24, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0C0F16; --surface: #141925; --surface-2: #1B2130; --border: #262E40; --muted: #9AA4B8;
+    --ink: #07090E; --ink-2: #141925;
+    --primary: #8AA2FF; --primary-hover: #AEBEFF;
+    --shadow: none; --lift: 0 12px 28px -12px rgba(0, 0, 0, .6);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0C0F16; --surface: #141925; --surface-2: #1B2130; --border: #262E40; --muted: #9AA4B8;
+  --ink: #07090E; --ink-2: #141925;
+  --primary: #8AA2FF; --primary-hover: #AEBEFF;
+  --shadow: none; --lift: 0 12px 28px -12px rgba(0, 0, 0, .6);
+}
+
+body { font-size: 16.5px; letter-spacing: -.003em; }
+h1, h2, h3, h4 { letter-spacing: -.025em; font-weight: 800; }
+h2 { font-size: clamp(1.6rem, 2.6vw, 2.15rem); }
+.eyebrow, .section-title, .unit-label, .callout-title { letter-spacing: .12em; font-weight: 500; }
+
+/* ---------- quiet the background ---------- */
+.fx-net, .fx-glow, body::after, .band::before, .floaters, .hero-demo::before { display: none !important; }
+body::before { animation: none; background-size: 32px 32px; opacity: .55; }
+@media (hover: hover) { .card:hover, .callout:hover, .sec-tab:hover, .fw-chip:hover { background-image: none; } }
+.read-progress { background: var(--mark); height: 2px; }
+
+/* ---------- header ---------- */
+.site-header { border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.brand { font-weight: 800; letter-spacing: -.03em; }
+.brand-mark { border-radius: 6px; background: var(--mark); color: var(--ink); font-family: var(--font-display); font-weight: 900; letter-spacing: -.04em; }
+.nav-links a { font-weight: 500; }
+.nav-links a::after { height: 2px; bottom: 0; opacity: 1; }
+.nav-links a.active { border-bottom-width: 2px; }
+.icon-btn { border-radius: 8px; border-color: rgba(255, 255, 255, .14); }
+
+/* ---------- hero ---------- */
+.hero { padding-block: 72px 88px; }
+.hero h1 { font-size: clamp(2.6rem, 5.6vw, 4.6rem); line-height: .98; letter-spacing: -.045em; font-weight: 900; }
+.hero h1 .hl { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: -.01em; color: var(--mark); background: none; animation: none; }
+.hero h1 .hl, .hero h1 .hl .fx-w { color: var(--mark); }
+.band .eyebrow { color: rgba(255, 255, 255, .55); }
+.hero p.lead { font-size: 1.12rem; }
+.hero-demo { border-radius: 14px; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .55); transform: rotate(1.2deg); }
+.hero-demo:hover { transform: rotate(0deg) translateY(-3px); }
+.hero-demo .verdict { border-radius: 10px; }
+.band-curves .c1 { stroke: rgba(255, 255, 255, .16); stroke-width: 1.5; }
+.band-curves .c2 { stroke: rgba(255, 197, 61, .32); stroke-width: 1.5; }
+.band-curves .c2b { stroke: rgba(255, 255, 255, .10); stroke-width: 1.5; }
+.band-curves .c4 { display: none; }
+/* headline: words rise out of a mask instead of blurring in */
+.fx-split .fx-w { animation-name: a-word; animation-duration: .8s; animation-timing-function: var(--ease); }
+@keyframes a-word { from { opacity: 0; transform: translateY(.35em); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(0 0 -20% 0); } }
+
+/* ---------- buttons ---------- */
+.btn { border-radius: 8px; font-weight: 700; letter-spacing: -.005em; }
+.btn.primary { background-image: none; }
+.btn.primary:hover { animation: none; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: none; }
+.band .btn.primary { background: var(--mark); color: var(--ink); }
+.band .btn.primary:hover { background: #FFD46B; color: var(--ink); }
+
+/* ---------- cards ---------- */
+.card, .q-card { border-radius: var(--radius); box-shadow: var(--shadow); }
+a.card:hover, .subject-card:hover, .section-card:hover { transform: translateY(-2px); box-shadow: var(--lift); border-color: color-mix(in srgb, var(--text) 22%, var(--border)); }
+.stat-big { font-weight: 900; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.card.accent { background: var(--ink); color: var(--on-ink); }
+.card.accent .stat-big { color: var(--mark); }
+.stat-tile.accent { animation: none; }
+
+/* subject cards: a coloured spine instead of a stripe, a flat monogram */
+.subject-card .stripe { display: none; }
+.subject-card { border-left: 4px solid var(--c); }
+.sc-mono { width: 44px; height: 44px; border-radius: 8px; background: color-mix(in srgb, var(--c) 14%, var(--surface)); color: var(--c); box-shadow: none; font-family: var(--font-display); font-weight: 900; font-size: 1.15rem; letter-spacing: -.03em; }
+.subject-card:hover .sc-mono { transform: none; background: var(--c); color: #FFFFFF; transition: background .25s, color .25s; }
+.sc-ring b { font-family: var(--font-display); }
+.sc-next { border-top-style: solid; }
+
+/* feature cards: outlined glyphs, numbered */
+.f-icon, .feature:nth-child(n) .f-icon { background: transparent; color: var(--text); border: 1.5px solid var(--border); border-radius: 8px; width: 40px; height: 40px; font-family: var(--font-display); font-size: 1.1rem; }
+.feature:hover .f-icon { animation: none; transform: none; background: var(--ink); color: var(--mark); border-color: var(--ink); transition: background .25s, color .25s; }
+.feature .eyebrow { color: var(--muted); }
+.f-cta { font-weight: 700; display: inline-flex; gap: 6px; }
+.feature:hover .f-cta { letter-spacing: 0; color: var(--primary-hover); }
+
+/* ---------- notes ---------- */
+.subject-tabs button { border-radius: 8px; font-weight: 600; }
+.subject-tabs button.active { box-shadow: none; }
+.side { border-radius: var(--radius); }
+.topic-list li a { border-radius: 6px; }
+.topic-list li a.active { background: transparent; box-shadow: inset 3px 0 0 var(--c); border-radius: 0 6px 6px 0; }
+.topic-banner { border-radius: 14px; background: var(--ink); }
+.topic-banner::after { display: none; }
+.topic-banner { box-shadow: inset 6px 0 0 var(--c); }
+.topic-big-num { color: var(--c); opacity: 1; font-weight: 900; letter-spacing: -.05em; }
+.subject-hero { border-radius: 14px; background: var(--ink); box-shadow: inset 6px 0 0 var(--c); }
+.tabs { border-radius: 10px; }
+.tabs button { border-radius: 6px; }
+.callout { border-radius: 10px; }
+.callout::before { width: 3px; }
+.jumpbar, .jump { border-radius: 8px; }
+.fn-head { background: var(--ink); box-shadow: inset 4px 0 0 var(--mark); }
+.fn-bar { border-radius: 6px; }
+
+/* ---------- motion: shorter, calmer ---------- */
+.rv.in { transition-duration: .5s, .6s; transition-timing-function: ease-out, var(--ease); }
+.rv { transform: translateY(10px); }
+#app { animation-duration: .35s; }
+.f-icon, .sc-mono { transition: background .25s, color .25s, border-color .25s; }
+
+/* the seventh feature becomes a full-width ink strip instead of an orphan card */
+@media (min-width: 700px) {
+  .feature:last-child { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto auto; column-gap: 20px; align-items: center; background: var(--ink); color: var(--on-ink); border-color: transparent; }
+  .feature:last-child .f-icon { grid-column: 1; grid-row: 1 / span 3; margin: 0; border-color: rgba(255, 255, 255, .2); color: var(--mark); }
+  .feature:last-child .eyebrow, .feature:last-child h3 { grid-column: 2; }
+  .feature:last-child .eyebrow { color: rgba(255, 255, 255, .55); }
+  .feature:last-child h3 { color: #FFFFFF; }
+  .feature:last-child p { grid-column: 2; color: var(--on-ink-muted); }
+  .feature:last-child .f-cta { grid-column: 3; grid-row: 1 / span 3; color: var(--mark); margin: 0; }
+  .feature:last-child:hover { color: var(--on-ink); }
+}
+
+/* layout fix shared by every try: cards inside a grid never take the stacked-card top margin
+   (today the 2nd+ subject and feature cards, and the game panel cards, sit 16px lower than the first) */
+.subject-grid > .card + .card, .features > .card + .card, .game-panel > .card + .card, [class*="grid"] > .card + .card { margin-top: 0; }
